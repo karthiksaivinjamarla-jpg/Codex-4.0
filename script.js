@@ -1,8 +1,3 @@
-/**
- * CODEX 4.0 - Registration Frontend
- * Netlify frontend -> Google Apps Script backend
- */
-
 const CONFIG = {
     API_URL: "https://script.google.com/macros/s/AKfycbwqbA-ujJmA0dHwx9z8YY9fuk86DdjkpxU-y0m1sZ9fvNBLc4qHa1apQEiy23hVOfkBKQ/exec",
 
@@ -15,6 +10,8 @@ const CONFIG = {
     MAX_FILE_SIZE: 10 * 1024 * 1024
 };
 
+let currentStep = 1;
+
 document.addEventListener("DOMContentLoaded", () => {
     const qr = document.getElementById("paymentQR");
     const fee = document.getElementById("displayFee");
@@ -23,417 +20,1166 @@ document.addEventListener("DOMContentLoaded", () => {
     if (fee) fee.innerText = `₹${CONFIG.PAYMENT_FEE} per team`;
 
     setupEventListeners();
+    setupStepNavigation();
+    updateTeamSizeUI();
+    showStep(1);
 });
 
-function setupEventListeners() {
-    const form = document.getElementById("registrationForm");
-    if (!form) return;
 
-    const teamSizeRadios = document.getElementsByName("teamSize");
-    const m3Section = document.getElementById("member3Section");
-    const m3Inputs = m3Section
-        ? m3Section.querySelectorAll("input, select")
-        : [];
+/* =========================================================
+   MULTI-STEP NAVIGATION
+   ========================================================= */
 
-    const receiptInput = document.getElementById("receipt");
-    const progressBar = document.getElementById("progressBar");
+function setupStepNavigation() {
 
-    teamSizeRadios.forEach(radio => {
-        radio.addEventListener("change", e => {
-            const isThree = e.target.value === "3";
+    const nextBtn = document.getElementById("nextBtn");
+    const backBtn = document.getElementById("backBtn");
 
-            if (m3Section) {
-                m3Section.classList.toggle("hidden", !isThree);
+    if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+
+            if (currentStep === 5) return;
+
+            if (!validateCurrentStep()) return;
+
+            const next = getNextStep(currentStep);
+
+            if (next) {
+                showStep(next);
             }
-
-            m3Inputs.forEach(input => {
-                if (isThree) {
-                    input.setAttribute("required", "");
-                } else {
-                    input.removeAttribute("required");
-                    input.setCustomValidity("");
-                }
-            });
-
-            if (progressBar) {
-                progressBar.style.width = isThree ? "66%" : "33%";
-            }
-        });
-    });
-
-    if (receiptInput) {
-        receiptInput.addEventListener("change", e => {
-            const file = e.target.files[0];
-            const info = document.getElementById("fileInfo");
-
-            if (!file) {
-                if (info) info.innerText = "No file selected (Max 10MB)";
-                return;
-            }
-
-            const allowedTypes = [
-                "image/jpeg",
-                "image/png",
-                "application/pdf"
-            ];
-
-            if (!allowedTypes.includes(file.type)) {
-                e.target.value = "";
-                if (info) {
-                    info.innerText = "Invalid file type. Use JPG, PNG or PDF.";
-                }
-                showStatus("Please upload a JPG, PNG or PDF payment receipt.", true);
-                return;
-            }
-
-            if (file.size > CONFIG.MAX_FILE_SIZE) {
-                e.target.value = "";
-                if (info) info.innerText = "No file selected (Max 10MB)";
-                showStatus("Payment receipt must be 10MB or smaller.", true);
-                return;
-            }
-
-            if (info) {
-                info.innerText =
-                    `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-            }
-
-            clearStatus();
         });
     }
 
-    form.addEventListener("submit", async e => {
-        e.preventDefault();
-        clearStatus();
+    if (backBtn) {
+        backBtn.addEventListener("click", () => {
 
-        if (!validateForm(form)) return;
+            if (currentStep === 1) return;
 
-        const submitBtn = document.getElementById("submitBtn");
-        const statusMsg = document.getElementById("statusMessage");
+            const previous = getPreviousStep(currentStep);
 
-        submitBtn.disabled = true;
-        submitBtn.innerText = "Submitting Registration...";
-
-        statusMsg.classList.remove("hidden");
-        statusMsg.innerText = "Uploading registration and payment receipt...";
-
-        try {
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-
-            data.payAmount = String(CONFIG.PAYMENT_FEE);
-            data.submissionToken = createToken();
-
-            const file = receiptInput.files[0];
-
-            if (!file) {
-                throw new Error("Payment receipt is required.");
+            if (previous) {
+                showStep(previous);
             }
-
-            data.receiptBase64 = await convertFileToBase64(file);
-            data.receiptType = file.type;
-            data.receiptName = file.name;
-
-            if (progressBar) {
-                progressBar.style.width = "100%";
-            }
-
-            await fetch(CONFIG.API_URL, {
-                method: "POST",
-                mode: "no-cors",
-                cache: "no-cache",
-                body: JSON.stringify(data)
-            });
-
-            statusMsg.innerText =
-                "Registration received. Confirming your Registration ID...";
-
-            const registrationId =
-                await pollForRegistrationId(data.submissionToken);
-
-            showSuccess(registrationId);
-
-        } catch (error) {
-            console.error("Submission error:", error);
-
-            showStatus(
-                error.message || "Something went wrong. Please try again.",
-                true
-            );
-
-            submitBtn.disabled = false;
-            submitBtn.innerText = "Submit Registration";
-        }
-    });
+        });
+    }
 }
 
-function validateForm(form) {
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return false;
+
+function getNextStep(step) {
+
+    const teamSize = getTeamSize();
+
+    if (step === 1) return 2;
+
+    if (step === 2) return 3;
+
+    if (step === 3) {
+        return teamSize === "3" ? 4 : 5;
     }
 
-    const teamSize =
-        document.querySelector('input[name="teamSize"]:checked')?.value;
+    if (step === 4) return 5;
 
-    if (!["2", "3"].includes(teamSize)) {
-        showStatus("Please select a team size of 2 or 3.", true);
-        return false;
+    return null;
+}
+
+
+function getPreviousStep(step) {
+
+    const teamSize = getTeamSize();
+
+    if (step === 5) {
+        return teamSize === "3" ? 4 : 3;
     }
 
-    const years = [];
+    if (step === 4) return 3;
 
-    const m1Year = document.querySelector('[name="m1_year"]');
-    const m2Year = document.querySelector('[name="m2_year"]');
+    if (step === 3) return 2;
 
-    if (m1Year) years.push(m1Year.value);
-    if (m2Year) years.push(m2Year.value);
+    if (step === 2) return 1;
 
-    if (teamSize === "3") {
-        const m3Year = document.querySelector('[name="m3_year"]');
-        if (m3Year) years.push(m3Year.value);
+    return null;
+}
+
+
+/* =========================================================
+   SHOW STEP
+   ========================================================= */
+
+function showStep(step) {
+
+    const teamSize = getTeamSize();
+
+    if (step === 4 && teamSize !== "3") {
+        step = 5;
     }
 
-    const allowedYears = ["2nd Year", "3rd Year", "4th Year"];
+    currentStep = step;
 
-    if (years.some(year => !allowedYears.includes(year))) {
-        showStatus(
-            "Only 2nd Year, 3rd Year and 4th Year students are allowed.",
-            true
+    const panels = document.querySelectorAll(".form-step");
+
+    panels.forEach(panel => {
+
+        const panelStep = Number(panel.dataset.panel);
+
+        panel.classList.toggle(
+            "active",
+            panelStep === currentStep
         );
-        return false;
-    }
+    });
 
-    const fourthYearCount =
-        years.filter(year => year === "4th Year").length;
 
-    if (fourthYearCount > 1) {
-        showStatus(
-            "A team can have a maximum of one 4th-year student.",
-            true
+    /* Stepper */
+
+    const stepButtons =
+        document.querySelectorAll(".stepper .step");
+
+    stepButtons.forEach(button => {
+
+        const buttonStep =
+            Number(button.dataset.step);
+
+        button.classList.toggle(
+            "active",
+            buttonStep === currentStep
         );
-        return false;
-    }
 
-    const phones = [];
-    const emails = [];
-    const memberCount = teamSize === "3" ? 3 : 2;
-
-    for (let i = 1; i <= memberCount; i++) {
-        const phoneElement =
-            document.querySelector(`[name="m${i}_phone"]`);
-
-        const emailElement =
-            document.querySelector(`[name="m${i}_email"]`);
-
-        if (!phoneElement || !emailElement) {
-            showStatus(`Member ${i} details are missing.`, true);
-            return false;
-        }
-
-        const phone = phoneElement.value.trim();
-        const email = emailElement.value.trim().toLowerCase();
-
-        if (!/^[0-9]{10}$/.test(phone)) {
-            showStatus(
-                `Member ${i}: please enter a valid 10-digit mobile number.`,
-                true
-            );
-            return false;
-        }
-
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            showStatus(
-                `Member ${i}: please enter a valid email address.`,
-                true
-            );
-            return false;
-        }
-
-        if (phones.includes(phone)) {
-            showStatus(
-                "Each team member must have a different mobile number.",
-                true
-            );
-            return false;
-        }
-
-        if (emails.includes(email)) {
-            showStatus(
-                "Each team member must have a different email ID.",
-                true
-            );
-            return false;
-        }
-
-        phones.push(phone);
-        emails.push(email);
-    }
-
-    const utrElement = document.querySelector('[name="utr"]');
-
-    if (!utrElement) {
-        showStatus("Payment transaction field is missing.", true);
-        return false;
-    }
-
-    const utr = utrElement.value.trim();
-
-    if (!/^[A-Za-z0-9]{8,30}$/.test(utr)) {
-        showStatus(
-            "Please enter a valid UPI Transaction ID / UTR (8–30 letters or numbers).",
-            true
+        button.classList.toggle(
+            "completed",
+            buttonStep < currentStep
         );
-        return false;
+
+        if (buttonStep === 4) {
+
+            button.classList.toggle(
+                "hidden",
+                teamSize !== "3"
+            );
+        }
+    });
+
+
+    /* Progress bar */
+
+    const progressBar =
+        document.getElementById("progressBar");
+
+    if (progressBar) {
+
+        const percentage =
+            (currentStep / 5) * 100;
+
+        progressBar.style.width =
+            `${percentage}%`;
     }
 
-    const file = document.getElementById("receipt")?.files[0];
 
-    if (!file) {
-        showStatus("Please upload your payment receipt.", true);
-        return false;
+    /* Buttons */
+
+    const backBtn =
+        document.getElementById("backBtn");
+
+    const nextBtn =
+        document.getElementById("nextBtn");
+
+    const submitBtn =
+        document.getElementById("submitBtn");
+
+
+    if (backBtn) {
+
+        backBtn.disabled =
+            currentStep === 1;
+
+        backBtn.style.visibility =
+            currentStep === 1
+                ? "hidden"
+                : "visible";
     }
 
-    const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "application/pdf"
-    ];
 
-    if (!allowedTypes.includes(file.type)) {
-        showStatus("Payment receipt must be JPG, PNG or PDF.", true);
-        return false;
+    if (nextBtn) {
+
+        nextBtn.classList.toggle(
+            "hidden",
+            currentStep === 5
+        );
     }
 
-    if (file.size > CONFIG.MAX_FILE_SIZE) {
-        showStatus("Payment receipt must be 10MB or smaller.", true);
-        return false;
+
+    if (submitBtn) {
+
+        submitBtn.classList.toggle(
+            "hidden",
+            currentStep !== 5
+        );
     }
+
+
+    clearStatus();
+}
+
+
+/* =========================================================
+   CURRENT STEP VALIDATION
+   ========================================================= */
+
+function validateCurrentStep() {
+
+    clearStatus();
+
+    const panel =
+        document.querySelector(
+            `.form-step[data-panel="${currentStep}"]`
+        );
+
+    if (!panel) return true;
+
+
+    const teamSize = getTeamSize();
+
+
+    if (currentStep === 4 &&
+        teamSize !== "3") {
+
+        return true;
+    }
+
+
+    const requiredFields =
+        panel.querySelectorAll(
+            "input[required], select[required], textarea[required]"
+        );
+
+
+    for (const field of requiredFields) {
+
+        if (!field.checkValidity()) {
+
+            field.reportValidity();
+            field.focus();
+
+            return false;
+        }
+    }
+
+
+    /* Team Details */
+
+    if (currentStep === 1) {
+
+        const teamName =
+            document.querySelector(
+                '[name="teamName"]'
+            );
+
+        const collegeName =
+            document.querySelector(
+                '[name="collegeName"]'
+            );
+
+
+        if (!teamName?.value.trim()) {
+
+            showStatus(
+                "Please enter your team name.",
+                true
+            );
+
+            teamName?.focus();
+
+            return false;
+        }
+
+
+        if (!collegeName?.value.trim()) {
+
+            showStatus(
+                "Please enter your college name.",
+                true
+            );
+
+            collegeName?.focus();
+
+            return false;
+        }
+    }
+
+
+    /* Member validation */
+
+    if (currentStep >= 2 &&
+        currentStep <= 4) {
+
+        const memberNumber =
+            currentStep - 1;
+
+        return validateMember(memberNumber);
+    }
+
 
     return true;
 }
 
-function createToken() {
-    if (window.crypto && window.crypto.getRandomValues) {
-        const bytes = new Uint8Array(18);
-        window.crypto.getRandomValues(bytes);
 
-        return Array.from(
-            bytes,
-            b => b.toString(16).padStart(2, "0")
-        ).join("");
+/* =========================================================
+   MEMBER VALIDATION
+   ========================================================= */
+
+function validateMember(number) {
+
+    const name =
+        document.querySelector(
+            `[name="m${number}_name"]`
+        );
+
+    const roll =
+        document.querySelector(
+            `[name="m${number}_roll"]`
+        );
+
+    const email =
+        document.querySelector(
+            `[name="m${number}_email"]`
+        );
+
+    const phone =
+        document.querySelector(
+            `[name="m${number}_phone"]`
+        );
+
+    const year =
+        document.querySelector(
+            `[name="m${number}_year"]`
+        );
+
+    const branch =
+        document.querySelector(
+            `[name="m${number}_branch"]`
+        );
+
+    const section =
+        document.querySelector(
+            `[name="m${number}_section"]`
+        );
+
+
+    const fields = [
+        name,
+        roll,
+        email,
+        phone,
+        year,
+        branch,
+        section
+    ];
+
+
+    for (const field of fields) {
+
+        if (!field ||
+            !field.value.trim()) {
+
+            field?.reportValidity();
+            field?.focus();
+
+            return false;
+        }
     }
 
-    return `${Date.now()}${Math.random().toString(36).slice(2)}`;
+
+    if (!/^[0-9]{10}$/.test(
+        phone.value.trim()
+    )) {
+
+        showStatus(
+            `Member ${number}: please enter a valid 10-digit mobile number.`,
+            true
+        );
+
+        phone.focus();
+
+        return false;
+    }
+
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        email.value.trim()
+    )) {
+
+        showStatus(
+            `Member ${number}: please enter a valid email address.`,
+            true
+        );
+
+        email.focus();
+
+        return false;
+    }
+
+
+    const allowedYears = [
+        "2nd Year",
+        "3rd Year",
+        "4th Year"
+    ];
+
+
+    if (!allowedYears.includes(
+        year.value
+    )) {
+
+        showStatus(
+            `Member ${number}: select 2nd Year, 3rd Year or 4th Year.`,
+            true
+        );
+
+        year.focus();
+
+        return false;
+    }
+
+
+    return true;
 }
 
-/*
- * Looks up the ID saved by Apps Script.
- * The backend now stores Submission Token and exposes
- * getRegistrationId as JSONP, so this works cross-origin.
- */
-function pollForRegistrationId(token, attempts = 20) {
-    return new Promise((resolve, reject) => {
-        let count = 0;
 
-        const check = () => {
-            count++;
+/* =========================================================
+   TEAM SIZE
+   ========================================================= */
 
-            const callbackName =
-                `codexCallback_${Date.now()}_${Math.random()
-                    .toString(36)
-                    .slice(2)}`;
+function getTeamSize() {
 
-            const script = document.createElement("script");
-            let finished = false;
+    return document.querySelector(
+        'input[name="teamSize"]:checked'
+    )?.value || "2";
+}
 
-            const cleanup = () => {
-                delete window[callbackName];
-                script.remove();
-            };
 
-            window[callbackName] = result => {
-                if (finished) return;
+function updateTeamSizeUI() {
 
-                finished = true;
-                cleanup();
+    const teamSize =
+        getTeamSize();
 
-                if (result?.success && result.registrationId) {
-                    resolve(result.registrationId);
+    const m3Section =
+        document.getElementById(
+            "member3Section"
+        );
+
+    const member3Step =
+        document.getElementById(
+            "member3Step"
+        );
+
+
+    if (m3Section) {
+
+        m3Section.classList.toggle(
+            "hidden",
+            teamSize !== "3"
+        );
+    }
+
+
+    if (member3Step) {
+
+        member3Step.classList.toggle(
+            "hidden",
+            teamSize !== "3"
+        );
+    }
+}
+
+
+/* =========================================================
+   EVENT LISTENERS
+   ========================================================= */
+
+function setupEventListeners() {
+
+    const form =
+        document.getElementById(
+            "registrationForm"
+        );
+
+    if (!form) return;
+
+
+    const teamSizeRadios =
+        document.getElementsByName(
+            "teamSize"
+        );
+
+
+    const m3Section =
+        document.getElementById(
+            "member3Section"
+        );
+
+
+    const m3Inputs =
+        m3Section
+            ? m3Section.querySelectorAll(
+                "input, select"
+            )
+            : [];
+
+
+    const receiptInput =
+        document.getElementById(
+            "receipt"
+        );
+
+
+    /* Team size */
+
+    teamSizeRadios.forEach(radio => {
+
+        radio.addEventListener(
+            "change",
+            e => {
+
+                const isThree =
+                    e.target.value === "3";
+
+
+                if (m3Section) {
+
+                    m3Section.classList.toggle(
+                        "hidden",
+                        !isThree
+                    );
+                }
+
+
+                m3Inputs.forEach(input => {
+
+                    if (isThree) {
+
+                        input.setAttribute(
+                            "required",
+                            ""
+                        );
+
+                    } else {
+
+                        input.removeAttribute(
+                            "required"
+                        );
+
+                        input.setCustomValidity("");
+                    }
+                });
+
+
+                updateTeamSizeUI();
+            }
+        );
+    });
+
+
+    /* Receipt */
+
+    if (receiptInput) {
+
+        receiptInput.addEventListener(
+            "change",
+            e => {
+
+                const file =
+                    e.target.files[0];
+
+                const info =
+                    document.getElementById(
+                        "fileInfo"
+                    );
+
+
+                if (!file) {
+
+                    if (info) {
+
+                        info.innerText =
+                            "No file selected (Max 10MB)";
+                    }
+
                     return;
                 }
 
-                if (count < attempts) {
-                    setTimeout(check, 1000);
-                } else {
-                    reject(
-                        new Error(
-                            "Registration was submitted, but the Registration ID could not be confirmed. Please contact the organizers with your submission time."
-                        )
+
+                const allowedTypes = [
+                    "image/jpeg",
+                    "image/png",
+                    "application/pdf"
+                ];
+
+
+                if (!allowedTypes.includes(
+                    file.type
+                )) {
+
+                    e.target.value = "";
+
+                    if (info) {
+
+                        info.innerText =
+                            "Invalid file type. Use JPG, PNG or PDF.";
+                    }
+
+                    showStatus(
+                        "Please upload a JPG, PNG or PDF payment receipt.",
+                        true
+                    );
+
+                    return;
+                }
+
+
+                if (file.size >
+                    CONFIG.MAX_FILE_SIZE) {
+
+                    e.target.value = "";
+
+                    if (info) {
+
+                        info.innerText =
+                            "No file selected (Max 10MB)";
+                    }
+
+                    showStatus(
+                        "Payment receipt must be 10MB or smaller.",
+                        true
+                    );
+
+                    return;
+                }
+
+
+                if (info) {
+
+                    info.innerText =
+                        `Selected: ${file.name} ` +
+                        `(${(
+                            file.size /
+                            1024 /
+                            1024
+                        ).toFixed(2)} MB)`;
+                }
+
+
+                clearStatus();
+            }
+        );
+    }
+
+
+    /* FINAL SUBMIT */
+
+    form.addEventListener(
+        "submit",
+        async e => {
+
+            e.preventDefault();
+
+            clearStatus();
+
+
+            if (!validateAllSteps()) {
+                return;
+            }
+
+
+            const submitBtn =
+                document.getElementById(
+                    "submitBtn"
+                );
+
+            const nextBtn =
+                document.getElementById(
+                    "nextBtn"
+                );
+
+            const backBtn =
+                document.getElementById(
+                    "backBtn"
+                );
+
+            const statusMsg =
+                document.getElementById(
+                    "statusMessage"
+                );
+
+
+            submitBtn.disabled = true;
+
+            if (nextBtn)
+                nextBtn.disabled = true;
+
+            if (backBtn)
+                backBtn.disabled = true;
+
+
+            submitBtn.innerText =
+                "Submitting Registration...";
+
+
+            statusMsg.classList.remove(
+                "hidden"
+            );
+
+            statusMsg.innerText =
+                "Uploading registration and payment receipt...";
+
+
+            try {
+
+                const formData =
+                    new FormData(form);
+
+
+                const data =
+                    Object.fromEntries(
+                        formData.entries()
+                    );
+
+
+                data.payAmount =
+                    String(CONFIG.PAYMENT_FEE);
+
+
+                data.submissionToken =
+                    createToken();
+
+
+                const file =
+                    receiptInput?.files[0];
+
+
+                if (!file) {
+
+                    throw new Error(
+                        "Payment receipt is required."
                     );
                 }
-            };
 
-            script.onerror = () => {
-                if (finished) return;
 
-                finished = true;
-                cleanup();
-
-                if (count < attempts) {
-                    setTimeout(check, 1000);
-                } else {
-                    reject(
-                        new Error(
-                            "Unable to confirm Registration ID. Please contact the organizers."
-                        )
+                data.receiptBase64 =
+                    await convertFileToBase64(
+                        file
                     );
-                }
-            };
 
-            script.src =
-                `${CONFIG.API_URL}?action=getRegistrationId` +
-                `&token=${encodeURIComponent(token)}` +
-                `&callback=${encodeURIComponent(callbackName)}` +
-                `&_=${Date.now()}`;
 
-            document.body.appendChild(script);
-        };
+                data.receiptType =
+                    file.type;
 
-        check();
-    });
+
+                data.receiptName =
+                    file.name;
+
+
+                await fetch(
+                    CONFIG.API_URL,
+                    {
+                        method: "POST",
+                        mode: "no-cors",
+                        cache: "no-cache",
+                        body: JSON.stringify(
+                            data
+                        )
+                    }
+                );
+
+
+                statusMsg.innerText =
+                    "Registration received. Confirming your Registration ID...";
+
+
+                const registrationId =
+                    await pollForRegistrationId(
+                        data.submissionToken
+                    );
+
+
+                showSuccess(
+                    registrationId
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Submission error:",
+                    error
+                );
+
+
+                showStatus(
+                    error.message ||
+                    "Something went wrong. Please try again.",
+                    true
+                );
+
+
+                submitBtn.disabled =
+                    false;
+
+
+                submitBtn.innerText =
+                    "Submit Registration";
+
+
+                if (nextBtn)
+                    nextBtn.disabled = false;
+
+                if (backBtn)
+                    backBtn.disabled = false;
+            }
+        }
+    );
 }
+
+
+/* =========================================================
+   VALIDATE ALL STEPS
+   ========================================================= */
+
+function validateAllSteps() {
+
+    const teamSize =
+        getTeamSize();
+
+
+    const steps =
+        teamSize === "3"
+            ? [1, 2, 3, 4]
+            : [1, 2, 3];
+
+
+    for (const step of steps) {
+
+        currentStep = step;
+
+
+        if (!validateCurrentStep()) {
+
+            showStep(step);
+
+            return false;
+        }
+    }
+
+
+    showStep(5);
+
+
+    const utr =
+        document.querySelector(
+            '[name="utr"]'
+        );
+
+
+    const file =
+        document.getElementById(
+            "receipt"
+        )?.files[0];
+
+
+    if (!utr ||
+        !/^[A-Za-z0-9]{8,30}$/.test(
+            utr.value.trim()
+        )) {
+
+        showStatus(
+            "Please enter a valid UPI Transaction ID / UTR.",
+            true
+        );
+
+        utr?.focus();
+
+        return false;
+    }
+
+
+    if (!file) {
+
+        showStatus(
+            "Please upload your payment receipt.",
+            true
+        );
+
+        return false;
+    }
+
+
+    if (file.size >
+        CONFIG.MAX_FILE_SIZE) {
+
+        showStatus(
+            "Payment receipt must be 10MB or smaller.",
+            true
+        );
+
+        return false;
+    }
+
+
+    return true;
+}
+
+
+/* =========================================================
+   REGISTRATION ID
+   ========================================================= */
+
+function createToken() {
+
+    if (
+        window.crypto &&
+        window.crypto.getRandomValues
+    ) {
+
+        const bytes =
+            new Uint8Array(18);
+
+
+        window.crypto.getRandomValues(
+            bytes
+        );
+
+
+        return Array.from(
+            bytes,
+            b =>
+                b.toString(16)
+                 .padStart(2, "0")
+        ).join("");
+    }
+
+
+    return `${Date.now()}${Math.random()
+        .toString(36)
+        .slice(2)}`;
+}
+
+
+function pollForRegistrationId(
+    token,
+    attempts = 20
+) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            let count = 0;
+
+
+            const check = () => {
+
+                count++;
+
+
+                const callbackName =
+                    `codexCallback_${Date.now()}_${Math.random()
+                        .toString(36)
+                        .slice(2)}`;
+
+
+                const script =
+                    document.createElement(
+                        "script"
+                    );
+
+
+                let finished = false;
+
+
+                const cleanup = () => {
+
+                    delete window[
+                        callbackName
+                    ];
+
+                    script.remove();
+                };
+
+
+                window[
+                    callbackName
+                ] = result => {
+
+                    if (finished)
+                        return;
+
+
+                    finished = true;
+
+                    cleanup();
+
+
+                    if (
+                        result?.success &&
+                        result.registrationId
+                    ) {
+
+                        resolve(
+                            result.registrationId
+                        );
+
+                        return;
+                    }
+
+
+                    if (count < attempts) {
+
+                        setTimeout(
+                            check,
+                            1000
+                        );
+
+                    } else {
+
+                        reject(
+                            new Error(
+                                "Registration was submitted, but the Registration ID could not be confirmed. Please contact the organizers."
+                            )
+                        );
+                    }
+                };
+
+
+                script.onerror = () => {
+
+                    if (finished)
+                        return;
+
+
+                    finished = true;
+
+                    cleanup();
+
+
+                    if (count < attempts) {
+
+                        setTimeout(
+                            check,
+                            1000
+                        );
+
+                    } else {
+
+                        reject(
+                            new Error(
+                                "Unable to confirm Registration ID. Please contact the organizers."
+                            )
+                        );
+                    }
+                };
+
+
+                script.src =
+                    `${CONFIG.API_URL}?action=getRegistrationId` +
+                    `&token=${encodeURIComponent(token)}` +
+                    `&callback=${encodeURIComponent(callbackName)}` +
+                    `&_=${Date.now()}`;
+
+
+                document.body.appendChild(
+                    script
+                );
+            };
+
+
+            check();
+        }
+    );
+}
+
+
+/* =========================================================
+   FILE
+   ========================================================= */
 
 function convertFileToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
 
-        reader.readAsDataURL(file);
+    return new Promise(
+        (resolve, reject) => {
 
-        reader.onload = () => {
-            resolve(reader.result.split(",")[1]);
-        };
+            const reader =
+                new FileReader();
 
-        reader.onerror = reject;
-    });
+
+            reader.readAsDataURL(
+                file
+            );
+
+
+            reader.onload = () => {
+
+                resolve(
+                    reader.result.split(
+                        ","
+                    )[1]
+                );
+            };
+
+
+            reader.onerror =
+                reject;
+        }
+    );
 }
 
-function showSuccess(registrationId) {
-    document
-        .getElementById("registrationForm")
-        .classList.add("hidden");
+
+/* =========================================================
+   SUCCESS
+   ========================================================= */
+
+function showSuccess(
+    registrationId
+) {
 
     document
-        .querySelector(".progress-container")
-        ?.classList.add("hidden");
+        .getElementById(
+            "registrationForm"
+        )
+        .classList.add(
+            "hidden"
+        );
+
 
     document
-        .getElementById("successScreen")
-        .classList.remove("hidden");
+        .querySelector(
+            ".stepper"
+        )
+        ?.classList.add(
+            "hidden"
+        );
+
 
     document
-        .getElementById("displayRegID")
-        .innerText = registrationId;
+        .querySelector(
+            ".progress-track"
+        )
+        ?.classList.add(
+            "hidden"
+        );
+
+
+    document
+        .getElementById(
+            "successScreen"
+        )
+        .classList.remove(
+            "hidden"
+        );
+
+
+    document
+        .getElementById(
+            "displayRegID"
+        )
+        .innerText =
+        registrationId;
+
 
     window.scrollTo({
         top: 0,
@@ -441,14 +1187,39 @@ function showSuccess(registrationId) {
     });
 }
 
-function showStatus(message, isError = false) {
-    const status = document.getElementById("statusMessage");
 
-    status.classList.remove("hidden");
-    status.innerText = message;
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+function showStatus(
+    message,
+    isError = false
+) {
+
+    const status =
+        document.getElementById(
+            "statusMessage"
+        );
+
+
+    if (!status) return;
+
+
+    status.classList.remove(
+        "hidden"
+    );
+
+
+    status.innerText =
+        message;
+
 
     status.style.color =
-        isError ? "var(--error)" : "var(--text-muted)";
+        isError
+            ? "var(--error)"
+            : "var(--text-muted)";
+
 
     status.scrollIntoView({
         behavior: "smooth",
@@ -456,9 +1227,22 @@ function showStatus(message, isError = false) {
     });
 }
 
-function clearStatus() {
-    const status = document.getElementById("statusMessage");
 
-    status.classList.add("hidden");
+function clearStatus() {
+
+    const status =
+        document.getElementById(
+            "statusMessage"
+        );
+
+
+    if (!status) return;
+
+
+    status.classList.add(
+        "hidden"
+    );
+
+
     status.innerText = "";
 }
