@@ -4,7 +4,7 @@
  */
 
 const CONFIG = {
-    API_URL: "https://script.google.com/macros/s/AKfycbz_1QzFyPz82upcA8OYMuBLy36iMaKhKd5kFfAIPf6FlcTnbCBiFs2lDg6IdCPBCSVqfQ/exec",
+    API_URL: "https://script.google.com/macros/s/AKfycbwqbA-ujJmA0dHwx9z8YY9fuk86DdjkpxU-y0m1sZ9fvNBLc4qHa1apQEiy23hVOfkBKQ/exec",
 
     QR_IMAGE_URL: "https://raw.githubusercontent.com/karthiksaivinjamarla-jpg/Codex-4.0/main/codex-payment-qr.png",
 
