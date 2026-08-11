@@ -16,7 +16,7 @@ const CONFIG = {
 
     // LOCAL PAYMENT QR
     QR_IMAGE_URL:
-        "./assets/codex-payment-qr.png",
+        "./codex-payment-qr.png",
 
 
     EVENT_NAME:
