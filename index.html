@@ -1,268 +1,1035 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>CODEX 4.0 | Inter-College Coding Event</title>
+
     <link rel="stylesheet" href="style.css">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
 
     <!-- Background Decoration -->
     <div class="bg-grid"></div>
     <div class="bg-gradient"></div>
 
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
     <header class="hero">
+
         <div class="container">
+
             <div class="hero-content">
-                <div class="badge">&lt; CODEX 4.0 /&gt;</div>
-                <h1>Inter-College Coding Event</h1>
-                <p class="subtitle">Bring your team, sharpen your logic, and compete with the best coding minds across colleges.</p>
-                
-                <div class="info-grid">
-                    <div class="info-card">
-                        <span class="label">Team Size</span>
-                        <span class="value">2–3 Members</span>
-                    </div>
-                    <div class="info-card">
-                        <span class="label">Format</span>
-                        <span class="value">Coding Challenge</span>
-                    </div>
-                    <div class="info-card">
-                        <span class="label">Organizer</span>
-                        <span class="value">Coders' Club</span>
-                    </div>
+
+                <div class="badge">
+                    &lt; CODEX 4.0 /&gt;
                 </div>
 
-                <a href="#register" class="btn-primary">Register Your Team</a>
+                <h1>
+                    Inter-College Coding Event
+                </h1>
+
+                <p class="subtitle">
+                    Bring your team, sharpen your logic,
+                    and compete with the best coding minds
+                    across colleges.
+                </p>
+
+
+                <div class="info-grid">
+
+                    <div class="info-card">
+                        <span class="label">
+                            Team Size
+                        </span>
+
+                        <span class="value">
+                            2–3 Members
+                        </span>
+                    </div>
+
+
+                    <div class="info-card">
+                        <span class="label">
+                            Format
+                        </span>
+
+                        <span class="value">
+                            Coding Challenge
+                        </span>
+                    </div>
+
+
+                    <div class="info-card">
+                        <span class="label">
+                            Organizer
+                        </span>
+
+                        <span class="value">
+                            Coders' Club
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <a
+                    href="#register"
+                    class="btn-primary"
+                >
+                    Register Your Team
+                </a>
+
             </div>
+
         </div>
+
     </header>
 
-    <main class="container" id="register">
-        <!-- Progress Indicator -->
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main
+        class="container"
+        id="register"
+    >
+
+
+        <!-- =================================================
+             PROGRESS
+        ================================================== -->
+
         <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
+
+            <div
+                class="progress-bar"
+                id="progressBar"
+            ></div>
+
             <div class="progress-steps">
-                <span class="step active">Team</span>
-                <span class="step">Members</span>
-                <span class="step">Payment</span>
+
+                <span class="step active">
+                    Team
+                </span>
+
+                <span class="step">
+                    Members
+                </span>
+
+                <span class="step">
+                    Payment
+                </span>
+
             </div>
+
         </div>
 
-        <form id="registrationForm" class="registration-card">
-            
-            <!-- SECTION 1: Team Details -->
-            <section class="form-section" id="section-team">
-                <h2 class="section-title">Team Details</h2>
+
+
+        <!-- =================================================
+             REGISTRATION FORM
+        ================================================== -->
+
+        <form
+            id="registrationForm"
+            class="registration-card"
+            novalidate
+        >
+
+
+            <!-- =============================================
+                 SECTION 1 — TEAM DETAILS
+            ============================================== -->
+
+            <section
+                class="form-section"
+                id="section-team"
+            >
+
+                <h2 class="section-title">
+                    Team Details
+                </h2>
+
+
                 <div class="form-group">
-                    <label for="teamName">Team Name *</label>
-                    <input type="text" id="teamName" name="teamName" placeholder="Enter a unique team name" required>
-                    <span class="error-msg">Please enter a team name.</span>
+
+                    <label for="teamName">
+                        Team Name *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="teamName"
+                        name="teamName"
+                        placeholder="Enter a unique team name"
+                        minlength="2"
+                        maxlength="50"
+                        required
+                    >
+
+                    <span class="error-msg">
+                        Please enter a team name.
+                    </span>
+
                 </div>
+
+
+
                 <div class="form-group">
-                    <label>Team Size *</label>
+
+                    <label>
+                        Team Size *
+                    </label>
+
                     <div class="radio-group">
+
                         <label class="radio-label">
-                            <input type="radio" name="teamSize" value="2" checked> 2 Members
+
+                            <input
+                                type="radio"
+                                name="teamSize"
+                                value="2"
+                                checked
+                            >
+
+                            2 Members
+
                         </label>
+
+
                         <label class="radio-label">
-                            <input type="radio" name="teamSize" value="3"> 3 Members
+
+                            <input
+                                type="radio"
+                                name="teamSize"
+                                value="3"
+                            >
+
+                            3 Members
+
                         </label>
+
                     </div>
+
                 </div>
+
+
+
                 <div class="form-group">
-                    <label for="collegeName">College Name *</label>
-                    <input type="text" id="collegeName" name="collegeName" placeholder="Full college name" required>
+
+                    <label for="collegeName">
+                        College Name *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="collegeName"
+                        name="collegeName"
+                        placeholder="Full college name"
+                        minlength="2"
+                        maxlength="150"
+                        required
+                    >
+
                 </div>
+
             </section>
 
-            <!-- SECTION 2: Member 1 (Leader) -->
+
+
+            <!-- =============================================
+                 SECTION 2 — MEMBER 1
+            ============================================== -->
+
             <section class="form-section">
-                <h2 class="section-title">Team Member 1 (Leader)</h2>
+
+                <h2 class="section-title">
+                    Team Member 1 (Leader)
+                </h2>
+
+
                 <div class="input-grid">
+
+
+                    <!-- FULL NAME -->
+
                     <div class="form-group">
-                        <label>Full Name *</label>
-                        <input type="text" name="m1_name" required>
+
+                        <label>
+                            Full Name *
+                        </label>
+
+                        <input
+                            type="text"
+                            name="m1_name"
+                            minlength="2"
+                            maxlength="80"
+                            required
+                        >
+
                     </div>
+
+
+
+                    <!-- ROLL -->
+
                     <div class="form-group">
-                        <label>Roll Number *</label>
-                        <input type="text" name="m1_roll" required>
+
+                        <label>
+                            Roll Number *
+                        </label>
+
+                        <input
+                            type="text"
+                            name="m1_roll"
+                            maxlength="30"
+                            required
+                        >
+
                     </div>
+
+
+
+                    <!-- EMAIL -->
+
                     <div class="form-group">
-                        <label>Email ID *</label>
-                        <input type="email" name="m1_email" required>
+
+                        <label>
+                            Email ID *
+                        </label>
+
+                        <input
+                            type="email"
+                            name="m1_email"
+                            maxlength="120"
+                            placeholder="example@email.com"
+                            required
+                        >
+
                     </div>
+
+
+
+                    <!-- MOBILE -->
+
                     <div class="form-group">
-                        <label>Mobile Number *</label>
-                        <input type="tel" name="m1_phone" pattern="[0-9]{10}" placeholder="10-digit number" required>
+
+                        <label>
+                            Mobile Number *
+                        </label>
+
+                        <input
+                            type="tel"
+                            name="m1_phone"
+                            pattern="[0-9]{10}"
+                            maxlength="10"
+                            inputmode="numeric"
+                            placeholder="10-digit number"
+                            required
+                        >
+
                     </div>
+
+
+
+                    <!-- YEAR -->
+
                     <div class="form-group">
-                        <label>Year of Study *</label>
-                        <select name="m1_year" required>
-                            <option value="">Select Year</option>
-                            <option>1st Year</option>
-                            <option>2nd Year</option>
-                            <option>3rd Year</option>
-                            <option>4th Year</option>
+
+                        <label>
+                            Year of Study *
+                        </label>
+
+                        <select
+                            name="m1_year"
+                            required
+                        >
+
+                            <option value="">
+                                Select Year
+                            </option>
+
+                            <option>
+                                2nd Year
+                            </option>
+
+                            <option>
+                                3rd Year
+                            </option>
+
+                            <option>
+                                4th Year
+                            </option>
+
                         </select>
+
                     </div>
+
+
+
+                    <!-- BRANCH -->
+
                     <div class="form-group">
-                        <label>Branch *</label>
-                        <input type="text" name="m1_branch" placeholder="e.g. CSE" required>
+
+                        <label>
+                            Branch *
+                        </label>
+
+                        <input
+                            type="text"
+                            name="m1_branch"
+                            placeholder="e.g. CSE"
+                            maxlength="50"
+                            required
+                        >
+
                     </div>
+
+
+
+                    <!-- SECTION -->
+
                     <div class="form-group">
-                        <label>Section *</label>
-                        <select name="m1_section" required>
-                            <option value="">Select Section</option>
-                            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+
+                        <label>
+                            Section *
+                        </label>
+
+                        <select
+                            name="m1_section"
+                            required
+                        >
+
+                            <option value="">
+                                Select Section
+                            </option>
+
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+
                         </select>
+
                     </div>
+
                 </div>
+
             </section>
 
-            <!-- SECTION 3: Member 2 -->
+
+
+            <!-- =============================================
+                 SECTION 3 — MEMBER 2
+            ============================================== -->
+
             <section class="form-section">
-                <h2 class="section-title">Team Member 2</h2>
+
+                <h2 class="section-title">
+                    Team Member 2
+                </h2>
+
+
                 <div class="input-grid">
+
+
                     <div class="form-group">
-                        <label>Full Name *</label>
-                        <input type="text" name="m2_name" required>
+
+                        <label>
+                            Full Name *
+                        </label>
+
+                        <input
+                            type="text"
+                            name="m2_name"
+                            minlength="2"
+                            maxlength="80"
+                            required
+                        >
+
                     </div>
+
+
+
                     <div class="form-group">
-                        <label>Roll Number *</label>
-                        <input type="text" name="m2_roll" required>
+
+                        <label>
+                            Roll Number *
+                        </label>
+
+                        <input
+                            type="text"
+                            name="m2_roll"
+                            maxlength="30"
+                            required
+                        >
+
                     </div>
+
+
+
                     <div class="form-group">
-                        <label>Email ID *</label>
-                        <input type="email" name="m2_email" required>
+
+                        <label>
+                            Email ID *
+                        </label>
+
+                        <input
+                            type="email"
+                            name="m2_email"
+                            maxlength="120"
+                            placeholder="example@email.com"
+                            required
+                        >
+
                     </div>
+
+
+
                     <div class="form-group">
-                        <label>Mobile Number *</label>
-                        <input type="tel" name="m2_phone" pattern="[0-9]{10}" required>
+
+                        <label>
+                            Mobile Number *
+                        </label>
+
+                        <input
+                            type="tel"
+                            name="m2_phone"
+                            pattern="[0-9]{10}"
+                            maxlength="10"
+                            inputmode="numeric"
+                            placeholder="10-digit number"
+                            required
+                        >
+
                     </div>
+
+
+
+                    <!-- NO 1ST YEAR -->
+
                     <div class="form-group">
-                        <label>Year of Study *</label>
-                        <select name="m2_year" required>
-                            <option value="">Select Year</option>
-                            <option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option>
+
+                        <label>
+                            Year of Study *
+                        </label>
+
+                        <select
+                            name="m2_year"
+                            required
+                        >
+
+                            <option value="">
+                                Select Year
+                            </option>
+
+                            <option>
+                                2nd Year
+                            </option>
+
+                            <option>
+                                3rd Year
+                            </option>
+
+                            <option>
+                                4th Year
+                            </option>
+
                         </select>
+
                     </div>
+
+
+
                     <div class="form-group">
-                        <label>Branch *</label>
-                        <input type="text" name="m2_branch" required>
+
+                        <label>
+                            Branch *
+                        </label>
+
+                        <input
+                            type="text"
+                            name="m2_branch"
+                            maxlength="50"
+                            required
+                        >
+
                     </div>
+
+
+
                     <div class="form-group">
-                        <label>Section *</label>
-                        <select name="m2_section" required>
-                            <option value="">Select Section</option>
-                            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+
+                        <label>
+                            Section *
+                        </label>
+
+                        <select
+                            name="m2_section"
+                            required
+                        >
+
+                            <option value="">
+                                Select Section
+                            </option>
+
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+
                         </select>
+
                     </div>
+
                 </div>
+
             </section>
 
-            <!-- SECTION 4: Member 3 (Initially Hidden) -->
-            <section class="form-section hidden" id="member3Section">
-                <h2 class="section-title">Team Member 3</h2>
+
+
+            <!-- =============================================
+                 SECTION 4 — MEMBER 3
+                 HIDDEN BY DEFAULT
+            ============================================== -->
+
+            <section
+                class="form-section hidden"
+                id="member3Section"
+            >
+
+                <h2 class="section-title">
+                    Team Member 3
+                </h2>
+
+
                 <div class="input-grid">
+
+
                     <div class="form-group">
-                        <label>Full Name *</label>
-                        <input type="text" name="m3_name">
+
+                        <label>
+                            Full Name *
+                        </label>
+
+                        <input
+                            type="text"
+                            name="m3_name"
+                            minlength="2"
+                            maxlength="80"
+                        >
+
                     </div>
+
+
+
                     <div class="form-group">
-                        <label>Roll Number *</label>
-                        <input type="text" name="m3_roll">
+
+                        <label>
+                            Roll Number *
+                        </label>
+
+                        <input
+                            type="text"
+                            name="m3_roll"
+                            maxlength="30"
+                        >
+
                     </div>
+
+
+
                     <div class="form-group">
-                        <label>Email ID *</label>
-                        <input type="email" name="m3_email">
+
+                        <label>
+                            Email ID *
+                        </label>
+
+                        <input
+                            type="email"
+                            name="m3_email"
+                            maxlength="120"
+                            placeholder="example@email.com"
+                        >
+
                     </div>
+
+
+
                     <div class="form-group">
-                        <label>Mobile Number *</label>
-                        <input type="tel" name="m3_phone" pattern="[0-9]{10}">
+
+                        <label>
+                            Mobile Number *
+                        </label>
+
+                        <input
+                            type="tel"
+                            name="m3_phone"
+                            pattern="[0-9]{10}"
+                            maxlength="10"
+                            inputmode="numeric"
+                            placeholder="10-digit number"
+                        >
+
                     </div>
+
+
+
+                    <!-- NO 1ST YEAR -->
+
                     <div class="form-group">
-                        <label>Year of Study *</label>
-                        <select name="m3_year">
-                            <option value="">Select Year</option>
-                            <option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option>
+
+                        <label>
+                            Year of Study *
+                        </label>
+
+                        <select
+                            name="m3_year"
+                        >
+
+                            <option value="">
+                                Select Year
+                            </option>
+
+                            <option>
+                                2nd Year
+                            </option>
+
+                            <option>
+                                3rd Year
+                            </option>
+
+                            <option>
+                                4th Year
+                            </option>
+
                         </select>
+
                     </div>
+
+
+
                     <div class="form-group">
-                        <label>Branch *</label>
-                        <input type="text" name="m3_branch">
+
+                        <label>
+                            Branch *
+                        </label>
+
+                        <input
+                            type="text"
+                            name="m3_branch"
+                            maxlength="50"
+                        >
+
                     </div>
+
+
+
                     <div class="form-group">
-                        <label>Section *</label>
-                        <select name="m3_section">
-                            <option value="">Select Section</option>
-                            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+
+                        <label>
+                            Section *
+                        </label>
+
+                        <select
+                            name="m3_section"
+                        >
+
+                            <option value="">
+                                Select Section
+                            </option>
+
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+
                         </select>
+
                     </div>
+
                 </div>
+
             </section>
 
-            <!-- SECTION 5: Payment -->
+
+
+            <!-- =============================================
+                 SECTION 5 — PAYMENT
+            ============================================== -->
+
             <section class="form-section payment-card">
-                <h2 class="section-title">Complete Your Registration</h2>
+
+                <h2 class="section-title">
+                    Complete Your Registration
+                </h2>
+
+
                 <div class="payment-content">
+
+
+                    <!-- QR -->
+
                     <div class="qr-container">
-                        <img id="paymentQR" src="" alt="Payment QR Code">
-                        <p class="fee-text" id="displayFee"></p>
+
+                        <img
+                            id="paymentQR"
+                            src=""
+                            alt="CODEX 4.0 Payment QR Code"
+                        >
+
+                        <p
+                            class="fee-text"
+                            id="displayFee"
+                        >
+                            ₹300 per team
+                        </p>
+
                     </div>
+
+
+
+                    <!-- PAYMENT FIELDS -->
+
                     <div class="payment-fields">
+
+
+                        <!-- FIXED AMOUNT -->
+
                         <div class="form-group">
-                            <label>Payment Amount (Paid) *</label>
-                            <input type="number" name="payAmount" placeholder="Amount entered during UPI" required>
-                        </div>
-                        <div class="form-group">
-                            <label>UPI Transaction ID / UTR *</label>
-                            <input type="text" name="utr" placeholder="12-digit transaction ID" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Upload Payment Receipt *</label>
-                            <div class="file-upload-wrapper">
-                                <input type="file" id="receipt" name="receipt" accept=".jpg,.jpeg,.png,.pdf" required>
-                                <div class="file-info" id="fileInfo">No file selected (Max 10MB)</div>
+
+                            <label>
+                                Registration Fee
+                            </label>
+
+                            <div
+                                class="fixed-payment-amount"
+                                id="fixedPaymentAmount"
+                            >
+                                ₹300 per team
                             </div>
-                            <small class="note">Please upload a clear screenshot of your successful payment.</small>
+
+                            <small class="note">
+                                The registration fee is fixed at ₹300 per team.
+                            </small>
+
                         </div>
+
+
+
+                        <!-- UTR -->
+
+                        <div class="form-group">
+
+                            <label for="utr">
+                                UPI Transaction ID / UTR *
+                            </label>
+
+                            <input
+                                type="text"
+                                id="utr"
+                                name="utr"
+                                placeholder="Enter UPI transaction ID / UTR"
+                                minlength="8"
+                                maxlength="30"
+                                pattern="[A-Za-z0-9]{8,30}"
+                                autocomplete="off"
+                                required
+                            >
+
+                            <small class="note">
+                                Enter the transaction/reference number shown after your payment.
+                            </small>
+
+                        </div>
+
+
+
+                        <!-- RECEIPT -->
+
+                        <div class="form-group">
+
+                            <label for="receipt">
+                                Upload Payment Receipt *
+                            </label>
+
+
+                            <div class="file-upload-wrapper">
+
+                                <input
+                                    type="file"
+                                    id="receipt"
+                                    name="receipt"
+                                    accept=".jpg,.jpeg,.png,.pdf"
+                                    required
+                                >
+
+
+                                <div
+                                    class="file-info"
+                                    id="fileInfo"
+                                >
+                                    No file selected (Max 10MB)
+                                </div>
+
+                            </div>
+
+
+                            <small class="note">
+                                Upload a clear payment receipt.
+                                Accepted: JPG, PNG or PDF.
+                            </small>
+
+                        </div>
+
                     </div>
+
                 </div>
+
             </section>
+
+
+
+            <!-- =============================================
+                 SUBMIT
+            ============================================== -->
 
             <div class="form-actions">
-                <button type="submit" id="submitBtn" class="btn-submit">Submit Registration</button>
+
+                <button
+                    type="submit"
+                    id="submitBtn"
+                    class="btn-submit"
+                >
+                    Submit Registration
+                </button>
+
             </div>
-            <div id="statusMessage" class="status-message hidden"></div>
+
+
+            <!-- STATUS -->
+
+            <div
+                id="statusMessage"
+                class="status-message hidden"
+            ></div>
+
+
         </form>
 
-        <!-- Success View -->
-        <div id="successScreen" class="success-screen hidden">
-            <div class="success-icon">✓</div>
-            <h2>Registration Successful</h2>
-            <p>Your CODEX 4.0 team registration has been submitted successfully.</p>
-            <div class="reg-id-box">
-                <span>Registration ID:</span>
-                <strong id="displayRegID">CODEX4-XXXX</strong>
+
+
+        <!-- =================================================
+             SUCCESS SCREEN
+        ================================================== -->
+
+        <div
+            id="successScreen"
+            class="success-screen hidden"
+        >
+
+            <div class="success-icon">
+                ✓
             </div>
-            <p class="note">Please save this Registration ID for future reference.</p>
-            <button onclick="window.location.reload()" class="btn-primary">Register Another Team</button>
+
+
+            <h2>
+                Registration Successful
+            </h2>
+
+
+            <p>
+                Your CODEX 4.0 team registration
+                has been submitted successfully.
+            </p>
+
+
+            <div class="reg-id-box">
+
+                <span>
+                    Registration ID:
+                </span>
+
+                <strong id="displayRegID">
+                    CODEX4-XXXX
+                </strong>
+
+            </div>
+
+
+            <p class="note">
+                Please save this Registration ID
+                for future reference.
+            </p>
+
+
+            <button
+                type="button"
+                onclick="window.location.reload()"
+                class="btn-primary"
+            >
+                Register Another Team
+            </button>
+
         </div>
+
     </main>
 
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
     <footer class="footer">
+
         <div class="container">
-            <p><strong>CODEX 4.0</strong></p>
-            <p>Inter-College Coding Event</p>
-            <p>Organized by Coders' Club</p>
+
+            <p>
+                <strong>
+                    CODEX 4.0
+                </strong>
+            </p>
+
+            <p>
+                Inter-College Coding Event
+            </p>
+
+            <p>
+                Organized by Coders' Club
+            </p>
+
         </div>
+
     </footer>
 
+
+
+    <!-- =====================================================
+         SCRIPT
+    ====================================================== -->
+
     <script src="script.js"></script>
+
 </body>
+
 </html>
