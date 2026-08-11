@@ -1,0 +1,181 @@
+:root {
+    --primary: #7c3aed;
+    --primary-hover: #6d28d9;
+    --bg-dark: #0f172a;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --error: #ef4444;
+    --success: #22c55e;
+    --border: #e2e8f0;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc;
+    color: var(--text-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+
+/* Visual Backgrounds */
+.bg-grid {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+    background-size: 30px 30px; opacity: 0.3; z-index: -1;
+}
+
+.bg-gradient {
+    position: fixed; top: -10%; right: -10%; width: 40%; height: 50%;
+    background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%);
+    z-index: -1;
+}
+
+/* Hero Section */
+.hero {
+    background: var(--bg-dark);
+    color: white;
+    padding: 80px 0;
+    text-align: center;
+    position: relative;
+    border-bottom: 4px solid var(--primary);
+}
+
+.badge {
+    font-family: 'Fira Code', monospace;
+    color: var(--primary);
+    background: rgba(124, 58, 237, 0.1);
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+h1 { font-size: 3rem; margin-bottom: 1rem; letter-spacing: -1px; }
+.subtitle { font-size: 1.2rem; color: #94a3b8; max-width: 600px; margin: 0 auto 40px; }
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.info-card {
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.info-card .label { display: block; font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; }
+.info-card .value { font-weight: 600; font-size: 1.1rem; }
+
+/* Form Progress */
+.progress-container { margin: -40px auto 40px; position: relative; z-index: 10; }
+.progress-bar { 
+    height: 6px; background: var(--primary); width: 33%; 
+    border-radius: 10px; transition: width 0.4s ease;
+}
+.progress-steps {
+    display: flex; justify-content: space-between; margin-top: 10px;
+}
+.step { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+.step.active { color: var(--primary); }
+
+/* Registration Form */
+.registration-card {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+    margin-bottom: 60px;
+}
+
+.form-section { margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 30px; }
+.form-section:last-of-type { border-bottom: none; }
+.section-title { font-size: 1.5rem; margin-bottom: 25px; display: flex; align-items: center; }
+
+.input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; }
+
+input, select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+}
+
+.radio-group { display: flex; gap: 20px; }
+.radio-label { display: flex; align-items: center; cursor: pointer; font-weight: 400 !important; }
+.radio-label input { width: auto; margin-right: 8px; }
+
+/* Payment Section */
+.payment-card { background: #f1f5f9; border-radius: 12px; padding: 30px; border: none; }
+.payment-content { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; }
+.qr-container { text-align: center; background: white; padding: 20px; border-radius: 12px; }
+#paymentQR { width: 100%; max-width: 200px; margin-bottom: 10px; }
+.fee-text { font-weight: 700; color: var(--primary); font-size: 1.2rem; }
+
+.file-upload-wrapper { position: relative; }
+#fileInfo { margin-top: 8px; font-size: 0.85rem; color: var(--text-muted); }
+
+/* Buttons */
+.btn-primary, .btn-submit {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-submit { width: 100%; font-size: 1.1rem; }
+.btn-primary:hover, .btn-submit:hover { background: var(--primary-hover); }
+.btn-submit:disabled { background: var(--text-muted); cursor: not-allowed; }
+
+/* State Management */
+.hidden { display: none; }
+.error-msg { color: var(--error); font-size: 0.8rem; display: none; margin-top: 5px; }
+.invalid input { border-color: var(--error); }
+.invalid .error-msg { display: block; }
+
+/* Success Screen */
+.success-screen { text-align: center; padding: 60px 20px; }
+.success-icon { 
+    width: 80px; height: 80px; background: var(--success); color: white; 
+    font-size: 40px; line-height: 80px; border-radius: 50%; margin: 0 auto 30px;
+}
+.reg-id-box { 
+    background: #f1f5f9; padding: 20px; border-radius: 12px; 
+    display: inline-block; margin: 25px 0; border: 2px dashed var(--primary);
+}
+.reg-id-box strong { font-size: 1.5rem; color: var(--primary); font-family: 'Fira Code', monospace; margin-left: 10px;}
+
+.footer { padding: 40px 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    h1 { font-size: 2.2rem; }
+    .input-grid, .payment-content { grid-template-columns: 1fr; }
+    .registration-card { padding: 20px; }
+}
