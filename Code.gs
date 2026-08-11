@@ -1,9 +1,6 @@
 /**
- * CODEX 4.0
- * Google Apps Script Backend
- *
- * Frontend: Netlify
- * Storage: Google Sheets + Google Drive
+ * CODEX 4.0 - Google Apps Script Backend
+ * Netlify frontend -> Google Apps Script -> Google Sheets + Drive
  */
 
 const CONFIG = {
@@ -16,49 +13,12 @@ const CONFIG = {
   MAX_FILE_SIZE: 10 * 1024 * 1024
 };
 
-const BASE_HEADERS = [
-  "Timestamp",
-  "Registration ID",
-  "Team Name",
-  "Team Size",
-  "College Name",
+/* =========================================================
+   FIRST TIME SETUP
+   Run setup() ONCE manually.
+   It also upgrades an existing sheet by adding Submission Token.
+   ========================================================= */
 
-  "Member 1 - Full Name",
-  "Member 1 - Roll Number",
-  "Member 1 - Email",
-  "Member 1 - Mobile",
-  "Member 1 - Year",
-  "Member 1 - Branch",
-  "Member 1 - Section",
-
-  "Member 2 - Full Name",
-  "Member 2 - Roll Number",
-  "Member 2 - Email",
-  "Member 2 - Mobile",
-  "Member 2 - Year",
-  "Member 2 - Branch",
-  "Member 2 - Section",
-
-  "Member 3 - Full Name",
-  "Member 3 - Roll Number",
-  "Member 3 - Email",
-  "Member 3 - Mobile",
-  "Member 3 - Year",
-  "Member 3 - Branch",
-  "Member 3 - Section",
-
-  "Payment Amount",
-  "UPI Transaction ID / UTR",
-  "Payment Receipt",
-  "Payment Status",
-  "Submission Token"
-];
-
-/**
- * Run setup() once manually after replacing Code.gs.
- * It creates storage if needed and upgrades an existing sheet header
- * by adding any missing columns.
- */
 function setup() {
   const props = PropertiesService.getScriptProperties();
 
@@ -74,13 +34,74 @@ function setup() {
   }
 
   let sheet = spreadsheet.getSheetByName(CONFIG.SHEET_NAME);
-
   if (!sheet) {
     sheet = spreadsheet.getSheets()[0];
     sheet.setName(CONFIG.SHEET_NAME);
   }
 
-  ensureHeaders(sheet);
+  const headers = [
+    "Timestamp",
+    "Registration ID",
+    "Team Name",
+    "Team Size",
+    "College Name",
+
+    "Member 1 - Full Name",
+    "Member 1 - Roll Number",
+    "Member 1 - Email",
+    "Member 1 - Mobile",
+    "Member 1 - Year",
+    "Member 1 - Branch",
+    "Member 1 - Section",
+
+    "Member 2 - Full Name",
+    "Member 2 - Roll Number",
+    "Member 2 - Email",
+    "Member 2 - Mobile",
+    "Member 2 - Year",
+    "Member 2 - Branch",
+    "Member 2 - Section",
+
+    "Member 3 - Full Name",
+    "Member 3 - Roll Number",
+    "Member 3 - Email",
+    "Member 3 - Mobile",
+    "Member 3 - Year",
+    "Member 3 - Branch",
+    "Member 3 - Section",
+
+    "Payment Amount",
+    "UPI Transaction ID / UTR",
+    "Payment Receipt",
+    "Status",
+    "Submission Token"
+  ];
+
+  const lastColumn = sheet.getLastColumn();
+
+  if (sheet.getLastRow() === 0 || lastColumn === 0) {
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  } else {
+    const existingHeaders = sheet
+      .getRange(1, 1, 1, lastColumn)
+      .getValues()[0]
+      .map(String);
+
+    // Add any missing headers at the end without disturbing existing data.
+    const missing = headers.filter(h => !existingHeaders.includes(h));
+
+    if (missing.length) {
+      sheet
+        .getRange(1, existingHeaders.length + 1, 1, missing.length)
+        .setValues([missing]);
+    }
+  }
+
+  sheet.setFrozenRows(1);
+  sheet
+    .getRange(1, 1, 1, sheet.getLastColumn())
+    .setFontWeight("bold");
+  sheet.autoResizeColumns(1, sheet.getLastColumn());
 
   let folderId = props.getProperty("FOLDER_ID");
 
@@ -90,19 +111,21 @@ function setup() {
     props.setProperty("FOLDER_ID", folderId);
   }
 
-  Logger.log("CODEX 4.0 SETUP COMPLETE");
+  Logger.log("CODEX 4.0 setup complete.");
   Logger.log("Google Sheet: " + spreadsheet.getUrl());
   Logger.log("Google Drive Folder: " + DriveApp.getFolderById(folderId).getUrl());
 }
 
-/**
- * JSON GET health check and JSONP registration-ID lookup.
- */
-function doGet(e) {
-  const params = (e && e.parameter) || {};
+/* =========================================================
+   WEB APP
+   ========================================================= */
 
-  if (params.action === "getRegistrationId") {
-    return registrationIdJsonp(params.token, params.callback);
+function doGet(e) {
+  const params = (e && e.parameter) ? e.parameter : {};
+  const action = params.action || "";
+
+  if (action === "getRegistrationId") {
+    return getRegistrationIdJsonp(params);
   }
 
   return jsonResponse({
@@ -111,9 +134,10 @@ function doGet(e) {
   });
 }
 
-/**
- * Receives registration data from Netlify.
- */
+/* =========================================================
+   RECEIVE REGISTRATION
+   ========================================================= */
+
 function doPost(e) {
   const lock = LockService.getScriptLock();
 
@@ -128,7 +152,6 @@ function doPost(e) {
     }
 
     let data;
-
     try {
       data = JSON.parse(e.postData.contents);
     } catch (err) {
@@ -148,71 +171,91 @@ function doPost(e) {
 
     validateRegistration(data);
 
-    const spreadsheet = SpreadsheetApp.openById(spreadsheetId);
-    const sheet = spreadsheet.getSheetByName(CONFIG.SHEET_NAME);
+    const registrationId = generateRegistrationId();
 
-    if (!sheet) throw new Error("Registrations sheet not found.");
-
-    ensureHeaders(sheet);
-
-    // Prevent duplicate POSTs for the same browser submission.
-    const existing = findByToken(sheet, data.submissionToken);
-    if (existing) {
-      return jsonResponse({
-        success: true,
-        registrationId: existing.registrationId,
-        message: "Registration already received."
-      });
+    let receiptUrl = "";
+    if (data.receiptBase64) {
+      receiptUrl = saveReceipt(data, registrationId, folderId);
     }
 
-    // Registration ID is created only here and saved with the submission token.
-    const registrationId = generateRegistrationId(sheet);
+    const sheet = SpreadsheetApp
+      .openById(spreadsheetId)
+      .getSheetByName(CONFIG.SHEET_NAME);
 
-    const receiptUrl = saveReceipt(
-      data,
-      registrationId,
-      folderId
-    );
+    if (!sheet) {
+      throw new Error("Registrations sheet not found.");
+    }
+
+    ensureSubmissionTokenColumn(sheet);
 
     const row = [
       new Date(),
       registrationId,
-      clean(data.teamName),
-      data.teamSize,
-      clean(data.collegeName),
+      data.teamName || "",
+      data.teamSize || "",
+      data.collegeName || "",
 
-      clean(data.m1_name),
-      clean(data.m1_roll),
-      clean(data.m1_email),
-      clean(data.m1_phone),
-      clean(data.m1_year),
-      clean(data.m1_branch),
-      clean(data.m1_section),
+      data.m1_name || "",
+      data.m1_roll || "",
+      data.m1_email || "",
+      data.m1_phone || "",
+      data.m1_year || "",
+      data.m1_branch || "",
+      data.m1_section || "",
 
-      clean(data.m2_name),
-      clean(data.m2_roll),
-      clean(data.m2_email),
-      clean(data.m2_phone),
-      clean(data.m2_year),
-      clean(data.m2_branch),
-      clean(data.m2_section),
+      data.m2_name || "",
+      data.m2_roll || "",
+      data.m2_email || "",
+      data.m2_phone || "",
+      data.m2_year || "",
+      data.m2_branch || "",
+      data.m2_section || "",
 
-      data.teamSize === "3" ? clean(data.m3_name) : "",
-      data.teamSize === "3" ? clean(data.m3_roll) : "",
-      data.teamSize === "3" ? clean(data.m3_email) : "",
-      data.teamSize === "3" ? clean(data.m3_phone) : "",
-      data.teamSize === "3" ? clean(data.m3_year) : "",
-      data.teamSize === "3" ? clean(data.m3_branch) : "",
-      data.teamSize === "3" ? clean(data.m3_section) : "",
+      data.m3_name || "",
+      data.m3_roll || "",
+      data.m3_email || "",
+      data.m3_phone || "",
+      data.m3_year || "",
+      data.m3_branch || "",
+      data.m3_section || "",
 
       CONFIG.PAYMENT_FEE,
-      clean(data.utr),
+      data.utr || "",
       receiptUrl,
       "Pending",
-      data.submissionToken
+      data.submissionToken || ""
     ];
 
-    sheet.appendRow(row);
+    // Write by header mapping so an older sheet remains compatible.
+    const headers = sheet
+      .getRange(1, 1, 1, sheet.getLastColumn())
+      .getValues()[0]
+      .map(String);
+
+    const valuesByHeader = {};
+    const headerValues = [
+      "Timestamp", "Registration ID", "Team Name", "Team Size", "College Name",
+      "Member 1 - Full Name", "Member 1 - Roll Number", "Member 1 - Email",
+      "Member 1 - Mobile", "Member 1 - Year", "Member 1 - Branch", "Member 1 - Section",
+      "Member 2 - Full Name", "Member 2 - Roll Number", "Member 2 - Email",
+      "Member 2 - Mobile", "Member 2 - Year", "Member 2 - Branch", "Member 2 - Section",
+      "Member 3 - Full Name", "Member 3 - Roll Number", "Member 3 - Email",
+      "Member 3 - Mobile", "Member 3 - Year", "Member 3 - Branch", "Member 3 - Section",
+      "Payment Amount", "UPI Transaction ID / UTR", "Payment Receipt", "Status",
+      "Submission Token"
+    ];
+
+    headerValues.forEach((header, i) => {
+      valuesByHeader[header] = row[i];
+    });
+
+    const outputRow = headers.map(h =>
+      Object.prototype.hasOwnProperty.call(valuesByHeader, h)
+        ? valuesByHeader[h]
+        : ""
+    );
+
+    sheet.appendRow(outputRow);
 
     return jsonResponse({
       success: true,
@@ -231,27 +274,134 @@ function doPost(e) {
   } finally {
     try {
       lock.releaseLock();
-    } catch (err) {}
+    } catch (e) {}
   }
 }
 
-/**
- * Validates all rules independently of frontend JavaScript.
- */
-function validateRegistration(data) {
-  if (!data || typeof data !== "object") {
-    throw new Error("Invalid registration data.");
+/* =========================================================
+   REGISTRATION ID LOOKUP
+   ========================================================= */
+
+function getRegistrationIdJsonp(params) {
+  const callback = params.callback;
+
+  if (!callback || !/^[A-Za-z_$][0-9A-Za-z_$]*$/.test(callback)) {
+    return ContentService
+      .createTextOutput("Invalid callback.")
+      .setMimeType(ContentService.MimeType.TEXT);
   }
 
-  if (!clean(data.teamName)) {
+  const token = String(params.token || "").trim();
+
+  let result = {
+    success: false,
+    message: "Registration ID not found yet."
+  };
+
+  if (token) {
+    result = findRegistrationByToken(token);
+  }
+
+  return ContentService
+    .createTextOutput(
+      callback + "(" + JSON.stringify(result) + ");"
+    )
+    .setMimeType(ContentService.MimeType.JAVASCRIPT);
+}
+
+function findRegistrationByToken(token) {
+  const props = PropertiesService.getScriptProperties();
+  const spreadsheetId = props.getProperty("SPREADSHEET_ID");
+
+  if (!spreadsheetId) {
+    return {
+      success: false,
+      message: "Backend has not been initialized."
+    };
+  }
+
+  const sheet = SpreadsheetApp
+    .openById(spreadsheetId)
+    .getSheetByName(CONFIG.SHEET_NAME);
+
+  if (!sheet || sheet.getLastRow() < 2) {
+    return {
+      success: false,
+      message: "Registration not found yet."
+    };
+  }
+
+  const tokenColumn = findHeaderColumn(sheet, "Submission Token");
+  const idColumn = findHeaderColumn(sheet, "Registration ID");
+
+  if (!tokenColumn || !idColumn) {
+    return {
+      success: false,
+      message: "Registration lookup columns are missing."
+    };
+  }
+
+  const rowCount = sheet.getLastRow() - 1;
+
+  const tokens = sheet
+    .getRange(2, tokenColumn, rowCount, 1)
+    .getValues();
+
+  for (let i = 0; i < tokens.length; i++) {
+    if (String(tokens[i][0]).trim() === token) {
+      const registrationId = sheet
+        .getRange(i + 2, idColumn)
+        .getDisplayValue();
+
+      if (registrationId) {
+        return {
+          success: true,
+          registrationId: registrationId
+        };
+      }
+    }
+  }
+
+  return {
+    success: false,
+    message: "Registration ID not found yet."
+  };
+}
+
+function ensureSubmissionTokenColumn(sheet) {
+  if (!findHeaderColumn(sheet, "Submission Token")) {
+    sheet
+      .getRange(1, sheet.getLastColumn() + 1)
+      .setValue("Submission Token");
+  }
+}
+
+function findHeaderColumn(sheet, headerName) {
+  if (sheet.getLastColumn() === 0) return 0;
+
+  const headers = sheet
+    .getRange(1, 1, 1, sheet.getLastColumn())
+    .getValues()[0]
+    .map(v => String(v).trim());
+
+  const index = headers.indexOf(headerName);
+  return index === -1 ? 0 : index + 1;
+}
+
+/* =========================================================
+   VALIDATION
+   ========================================================= */
+
+function validateRegistration(data) {
+  if (!data.teamName) {
     throw new Error("Team name is required.");
   }
 
   if (data.teamSize !== "2" && data.teamSize !== "3") {
-    throw new Error("Team size must be 2 or 3 members.");
+    throw new Error("Invalid team size. Select 2 or 3.");
   }
 
-  if (!clean(data.collegeName)) {
+  if (!data.collegeName) {
     throw new Error("College name is required.");
   }
 
@@ -262,39 +412,16 @@ function validateRegistration(data) {
     validateMember(data, 3);
   }
 
-  const years = [
-    clean(data.m1_year),
-    clean(data.m2_year)
-  ];
-
-  if (data.teamSize === "3") {
-    years.push(clean(data.m3_year));
+  const expectedFee = String(CONFIG.PAYMENT_FEE);
+  if (String(data.payAmount || "") !== expectedFee) {
+    throw new Error("Invalid payment amount. Registration fee is ₹300 per team.");
   }
 
-  const allowedYears = ["2nd Year", "3rd Year", "4th Year"];
-
-  if (years.some(y => allowedYears.indexOf(y) === -1)) {
-    throw new Error("Only 2nd Year, 3rd Year and 4th Year students are eligible.");
-  }
-
-  const fourthYearCount = years.filter(y => y === "4th Year").length;
-
-  if (fourthYearCount > 1) {
-    throw new Error("A team can have a maximum of one 4th-year student.");
-  }
-
-  // Fixed amount: never trust a participant-supplied amount.
-  if (Number(data.payAmount) !== CONFIG.PAYMENT_FEE) {
-    throw new Error("Invalid payment amount.");
-  }
-
-  const utr = clean(data.utr);
-
-  if (!utr) {
+  if (!data.utr) {
     throw new Error("UPI Transaction ID / UTR is required.");
   }
 
-  if (!/^[A-Za-z0-9]{8,30}$/.test(utr)) {
+  if (!/^[A-Za-z0-9]{8,30}$/.test(String(data.utr).trim())) {
     throw new Error("Invalid UPI Transaction ID / UTR.");
   }
 
@@ -302,86 +429,82 @@ function validateRegistration(data) {
     throw new Error("Payment receipt is required.");
   }
 
-  if (!data.submissionToken || !/^[A-Za-z0-9_-]{16,100}$/.test(data.submissionToken)) {
-    throw new Error("Invalid submission token.");
+  if (!data.submissionToken) {
+    throw new Error("Submission token is missing. Please submit again.");
   }
 
-  validateReceiptSize(data.receiptBase64);
+  const years = [data.m1_year, data.m2_year];
+
+  if (data.teamSize === "3") {
+    years.push(data.m3_year);
+  }
+
+  const allowedYears = ["2nd Year", "3rd Year", "4th Year"];
+
+  if (years.some(y => !allowedYears.includes(String(y)))) {
+    throw new Error(
+      "Only 2nd Year, 3rd Year and 4th Year students are allowed."
+    );
+  }
+
+  const fourthYearCount = years.filter(y => y === "4th Year").length;
+
+  if (fourthYearCount > 1) {
+    throw new Error(
+      "A team can have a maximum of one 4th-year student."
+    );
+  }
 }
 
-/**
- * Member-level validation.
- */
 function validateMember(data, number) {
-  const prefix = "m" + number + "_";
-
   const fields = [
-    "name",
-    "roll",
-    "email",
-    "phone",
-    "year",
-    "branch",
-    "section"
+    `m${number}_name`,
+    `m${number}_roll`,
+    `m${number}_email`,
+    `m${number}_phone`,
+    `m${number}_year`,
+    `m${number}_branch`,
+    `m${number}_section`
   ];
 
   fields.forEach(field => {
-    if (!clean(data[prefix + field])) {
-      throw new Error("Member " + number + ": " + field + " is required.");
+    if (!data[field] || String(data[field]).trim() === "") {
+      throw new Error(`${field} is required.`);
     }
   });
 
-  const phone = clean(data[prefix + "phone"]);
+  const phone = String(data[`m${number}_phone`]).trim();
   if (!/^[0-9]{10}$/.test(phone)) {
-    throw new Error("Member " + number + " mobile number must contain 10 digits.");
+    throw new Error(`Member ${number} mobile number must contain 10 digits.`);
   }
 
-  const email = clean(data[prefix + "email"]);
+  const email = String(data[`m${number}_email`]).trim();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    throw new Error("Invalid email address for Member " + number + ".");
+    throw new Error(`Invalid email address for Member ${number}.`);
   }
 }
 
-/**
- * Receipt size check.
- */
-function validateReceiptSize(base64) {
+/* =========================================================
+   RECEIPT -> GOOGLE DRIVE
+   ========================================================= */
+
+function saveReceipt(data, registrationId, folderId) {
+  const base64 = String(data.receiptBase64 || "");
+
   const approximateSize = Math.floor(base64.length * 0.75);
 
   if (approximateSize > CONFIG.MAX_FILE_SIZE) {
-    throw new Error("Payment receipt exceeds the 10MB limit.");
+    throw new Error("Payment receipt exceeds the 10 MB limit.");
   }
-}
 
-/**
- * Saves receipt as RegistrationID_originalfilename.
- */
-function saveReceipt(data, registrationId, folderId) {
-  validateReceiptSize(data.receiptBase64);
-
-  const bytes = Utilities.base64Decode(data.receiptBase64);
-
-  const allowedMimeTypes = [
-    "image/jpeg",
-    "image/png",
-    "application/pdf"
-  ];
-
+  const bytes = Utilities.base64Decode(base64);
   const mimeType = data.receiptType || "application/octet-stream";
+  const originalName = data.receiptName || "payment-receipt";
 
-  if (allowedMimeTypes.indexOf(mimeType) === -1) {
-    throw new Error("Unsupported payment receipt type.");
-  }
-
-  const originalName = clean(data.receiptName) || "payment-receipt";
   const safeName = originalName.replace(/[^a-zA-Z0-9._-]/g, "_");
   const filename = registrationId + "_" + safeName;
 
-  const blob = Utilities.newBlob(
-    bytes,
-    mimeType,
-    filename
-  );
+  const blob = Utilities.newBlob(bytes, mimeType, filename);
 
   const folder = DriveApp.getFolderById(folderId);
   const file = folder.createFile(blob);
@@ -389,144 +512,53 @@ function saveReceipt(data, registrationId, folderId) {
   return file.getUrl();
 }
 
-/**
- * Registration ID format:
- * CDX26-0001, CDX26-0002, ...
- */
-function generateRegistrationId(sheet) {
-  const lastRow = sheet.getLastRow();
-  const nextNumber = Math.max(1, lastRow);
+/* =========================================================
+   REGISTRATION ID
+   ========================================================= */
 
-  return "CDX26-" + String(nextNumber).padStart(4, "0");
-}
-
-/**
- * Finds an already submitted token to prevent duplicate rows.
- */
-function findByToken(sheet, token) {
-  if (!token || sheet.getLastRow() < 2) return null;
-
-  const headers = getHeaders(sheet);
-  const tokenColumn = headers.indexOf("Submission Token") + 1;
-  const idColumn = headers.indexOf("Registration ID") + 1;
-
-  if (!tokenColumn || !idColumn) return null;
-
-  const values = sheet
-    .getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn())
-    .getValues();
-
-  for (let i = 0; i < values.length; i++) {
-    if (String(values[i][tokenColumn - 1]) === String(token)) {
-      return {
-        registrationId: values[i][idColumn - 1]
-      };
-    }
-  }
-
-  return null;
-}
-
-/**
- * JSONP endpoint used only to retrieve the ID for the submission token.
- */
-function registrationIdJsonp(token, callback) {
-  if (!token || !callback) {
-    return jsonResponse({
-      success: false,
-      message: "Missing token or callback."
-    });
-  }
-
-  // Callback must be a simple JS identifier generated by our frontend.
-  if (!/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(callback)) {
-    return jsonResponse({
-      success: false,
-      message: "Invalid callback."
-    });
-  }
-
+function generateRegistrationId() {
   const props = PropertiesService.getScriptProperties();
   const spreadsheetId = props.getProperty("SPREADSHEET_ID");
-
-  if (!spreadsheetId) {
-    return jsonpResponse(callback, {
-      success: false,
-      message: "Backend is not initialized."
-    });
-  }
 
   const sheet = SpreadsheetApp
     .openById(spreadsheetId)
     .getSheetByName(CONFIG.SHEET_NAME);
 
-  if (!sheet) {
-    return jsonpResponse(callback, {
-      success: false,
-      message: "Registrations sheet not found."
-    });
+  const idColumn = findHeaderColumn(sheet, "Registration ID");
+
+  if (!idColumn) {
+    throw new Error("Registration ID column not found.");
   }
 
-  const result = findByToken(sheet, token);
+  const lastRow = sheet.getLastRow();
 
-  if (!result) {
-    return jsonpResponse(callback, {
-      success: false,
-      message: "Registration not found yet."
-    });
+  if (lastRow < 2) {
+    return "CODEX4-0001";
   }
 
-  return jsonpResponse(callback, {
-    success: true,
-    registrationId: result.registrationId
-  });
-}
+  const ids = sheet
+    .getRange(2, idColumn, lastRow - 1, 1)
+    .getDisplayValues()
+    .flat();
 
-/**
- * Makes sure existing sheets have the latest required headers.
- */
-function ensureHeaders(sheet) {
-  const existingLastColumn = sheet.getLastColumn();
+  let maxNumber = 0;
 
-  if (existingLastColumn === 0) {
-    sheet.getRange(1, 1, 1, BASE_HEADERS.length).setValues([BASE_HEADERS]);
-  } else {
-    const currentHeaders = getHeaders(sheet);
-    const missing = BASE_HEADERS.filter(h => currentHeaders.indexOf(h) === -1);
-
-    if (missing.length > 0) {
-      sheet
-        .getRange(1, existingLastColumn + 1, 1, missing.length)
-        .setValues([missing]);
+  ids.forEach(id => {
+    const match = String(id).match(/^CODEX4-(\d+)$/);
+    if (match) {
+      maxNumber = Math.max(maxNumber, Number(match[1]));
     }
-  }
+  });
 
-  sheet.setFrozenRows(1);
-  sheet
-    .getRange(1, 1, 1, sheet.getLastColumn())
-    .setFontWeight("bold");
-  sheet.autoResizeColumns(1, sheet.getLastColumn());
+  return "CODEX4-" + String(maxNumber + 1).padStart(4, "0");
 }
 
-function getHeaders(sheet) {
-  if (sheet.getLastColumn() === 0) return [];
-  return sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-}
-
-function clean(value) {
-  return value === null || value === undefined
-    ? ""
-    : String(value).trim();
-}
+/* =========================================================
+   JSON RESPONSE
+   ========================================================= */
 
 function jsonResponse(data) {
   return ContentService
     .createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
-}
-
-function jsonpResponse(callback, data) {
-  return ContentService
-    .createTextOutput(callback + "(" + JSON.stringify(data) + ");")
-    .setMimeType(ContentService.MimeType.JAVASCRIPT);
 }
