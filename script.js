@@ -8,9 +8,10 @@ const CONFIG = {
 };
 
 let currentStep = 1;
+let maxReachedStep = 1;
 
 /* =========================================================
-   INITIALIZATION — ONE DOMContentLoaded ONLY
+   INITIALIZATION
 ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
     const qr = document.getElementById("paymentQR");
@@ -23,6 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupNavigation();
     setupFileUpload();
     setupFormSubmission();
+    compactTeamSizeSelector();
     showStep(1);
 });
 
@@ -40,14 +42,27 @@ function updateTeamSizeUI() {
     });
 }
 
+function compactTeamSizeSelector() {
+    document.querySelectorAll('.choice span').forEach(span => {
+        span.style.padding = "9px 10px";
+        span.style.fontSize = "10px";
+    });
+    document.querySelectorAll('.choice-row').forEach(row => {
+        row.style.gap = "8px";
+    });
+}
+
 function setupTeamSize() {
     document.querySelectorAll('input[name="teamSize"]').forEach(radio => {
         radio.addEventListener('change', () => {
             updateTeamSizeUI();
             updateMember3State();
-            // If currently on payment and user changes team size through Back,
-            // keep the current page. Otherwise do not unexpectedly navigate.
-            updateNavigation();
+
+            /* Changing team size changes the step sequence, so restart
+               progression from Team Details. Existing typed data is kept. */
+            maxReachedStep = 1;
+            currentStep = 1;
+            showStep(1);
         });
     });
     updateTeamSizeUI();
@@ -62,7 +77,6 @@ function updateMember3State() {
     if (step) step.classList.toggle("hidden", !isThree);
 
     if (section) {
-        // Only hide the panel when it is not the current step.
         if (!isThree && currentStep === 4) currentStep = 5;
         if (currentStep !== 4) section.classList.add("hidden");
 
@@ -94,11 +108,13 @@ function setupNavigation() {
         button.addEventListener("click", () => {
             const target = Number(button.dataset.step);
             const sequence = getStepSequence();
-            const currentIndex = sequence.indexOf(currentStep);
-            const targetIndex = sequence.indexOf(target);
 
-            // Allow going backwards to completed/current steps.
-            if (targetIndex >= 0 && targetIndex <= currentIndex) showStep(target);
+            /* A section can be opened directly once it has already been
+               completed/reached. This lets users edit earlier details and
+               then jump directly to any already-filled section. */
+            if (sequence.includes(target) && target <= maxReachedStep) {
+                showStep(target);
+            }
         });
     });
 }
@@ -111,7 +127,11 @@ function nextStep(event) {
     const sequence = getStepSequence();
     const index = sequence.indexOf(currentStep);
 
-    if (index < sequence.length - 1) showStep(sequence[index + 1]);
+    if (index < sequence.length - 1) {
+        const next = sequence[index + 1];
+        maxReachedStep = Math.max(maxReachedStep, next);
+        showStep(next);
+    }
 }
 
 function previousStep(event) {
@@ -132,18 +152,22 @@ function showStep(step) {
 
     document.querySelectorAll(".form-step").forEach(panel => {
         const panelStep = Number(panel.dataset.panel);
-        panel.classList.toggle("active", panelStep === currentStep);
+        const isCurrent = panelStep === currentStep;
+
+        panel.classList.toggle("active", isCurrent);
+
         if (panelStep !== 4 || getTeamSize() === "3") {
-            panel.classList.toggle("hidden", panelStep !== currentStep);
+            panel.classList.toggle("hidden", !isCurrent);
         }
     });
 
     document.querySelectorAll(".stepper .step").forEach(button => {
         const number = Number(button.dataset.step);
         const visible = number !== 4 || getTeamSize() === "3";
+
         button.classList.toggle("hidden", !visible);
         button.classList.toggle("active", number === currentStep);
-        button.classList.toggle("completed", number < currentStep);
+        button.classList.toggle("completed", number < currentStep || number <= maxReachedStep);
     });
 
     const progressBar = document.getElementById("progressBar");
@@ -171,7 +195,6 @@ function updateNavigation() {
     }
 
     if (submitBtn) {
-        // Never rely on the HTML hidden class alone.
         submitBtn.classList.toggle("hidden", currentStep !== 5);
         submitBtn.style.display = currentStep === 5 ? "inline-flex" : "none";
     }
@@ -243,7 +266,6 @@ function setupFileUpload() {
 function validateCompleteForm(form) {
     const teamSize = getTeamSize();
 
-    // Validate only fields that belong to the selected team size.
     const member3Fields = document.querySelectorAll("#member3Section input, #member3Section select");
     member3Fields.forEach(field => {
         if (teamSize === "3") field.setAttribute("required", "");
@@ -399,6 +421,10 @@ function convertFileToBase64(file) {
 ========================================================= */
 function showSuccess() {
     document.getElementById("registrationForm")?.classList.add("hidden");
+
+    /* Remove the payment-verification message from the final screen. */
+    document.querySelector("#successScreen .pending-badge")?.remove();
+
     document.getElementById("successScreen")?.classList.remove("hidden");
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
