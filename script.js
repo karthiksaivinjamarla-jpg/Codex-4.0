@@ -1104,3 +1104,17 @@ function clearStatus() {
     status.innerText = "";
 
 }
+// Team size selection glow
+document.querySelectorAll('input[name="teamSize"]').forEach(radio => {
+
+    radio.addEventListener('change', function () {
+
+        document.querySelectorAll('.choice').forEach(choice => {
+            choice.classList.remove('active');
+        });
+
+        this.closest('.choice').classList.add('active');
+
+    });
+
+});
