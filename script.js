@@ -1,1419 +1,744 @@
 /**
- * =========================================================
  * CODEX 4.0
  * Registration Frontend
  *
- * Frontend:
- * GitHub / Netlify
- *
- * Backend:
- * Google Apps Script
- * =========================================================
+ * GitHub Pages / Netlify frontend
+ * Google Apps Script backend
  */
 
 const CONFIG = {
-
     API_URL:
         "https://script.google.com/macros/s/AKfycbwqbA-ujJmA0dHwx9z8YY9fuk86DdjkpxU-y0m1sZ9fvNBLc4qHa1apQEiy23hVOfkBKQ/exec",
 
     QR_IMAGE_URL:
         "https://raw.githubusercontent.com/karthiksaivinjamarla-jpg/Codex-4.0/main/codex-payment-qr.png",
 
-    EVENT_NAME:
-        "CODEX 4.0",
+    EVENT_NAME: "CODEX 4.0",
+    ORGANIZER: "Coders' Club",
 
-    ORGANIZER:
-        "Coders' Club",
+    // FIXED PAYMENT
+    PAYMENT_FEE: 300,
 
-    PAYMENT_FEE:
-        300,
-
-    MAX_FILE_SIZE:
-        10 * 1024 * 1024
-
+    // Maximum receipt size: 10 MB
+    MAX_FILE_SIZE: 10 * 1024 * 1024
 };
 
 
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
+
 let currentStep = 1;
-let isSubmitting = false;
+let maxStepReached = 1;
 
 
-// =========================================================
-// INITIALIZE
-// =========================================================
+/* =========================================================
+   INITIALIZATION
+========================================================= */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+document.addEventListener("DOMContentLoaded", () => {
 
-        initializeQR();
-        initializeTeamSize();
-        initializeReceipt();
-        initializeNavigation();
-        initializeForm();
-
-        updateTeamSize();
-        showStep(1);
-
-    }
-);
-
-
-// =========================================================
-// QR
-// =========================================================
-
-function initializeQR() {
-
-    const qr =
-        document.getElementById(
-            "paymentQR"
-        );
-
-    const fee =
-        document.getElementById(
-            "displayFee"
-        );
-
+    const qr = document.getElementById("paymentQR");
+    const fee = document.getElementById("displayFee");
 
     if (qr) {
-
-        qr.src =
-            CONFIG.QR_IMAGE_URL;
-
+        qr.src = CONFIG.QR_IMAGE_URL;
     }
-
 
     if (fee) {
-
-        fee.innerText =
-            `₹${CONFIG.PAYMENT_FEE} per team`;
-
+        fee.innerText = `₹${CONFIG.PAYMENT_FEE} per team`;
     }
 
-}
+    setupTeamSize();
+    setupNavigation();
+    setupFileUpload();
+    setupFormSubmission();
+
+    showStep(1);
+});
 
 
-// =========================================================
-// TEAM SIZE
-// =========================================================
+/* =========================================================
+   TEAM SIZE
+========================================================= */
 
-function initializeTeamSize() {
+function setupTeamSize() {
 
     const radios =
-        document.querySelectorAll(
-            'input[name="teamSize"]'
-        );
-
-
-    radios.forEach(
-        function (radio) {
-
-            radio.addEventListener(
-                "change",
-                function () {
-
-                    updateTeamSize();
-
-                }
-            );
-
-        }
-    );
-
-}
-
-
-function getTeamSize() {
-
-    const selected =
-        document.querySelector(
-            'input[name="teamSize"]:checked'
-        );
-
-
-    return selected
-        ? selected.value
-        : "2";
-
-}
-
-
-function updateTeamSize() {
-
-    const teamSize =
-        getTeamSize();
-
+        document.querySelectorAll('input[name="teamSize"]');
 
     const member3Section =
-        document.getElementById(
-            "member3Section"
-        );
-
+        document.getElementById("member3Section");
 
     const member3Step =
-        document.getElementById(
-            "member3Step"
-        );
-
+        document.getElementById("member3Step");
 
     const member3Inputs =
         member3Section
-            ? member3Section.querySelectorAll(
-                "input, select"
-            )
+            ? member3Section.querySelectorAll("input, select")
             : [];
 
+    radios.forEach(radio => {
 
-    // -------------------------
-    // MEMBER 3
-    // -------------------------
+        radio.addEventListener("change", () => {
 
-    if (teamSize === "3") {
+            const isThree =
+                radio.value === "3";
 
-        if (member3Section) {
-            member3Section.classList.remove(
-                "hidden"
-            );
-        }
-
-
-        if (member3Step) {
-            member3Step.classList.remove(
-                "hidden"
-            );
-        }
-
-
-        member3Inputs.forEach(
-            function (input) {
-
-                input.setAttribute(
-                    "required",
-                    ""
+            if (member3Section) {
+                member3Section.classList.toggle(
+                    "hidden",
+                    !isThree
                 );
-
             }
-        );
 
-    } else {
-
-        if (member3Section) {
-            member3Section.classList.add(
-                "hidden"
-            );
-        }
-
-
-        if (member3Step) {
-            member3Step.classList.add(
-                "hidden"
-            );
-        }
-
-
-        member3Inputs.forEach(
-            function (input) {
-
-                input.removeAttribute(
-                    "required"
+            if (member3Step) {
+                member3Step.classList.toggle(
+                    "hidden",
+                    !isThree
                 );
-
-                input.setCustomValidity("");
-
             }
-        );
 
-    }
+            member3Inputs.forEach(input => {
 
-
-    // -------------------------
-    // TEAM SIZE LIGHTING
-    // -------------------------
-
-    document
-        .querySelectorAll(
-            'input[name="teamSize"]'
-        )
-        .forEach(
-            function (radio) {
-
-                const choice =
-                    radio.closest(
-                        ".choice"
-                    );
-
-
-                if (choice) {
-
-                    choice.classList.toggle(
-                        "active",
-                        radio.checked
-                    );
-
+                if (isThree) {
+                    input.setAttribute("required", "");
+                } else {
+                    input.removeAttribute("required");
+                    input.setCustomValidity("");
                 }
 
-            }
-        );
+            });
 
+            // Reset navigation when team size changes
+            maxStepReached = Math.min(maxStepReached, 3);
 
-    // -------------------------
-    // IF CURRENT STEP INVALID
-    // -------------------------
+            updateNavigation();
+        });
 
-    if (
-        currentStep === 4 &&
-        teamSize === "2"
-    ) {
-
-        showStep(5);
-
-    }
+    });
 
 }
 
 
-// =========================================================
-// NAVIGATION
-// =========================================================
+/* =========================================================
+   NAVIGATION
+========================================================= */
 
-function initializeNavigation() {
+function setupNavigation() {
 
     const nextBtn =
-        document.getElementById(
-            "nextBtn"
-        );
-
+        document.getElementById("nextBtn");
 
     const backBtn =
-        document.getElementById(
-            "backBtn"
-        );
-
-
-    const steps =
-        document.querySelectorAll(
-            ".stepper .step"
-        );
-
-
-    // CONTINUE
+        document.getElementById("backBtn");
 
     if (nextBtn) {
-
-        nextBtn.addEventListener(
-            "click",
-            function () {
-
-                if (isSubmitting) {
-                    return;
-                }
-
-
-                if (
-                    !validateStep(
-                        currentStep
-                    )
-                ) {
-
-                    return;
-
-                }
-
-
-                const next =
-                    getNextStep(
-                        currentStep
-                    );
-
-
-                if (next) {
-
-                    showStep(next);
-
-                }
-
-            }
-        );
-
+        nextBtn.addEventListener("click", nextStep);
     }
-
-
-    // BACK
 
     if (backBtn) {
+        backBtn.addEventListener("click", previousStep);
+    }
 
-        backBtn.addEventListener(
-            "click",
-            function () {
+    // Stepper buttons
+    document.querySelectorAll(".step").forEach(stepButton => {
 
-                if (isSubmitting) {
-                    return;
-                }
+        stepButton.addEventListener("click", () => {
 
+            const target =
+                Number(stepButton.dataset.step);
 
-                const previous =
-                    getPreviousStep(
-                        currentStep
-                    );
-
-
-                if (previous) {
-
-                    showStep(
-                        previous
-                    );
-
-                }
-
+            if (
+                !stepButton.classList.contains("hidden") &&
+                target <= maxStepReached
+            ) {
+                showStep(target);
             }
-        );
 
-    }
+        });
 
-
-    // STEPPER
-
-    steps.forEach(
-        function (stepButton) {
-
-            stepButton.addEventListener(
-                "click",
-                function () {
-
-                    const target =
-                        Number(
-                            stepButton.dataset.step
-                        );
-
-
-                    if (!target) {
-                        return;
-                    }
-
-
-                    // Don't jump forward.
-
-                    if (
-                        target >
-                        currentStep
-                    ) {
-
-                        return;
-
-                    }
-
-
-                    if (
-                        target === 4 &&
-                        getTeamSize() !== "3"
-                    ) {
-
-                        return;
-
-                    }
-
-
-                    showStep(target);
-
-                }
-            );
-
-        }
-    );
+    });
 
 }
 
 
-// =========================================================
-// NEXT STEP
-// =========================================================
+/* =========================================================
+   NEXT STEP
+========================================================= */
 
-function getNextStep(step) {
+function nextStep() {
 
     const teamSize =
-        getTeamSize();
+        document.querySelector(
+            'input[name="teamSize"]:checked'
+        )?.value;
 
+    // Determine actual sequence
+    const steps =
+        teamSize === "3"
+            ? [1, 2, 3, 4, 5]
+            : [1, 2, 3, 5];
 
-    if (step === 1) {
-        return 2;
+    const index =
+        steps.indexOf(currentStep);
+
+    if (index === -1 || index >= steps.length - 1) {
+        return;
     }
 
-
-    if (step === 2) {
-        return 3;
+    // Validate current section before continuing
+    if (!validateCurrentStep()) {
+        return;
     }
 
+    const next =
+        steps[index + 1];
 
-    if (step === 3) {
+    maxStepReached =
+        Math.max(maxStepReached, next);
 
-        if (teamSize === "3") {
-            return 4;
-        }
-
-        return 5;
-
-    }
-
-
-    if (step === 4) {
-        return 5;
-    }
-
-
-    return null;
+    showStep(next);
 
 }
 
 
-// =========================================================
-// PREVIOUS STEP
-// =========================================================
+/* =========================================================
+   PREVIOUS STEP
+========================================================= */
 
-function getPreviousStep(step) {
+function previousStep() {
 
     const teamSize =
-        getTeamSize();
+        document.querySelector(
+            'input[name="teamSize"]:checked'
+        )?.value;
 
+    const steps =
+        teamSize === "3"
+            ? [1, 2, 3, 4, 5]
+            : [1, 2, 3, 5];
 
-    if (step === 5) {
+    const index =
+        steps.indexOf(currentStep);
 
-        if (teamSize === "3") {
-            return 4;
-        }
-
-        return 3;
-
+    if (index <= 0) {
+        return;
     }
 
-
-    if (step === 4) {
-        return 3;
-    }
-
-
-    if (step === 3) {
-        return 2;
-    }
-
-
-    if (step === 2) {
-        return 1;
-    }
-
-
-    return null;
-
+    showStep(steps[index - 1]);
 }
 
 
-// =========================================================
-// SHOW STEP
-// =========================================================
+/* =========================================================
+   SHOW STEP
+========================================================= */
 
 function showStep(step) {
 
     const teamSize =
-        getTeamSize();
+        document.querySelector(
+            'input[name="teamSize"]:checked'
+        )?.value;
 
-
-    // Never show Member 3 for a 2-member team.
-
-    if (
-        step === 4 &&
-        teamSize !== "3"
-    ) {
-
+    // If team has only 2 members,
+    // never show member 3
+    if (step === 4 && teamSize !== "3") {
         step = 5;
-
     }
 
+    currentStep = step;
 
-    currentStep =
-        step;
+    document
+        .querySelectorAll(".form-step")
+        .forEach(panel => {
 
-
-    const panels =
-        document.querySelectorAll(
-            ".form-step"
-        );
-
-
-    const stepButtons =
-        document.querySelectorAll(
-            ".stepper .step"
-        );
-
-
-    // -------------------------
-    // PANELS
-    // -------------------------
-
-    panels.forEach(
-        function (panel) {
-
-            const panelNumber =
-                Number(
-                    panel.dataset.panel
-                );
-
+            const panelStep =
+                Number(panel.dataset.panel);
 
             panel.classList.toggle(
                 "active",
-                panelNumber === currentStep
+                panelStep === step
             );
 
+        });
 
-            if (
-                panelNumber === 4 &&
-                teamSize !== "3"
-            ) {
+    // Update stepper
+    document
+        .querySelectorAll(".step")
+        .forEach(button => {
 
-                panel.classList.add(
-                    "hidden"
-                );
-
-            }
-
-        }
-    );
-
-
-    // -------------------------
-    // STEPPER
-    // -------------------------
-
-    stepButtons.forEach(
-        function (button) {
-
-            const stepNumber =
-                Number(
-                    button.dataset.step
-                );
-
-
-            if (
-                stepNumber === 4
-            ) {
-
-                button.classList.toggle(
-                    "hidden",
-                    teamSize !== "3"
-                );
-
-            }
-
+            const buttonStep =
+                Number(button.dataset.step);
 
             button.classList.toggle(
                 "active",
-                stepNumber === currentStep
+                buttonStep === step
             );
-
 
             button.classList.toggle(
                 "completed",
-                stepNumber < currentStep
+                buttonStep < step
             );
 
-        }
-    );
+        });
 
-
-    // -------------------------
-    // PROGRESS
-    // -------------------------
-
+    // Progress
     const progressBar =
-        document.getElementById(
-            "progressBar"
-        );
+        document.getElementById("progressBar");
 
+    const total =
+        teamSize === "3" ? 5 : 4;
+
+    let progress = 0;
+
+    if (teamSize === "3") {
+        progress = ((step - 1) / 4) * 100;
+    } else {
+
+        const positions = {
+            1: 0,
+            2: 33,
+            3: 66,
+            5: 100
+        };
+
+        progress =
+            positions[step] ?? 0;
+    }
 
     if (progressBar) {
-
-        let percentage;
-
-
-        if (teamSize === "3") {
-
-            const map = {
-                1: 20,
-                2: 40,
-                3: 60,
-                4: 80,
-                5: 100
-            };
-
-
-            percentage =
-                map[currentStep];
-
-        } else {
-
-            const map = {
-                1: 25,
-                2: 50,
-                3: 75,
-                5: 100
-            };
-
-
-            percentage =
-                map[currentStep];
-
-        }
-
-
         progressBar.style.width =
-            `${percentage || 20}%`;
-
+            `${progress}%`;
     }
 
-
-    // -------------------------
-    // BUTTONS
-    // -------------------------
-
-    const backBtn =
-        document.getElementById(
-            "backBtn"
-        );
-
-
-    const nextBtn =
-        document.getElementById(
-            "nextBtn"
-        );
-
-
-    const submitBtn =
-        document.getElementById(
-            "submitBtn"
-        );
-
-
-    if (backBtn) {
-
-        backBtn.style.visibility =
-            currentStep === 1
-                ? "hidden"
-                : "visible";
-
-    }
-
-
-    if (nextBtn) {
-
-        nextBtn.classList.toggle(
-            "hidden",
-            currentStep === 5
-        );
-
-    }
-
-
-    if (submitBtn) {
-
-        submitBtn.classList.toggle(
-            "hidden",
-            currentStep !== 5
-        );
-
-    }
-
+    updateNavigation();
 
     clearStatus();
 
-
-    const register =
-        document.getElementById(
-            "register"
-        );
-
-
-    if (register) {
-
-        register.scrollIntoView({
+    // Scroll to registration area
+    document
+        .getElementById("register")
+        ?.scrollIntoView({
             behavior: "smooth",
             block: "start"
         });
+
+}
+
+
+/* =========================================================
+   NAVIGATION BUTTON STATE
+========================================================= */
+
+function updateNavigation() {
+
+    const nextBtn =
+        document.getElementById("nextBtn");
+
+    const backBtn =
+        document.getElementById("backBtn");
+
+    const submitBtn =
+        document.getElementById("submitBtn");
+
+    const isPayment =
+        currentStep === 5;
+
+    if (backBtn) {
+
+        backBtn.style.display =
+            currentStep === 1
+                ? "none"
+                : "inline-flex";
+
+    }
+
+    if (nextBtn) {
+
+        nextBtn.style.display =
+            isPayment
+                ? "none"
+                : "inline-flex";
+
+    }
+
+    if (submitBtn) {
+
+        // IMPORTANT:
+        // Submit button is visible ONLY on payment page.
+        if (isPayment) {
+            submitBtn.classList.remove("hidden");
+            submitBtn.style.display = "inline-flex";
+        } else {
+            submitBtn.classList.add("hidden");
+            submitBtn.style.display = "none";
+        }
 
     }
 
 }
 
 
-// =========================================================
-// VALIDATION
-// =========================================================
+/* =========================================================
+   CURRENT STEP VALIDATION
+========================================================= */
 
-function validateStep(step) {
-
-    clearStatus();
-
+function validateCurrentStep() {
 
     const panel =
         document.querySelector(
-            `.form-step[data-panel="${step}"]`
+            `.form-step[data-panel="${currentStep}"]`
         );
-
 
     if (!panel) {
         return true;
     }
 
-
-    const teamSize =
-        getTeamSize();
-
-
-    // Member 3 isn't needed for 2 members.
-
-    if (
-        step === 4 &&
-        teamSize !== "3"
-    ) {
-
-        return true;
-
-    }
-
-
-    const fields =
+    const inputs =
         panel.querySelectorAll(
-            "input[required], select[required]"
+            "input, select, textarea"
         );
 
+    for (const input of inputs) {
 
-    for (
-        const field of fields
-    ) {
-
+        // Ignore hidden member 3 section
         if (
-            !field.checkValidity()
+            input.closest(".hidden") &&
+            currentStep !== 4
         ) {
+            continue;
+        }
 
-            field.reportValidity();
+        if (!input.checkValidity()) {
 
-            field.focus();
+            input.reportValidity();
 
             return false;
-
         }
 
     }
-
-
-    // TEAM
-
-    if (step === 1) {
-
-        const teamName =
-            document.querySelector(
-                '[name="teamName"]'
-            );
-
-
-        const college =
-            document.querySelector(
-                '[name="collegeName"]'
-            );
-
-
-        if (
-            !teamName.value.trim()
-        ) {
-
-            showStatus(
-                "Please enter a team name.",
-                true
-            );
-
-            teamName.focus();
-
-            return false;
-
-        }
-
-
-        if (
-            !college.value.trim()
-        ) {
-
-            showStatus(
-                "Please enter your college name.",
-                true
-            );
-
-            college.focus();
-
-            return false;
-
-        }
-
-    }
-
-
-    // MEMBER
-
-    if (
-        step >= 2 &&
-        step <= 4
-    ) {
-
-        const memberNumber =
-            step - 1;
-
-
-        if (
-            !validateMember(
-                memberNumber
-            )
-        ) {
-
-            return false;
-
-        }
-
-    }
-
 
     return true;
-
 }
 
 
-// =========================================================
-// MEMBER VALIDATION
-// =========================================================
+/* =========================================================
+   FILE UPLOAD
+========================================================= */
 
-function validateMember(number) {
-
-    const name =
-        document.querySelector(
-            `[name="m${number}_name"]`
-        );
-
-
-    const roll =
-        document.querySelector(
-            `[name="m${number}_roll"]`
-        );
-
-
-    const email =
-        document.querySelector(
-            `[name="m${number}_email"]`
-        );
-
-
-    const phone =
-        document.querySelector(
-            `[name="m${number}_phone"]`
-        );
-
-
-    const year =
-        document.querySelector(
-            `[name="m${number}_year"]`
-        );
-
-
-    const branch =
-        document.querySelector(
-            `[name="m${number}_branch"]`
-        );
-
-
-    const section =
-        document.querySelector(
-            `[name="m${number}_section"]`
-        );
-
-
-    const fields = [
-        name,
-        roll,
-        email,
-        phone,
-        year,
-        branch,
-        section
-    ];
-
-
-    for (
-        const field of fields
-    ) {
-
-        if (
-            !field ||
-            !field.value.trim()
-        ) {
-
-            if (field) {
-                field.reportValidity();
-                field.focus();
-            }
-
-            return false;
-
-        }
-
-    }
-
-
-    // PHONE
-
-    if (
-        !/^[0-9]{10}$/.test(
-            phone.value.trim()
-        )
-    ) {
-
-        showStatus(
-            `Member ${number}: enter a valid 10-digit mobile number.`,
-            true
-        );
-
-        phone.focus();
-
-        return false;
-
-    }
-
-
-    // EMAIL
-
-    if (
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-            email.value.trim()
-        )
-    ) {
-
-        showStatus(
-            `Member ${number}: enter a valid email address.`,
-            true
-        );
-
-        email.focus();
-
-        return false;
-
-    }
-
-
-    return true;
-
-}
-
-
-// =========================================================
-// RECEIPT
-// =========================================================
-
-function initializeReceipt() {
+function setupFileUpload() {
 
     const receipt =
-        document.getElementById(
-            "receipt"
-        );
+        document.getElementById("receipt");
 
+    const fileInfo =
+        document.getElementById("fileInfo");
 
     if (!receipt) {
         return;
     }
 
+    receipt.addEventListener("change", event => {
 
-    receipt.addEventListener(
-        "change",
-        function (event) {
+        const file =
+            event.target.files[0];
 
-            const file =
-                event.target.files[0];
+        if (!file) {
 
-
-            const info =
-                document.getElementById(
-                    "fileInfo"
-                );
-
-
-            if (!file) {
-
-                if (info) {
-                    info.innerText =
-                        "No file selected";
-                }
-
-                return;
-
+            if (fileInfo) {
+                fileInfo.innerText =
+                    "No file selected";
             }
 
+            return;
+        }
 
-            const allowedTypes = [
-                "image/jpeg",
-                "image/png",
-                "application/pdf"
-            ];
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "application/pdf"
+        ];
 
+        if (!allowedTypes.includes(file.type)) {
 
-            if (
-                !allowedTypes.includes(
-                    file.type
-                )
-            ) {
+            receipt.value = "";
 
-                event.target.value =
-                    "";
-
-
-                if (info) {
-
-                    info.innerText =
-                        "Invalid file type. Use JPG, PNG or PDF.";
-
-                }
-
-
-                showStatus(
-                    "Please upload a JPG, PNG or PDF payment receipt.",
-                    true
-                );
-
-                return;
-
+            if (fileInfo) {
+                fileInfo.innerText =
+                    "Invalid file. Use JPG, PNG or PDF.";
             }
 
+            showStatus(
+                "Please upload a JPG, PNG or PDF payment receipt.",
+                true
+            );
 
-            if (
-                file.size >
-                CONFIG.MAX_FILE_SIZE
-            ) {
+            return;
+        }
 
-                event.target.value =
-                    "";
+        if (file.size > CONFIG.MAX_FILE_SIZE) {
 
+            receipt.value = "";
 
-                if (info) {
-
-                    info.innerText =
-                        "No file selected";
-
-                }
-
-
-                showStatus(
-                    "Payment receipt must be 10MB or smaller.",
-                    true
-                );
-
-                return;
-
+            if (fileInfo) {
+                fileInfo.innerText =
+                    "File is too large. Maximum size is 10MB.";
             }
 
+            showStatus(
+                "Payment receipt must be 10MB or smaller.",
+                true
+            );
 
-            if (info) {
+            return;
+        }
 
-                info.innerText =
-                    `Selected: ${file.name} ` +
-                    `(${(
-                        file.size /
-                        1024 /
-                        1024
-                    ).toFixed(2)} MB)`;
+        if (fileInfo) {
 
-            }
-
-
-            clearStatus();
+            fileInfo.innerText =
+                `Selected: ${file.name} (${(
+                    file.size / 1024 / 1024
+                ).toFixed(2)} MB)`;
 
         }
-    );
+
+        clearStatus();
+
+    });
 
 }
 
 
-// =========================================================
-// FORM SUBMISSION
-// =========================================================
+/* =========================================================
+   FORM SUBMISSION
+========================================================= */
 
-function initializeForm() {
+function setupFormSubmission() {
 
     const form =
-        document.getElementById(
-            "registrationForm"
-        );
-
+        document.getElementById("registrationForm");
 
     if (!form) {
         return;
     }
 
+    form.addEventListener("submit", async event => {
 
-    form.addEventListener(
-        "submit",
-        async function (event) {
+        event.preventDefault();
 
-            event.preventDefault();
+        clearStatus();
 
+        // Must be on payment step
+        if (currentStep !== 5) {
+            showStatus(
+                "Please complete the registration steps first.",
+                true
+            );
+            return;
+        }
 
-            if (isSubmitting) {
-                return;
-            }
+        if (!validateCompleteForm(form)) {
+            return;
+        }
 
+        const submitBtn =
+            document.getElementById("submitBtn");
 
-            // Validate all visible steps.
+        const receipt =
+            document.getElementById("receipt");
 
-            if (
-                !validateAllSteps()
-            ) {
+        try {
 
-                return;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML =
+                "Submitting Registration...";
 
-            }
+            showStatus(
+                "Uploading registration and payment receipt...",
+                false
+            );
 
+            const formData =
+                new FormData(form);
 
-            const submitBtn =
-                document.getElementById(
-                    "submitBtn"
+            const data =
+                Object.fromEntries(
+                    formData.entries()
                 );
 
+            // Fixed payment amount
+            data.payAmount =
+                String(CONFIG.PAYMENT_FEE);
 
-            const status =
-                document.getElementById(
-                    "statusMessage"
+            // Create unique token for backend tracking
+            data.submissionToken =
+                createSubmissionToken();
+
+            // Receipt
+            const file =
+                receipt.files[0];
+
+            if (!file) {
+                throw new Error(
+                    "Payment receipt is required."
                 );
-
-
-            isSubmitting =
-                true;
-
-
-            if (submitBtn) {
-
-                submitBtn.disabled =
-                    true;
-
-                submitBtn.innerText =
-                    "Submitting Registration...";
-
             }
 
+            data.receiptBase64 =
+                await convertFileToBase64(file);
 
-            if (status) {
+            data.receiptType =
+                file.type;
 
-                status.classList.remove(
-                    "hidden"
-                );
+            data.receiptName =
+                file.name;
 
-                status.innerText =
-                    "Uploading registration and payment receipt...";
-
-            }
-
-
-            try {
-
-                const formData =
-                    new FormData(
-                        form
-                    );
-
-
-                const data =
-                    Object.fromEntries(
-                        formData.entries()
-                    );
-
-
-                // FIXED PAYMENT
-
-                data.payAmount =
-                    "300";
-
-
-                // RECEIPT
-
-                const receipt =
-                    document.getElementById(
-                        "receipt"
-                    );
-
-
-                const file =
-                    receipt?.files[0];
-
-
-                if (!file) {
-
-                    throw new Error(
-                        "Payment receipt is required."
-                    );
-
+            /*
+             * Send to Google Apps Script.
+             *
+             * no-cors is used because the Apps Script
+             * endpoint is cross-origin.
+             */
+            await fetch(
+                CONFIG.API_URL,
+                {
+                    method: "POST",
+                    mode: "no-cors",
+                    cache: "no-cache",
+                    body: JSON.stringify(data)
                 }
+            );
 
+            /*
+             * Do NOT poll for Registration ID.
+             *
+             * Apps Script generates and stores the ID
+             * directly in Google Sheets.
+             *
+             * Website only shows successful submission.
+             */
 
-                data.receiptBase64 =
-                    await convertFileToBase64(
-                        file
-                    );
+            showSuccess();
 
+        } catch (error) {
 
-                data.receiptType =
-                    file.type;
+            console.error(
+                "Registration submission error:",
+                error
+            );
 
+            showStatus(
+                error.message ||
+                "Unable to submit registration. Please try again.",
+                true
+            );
 
-                data.receiptName =
-                    file.name;
+            submitBtn.disabled = false;
 
-
-                // SEND
-
-                if (status) {
-
-                    status.innerText =
-                        "Submitting registration...";
-
-                }
-
-
-                await fetch(
-                    CONFIG.API_URL,
-                    {
-                        method: "POST",
-
-                        mode: "no-cors",
-
-                        cache: "no-cache",
-
-                        body:
-                            JSON.stringify(
-                                data
-                            )
-                    }
-                );
-
-
-                // Apps Script receives the data,
-                // generates Registration ID,
-                // stores it in Sheets,
-                // and saves receipt in Drive.
-                //
-                // Participant does NOT see the ID.
-
-                showSuccess();
-
-
-            } catch (error) {
-
-                console.error(
-                    "Registration error:",
-                    error
-                );
-
-
-                showStatus(
-                    error.message ||
-                    "Unable to submit registration. Please try again.",
-                    true
-                );
-
-
-                if (submitBtn) {
-
-                    submitBtn.disabled =
-                        false;
-
-                    submitBtn.innerText =
-                        "Submit Registration ✓";
-
-                }
-
-
-                isSubmitting =
-                    false;
-
-            }
+            submitBtn.innerHTML =
+                'Submit Registration <span>✓</span>';
 
         }
-    );
+
+    });
 
 }
 
 
-// =========================================================
-// VALIDATE COMPLETE FORM
-// =========================================================
+/* =========================================================
+   COMPLETE FORM VALIDATION
+========================================================= */
 
-function validateAllSteps() {
+function validateCompleteForm(form) {
+
+    if (!form.checkValidity()) {
+
+        form.reportValidity();
+
+        return false;
+    }
 
     const teamSize =
-        getTeamSize();
+        document.querySelector(
+            'input[name="teamSize"]:checked'
+        )?.value;
+
+    if (!["2", "3"].includes(teamSize)) {
+
+        showStatus(
+            "Please select a team size of 2 or 3.",
+            true
+        );
+
+        return false;
+    }
 
 
-    const steps =
-        teamSize === "3"
-            ? [1, 2, 3, 4]
-            : [1, 2, 3];
+    /* -------------------------
+       YEAR VALIDATION
+    ------------------------- */
 
+    const years = [];
 
-    for (
-        const step of steps
-    ) {
+    const m1Year =
+        document.querySelector('[name="m1_year"]');
 
-        if (
-            !validateStep(step)
-        ) {
+    const m2Year =
+        document.querySelector('[name="m2_year"]');
 
-            showStep(step);
+    if (m1Year) {
+        years.push(m1Year.value);
+    }
 
-            return false;
+    if (m2Year) {
+        years.push(m2Year.value);
+    }
 
+    if (teamSize === "3") {
+
+        const m3Year =
+            document.querySelector('[name="m3_year"]');
+
+        if (m3Year) {
+            years.push(m3Year.value);
         }
 
     }
 
-
-    // -------------------------
-    // FOURTH YEAR LIMIT
-    // -------------------------
-
-    let fourthYearCount =
-        0;
-
-
-    const members =
-        teamSize === "3"
-            ? [1, 2, 3]
-            : [1, 2];
-
-
-    members.forEach(
-        function (number) {
-
-            const year =
-                document.querySelector(
-                    `[name="m${number}_year"]`
-                );
-
-
-            if (
-                year &&
-                year.value === "4th Year"
-            ) {
-
-                fourthYearCount++;
-
-            }
-
-        }
-    );
-
+    const allowedYears = [
+        "2nd Year",
+        "3rd Year",
+        "4th Year"
+    ];
 
     if (
-        fourthYearCount > 1
+        years.some(
+            year =>
+                !allowedYears.includes(year)
+        )
     ) {
+
+        showStatus(
+            "Only 2nd Year, 3rd Year and 4th Year students are allowed.",
+            true
+        );
+
+        return false;
+    }
+
+
+    /* -------------------------
+       MAX ONE 4TH YEAR
+    ------------------------- */
+
+    const fourthYearCount =
+        years.filter(
+            year =>
+                year === "4th Year"
+        ).length;
+
+    if (fourthYearCount > 1) {
 
         showStatus(
             "A team can have a maximum of one 4th-year student.",
@@ -1421,50 +746,133 @@ function validateAllSteps() {
         );
 
         return false;
+    }
+
+
+    /* -------------------------
+       PHONE + EMAIL
+    ------------------------- */
+
+    const phones = [];
+    const emails = [];
+
+    const memberCount =
+        teamSize === "3"
+            ? 3
+            : 2;
+
+    for (
+        let i = 1;
+        i <= memberCount;
+        i++
+    ) {
+
+        const phoneElement =
+            document.querySelector(
+                `[name="m${i}_phone"]`
+            );
+
+        const emailElement =
+            document.querySelector(
+                `[name="m${i}_email"]`
+            );
+
+        if (
+            !phoneElement ||
+            !emailElement
+        ) {
+
+            showStatus(
+                `Member ${i} details are missing.`,
+                true
+            );
+
+            return false;
+        }
+
+        const phone =
+            phoneElement.value.trim();
+
+        const email =
+            emailElement.value
+                .trim()
+                .toLowerCase();
+
+        if (
+            !/^[0-9]{10}$/.test(phone)
+        ) {
+
+            showStatus(
+                `Member ${i}: please enter a valid 10-digit mobile number.`,
+                true
+            );
+
+            return false;
+        }
+
+        if (
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/
+                .test(email)
+        ) {
+
+            showStatus(
+                `Member ${i}: please enter a valid email address.`,
+                true
+            );
+
+            return false;
+        }
+
+        if (phones.includes(phone)) {
+
+            showStatus(
+                "Each team member must have a different mobile number.",
+                true
+            );
+
+            return false;
+        }
+
+        if (emails.includes(email)) {
+
+            showStatus(
+                "Each team member must have a different email ID.",
+                true
+            );
+
+            return false;
+        }
+
+        phones.push(phone);
+        emails.push(email);
 
     }
 
 
-    // -------------------------
-    // PAYMENT
-    // -------------------------
+    /* -------------------------
+       UTR
+    ------------------------- */
 
-    showStep(5);
-
-
-    const utr =
+    const utrElement =
         document.querySelector(
             '[name="utr"]'
         );
 
-
-    const receipt =
-        document.getElementById(
-            "receipt"
-        );
-
-
-    if (
-        !utr ||
-        !utr.value.trim()
-    ) {
+    if (!utrElement) {
 
         showStatus(
-            "Please enter your UPI Transaction ID / UTR.",
+            "Payment transaction field is missing.",
             true
         );
 
-        utr?.focus();
-
         return false;
-
     }
 
+    const utr =
+        utrElement.value.trim();
 
     if (
-        !/^[A-Za-z0-9]{8,30}$/.test(
-            utr.value.trim()
-        )
+        !/^[A-Za-z0-9]{8,30}$/.test(utr)
     ) {
 
         showStatus(
@@ -1472,17 +880,20 @@ function validateAllSteps() {
             true
         );
 
-        utr.focus();
-
         return false;
-
     }
 
 
-    if (
-        !receipt ||
-        !receipt.files[0]
-    ) {
+    /* -------------------------
+       RECEIPT
+    ------------------------- */
+
+    const receipt =
+        document.getElementById(
+            "receipt"
+        )?.files[0];
+
+    if (!receipt) {
 
         showStatus(
             "Please upload your payment receipt.",
@@ -1490,68 +901,118 @@ function validateAllSteps() {
         );
 
         return false;
-
     }
 
+    const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "application/pdf"
+    ];
+
+    if (
+        !allowedTypes.includes(
+            receipt.type
+        )
+    ) {
+
+        showStatus(
+            "Payment receipt must be JPG, PNG or PDF.",
+            true
+        );
+
+        return false;
+    }
+
+    if (
+        receipt.size >
+        CONFIG.MAX_FILE_SIZE
+    ) {
+
+        showStatus(
+            "Payment receipt must be 10MB or smaller.",
+            true
+        );
+
+        return false;
+    }
 
     return true;
-
 }
 
 
-// =========================================================
-// FILE → BASE64
-// =========================================================
+/* =========================================================
+   TOKEN
+========================================================= */
 
-function convertFileToBase64(
-    file
-) {
+function createSubmissionToken() {
+
+    if (
+        window.crypto &&
+        window.crypto.getRandomValues
+    ) {
+
+        const bytes =
+            new Uint8Array(18);
+
+        window.crypto.getRandomValues(
+            bytes
+        );
+
+        return Array.from(
+            bytes,
+            byte =>
+                byte
+                    .toString(16)
+                    .padStart(2, "0")
+        ).join("");
+
+    }
+
+    return (
+        Date.now() +
+        Math.random()
+            .toString(36)
+            .slice(2)
+    );
+}
+
+
+/* =========================================================
+   FILE → BASE64
+========================================================= */
+
+function convertFileToBase64(file) {
 
     return new Promise(
-        function (
-            resolve,
-            reject
-        ) {
+        (resolve, reject) => {
 
             const reader =
                 new FileReader();
-
 
             reader.readAsDataURL(
                 file
             );
 
+            reader.onload = () => {
 
-            reader.onload =
-                function () {
+                resolve(
+                    reader.result
+                        .split(",")[1]
+                );
 
-                    const result =
-                        reader.result;
-
-
-                    resolve(
-                        result.split(",")[1]
-                    );
-
-                };
-
+            };
 
             reader.onerror =
-                function (error) {
-
-                    reject(error);
-
-                };
+                reject;
 
         }
     );
-
 }
 
 
-// =========================================================
-// SUCCESS
-// =========================================================
+/* =========================================================
+   SUCCESS SCREEN
+========================================================= */
 
 function showSuccess() {
 
@@ -1560,30 +1021,24 @@ function showSuccess() {
             "registrationForm"
         );
 
-
-    const success =
+    const successScreen =
         document.getElementById(
             "successScreen"
         );
 
-
     if (form) {
+        form.classList.add("hidden");
+    }
 
-        form.classList.add(
+    if (successScreen) {
+
+        successScreen.classList.remove(
             "hidden"
         );
 
     }
 
-
-    if (success) {
-
-        success.classList.remove(
-            "hidden"
-        );
-
-    }
-
+    // Registration ID is intentionally NOT displayed.
 
     window.scrollTo({
         top: 0,
@@ -1593,13 +1048,13 @@ function showSuccess() {
 }
 
 
-// =========================================================
-// STATUS
-// =========================================================
+/* =========================================================
+   STATUS
+========================================================= */
 
 function showStatus(
     message,
-    isError
+    isError = false
 ) {
 
     const status =
@@ -1607,25 +1062,26 @@ function showStatus(
             "statusMessage"
         );
 
-
     if (!status) {
         return;
     }
-
 
     status.classList.remove(
         "hidden"
     );
 
-
     status.innerText =
         message;
-
 
     status.style.color =
         isError
             ? "var(--error)"
             : "var(--text-muted)";
+
+    status.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
 
 }
 
@@ -1637,18 +1093,14 @@ function clearStatus() {
             "statusMessage"
         );
 
-
     if (!status) {
         return;
     }
-
 
     status.classList.add(
         "hidden"
     );
 
-
-    status.innerText =
-        "";
+    status.innerText = "";
 
 }
