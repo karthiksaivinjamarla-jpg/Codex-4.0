@@ -1096,3 +1096,502 @@ document.querySelectorAll('input[name="teamSize"]').forEach(radio => {
     });
 
 });
+// =====================================================
+// CODEX 4.0 - STEP NAVIGATION
+// =====================================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    let currentStep = 1;
+
+    const nextBtn = document.getElementById("nextBtn");
+    const backBtn = document.getElementById("backBtn");
+    const submitBtn = document.getElementById("submitBtn");
+    const progressBar = document.getElementById("progressBar");
+
+    const steps = document.querySelectorAll(".form-step");
+
+    const stepButtons = document.querySelectorAll(
+        ".stepper .step"
+    );
+
+    const member3Section =
+        document.getElementById("member3Section");
+
+    const member3Step =
+        document.getElementById("member3Step");
+
+
+    // -------------------------------------------------
+    // GET SELECTED TEAM SIZE
+    // -------------------------------------------------
+
+    function getTeamSize() {
+
+        const selected =
+            document.querySelector(
+                'input[name="teamSize"]:checked'
+            );
+
+        return selected ? selected.value : "2";
+    }
+
+
+    // -------------------------------------------------
+    // UPDATE TEAM SIZE VISUAL
+    // -------------------------------------------------
+
+    function updateTeamSizeUI() {
+
+        document
+            .querySelectorAll(".choice")
+            .forEach(choice => {
+
+                const radio =
+                    choice.querySelector(
+                        'input[name="teamSize"]'
+                    );
+
+                if (!radio) return;
+
+                choice.classList.toggle(
+                    "active",
+                    radio.checked
+                );
+
+            });
+    }
+
+
+    // -------------------------------------------------
+    // SHOW STEP
+    // -------------------------------------------------
+
+    function showStep(stepNumber) {
+
+        const teamSize = getTeamSize();
+
+        // If team has only 2 members,
+        // skip Member 3.
+        if (
+            stepNumber === 4 &&
+            teamSize !== "3"
+        ) {
+            stepNumber = 5;
+        }
+
+
+        currentStep = stepNumber;
+
+
+        // Hide all sections
+
+        steps.forEach(section => {
+
+            const panel =
+                Number(
+                    section.dataset.panel
+                );
+
+            section.classList.toggle(
+                "active",
+                panel === currentStep
+            );
+
+            section.classList.toggle(
+                "hidden",
+                panel !== currentStep
+            );
+
+        });
+
+
+        // Update stepper
+
+        stepButtons.forEach(button => {
+
+            const number =
+                Number(
+                    button.dataset.step
+                );
+
+            button.classList.toggle(
+                "active",
+                number === currentStep
+            );
+
+        });
+
+
+        // Show / hide Member 3 step
+
+        if (member3Step) {
+
+            member3Step.classList.toggle(
+                "hidden",
+                teamSize !== "3"
+            );
+
+        }
+
+
+        // Progress
+
+        if (progressBar) {
+
+            let percentage = 20;
+
+            if (currentStep === 1) {
+                percentage = 20;
+            }
+
+            else if (currentStep === 2) {
+                percentage = 40;
+            }
+
+            else if (currentStep === 3) {
+                percentage = 60;
+            }
+
+            else if (currentStep === 4) {
+                percentage = 80;
+            }
+
+            else if (currentStep === 5) {
+                percentage = 100;
+            }
+
+            progressBar.style.width =
+                percentage + "%";
+        }
+
+
+        // Buttons
+
+        if (backBtn) {
+
+            backBtn.style.display =
+                currentStep === 1
+                    ? "none"
+                    : "inline-flex";
+
+        }
+
+
+        if (currentStep === 5) {
+
+            // Payment page
+
+            if (nextBtn) {
+                nextBtn.classList.add("hidden");
+            }
+
+            if (submitBtn) {
+                submitBtn.classList.remove("hidden");
+            }
+
+        }
+
+        else {
+
+            if (nextBtn) {
+                nextBtn.classList.remove("hidden");
+            }
+
+            if (submitBtn) {
+                submitBtn.classList.add("hidden");
+            }
+
+        }
+
+
+        // Scroll to the beginning of the form
+
+        const registrationForm =
+            document.getElementById(
+                "registrationForm"
+            );
+
+        if (registrationForm) {
+
+            registrationForm.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+        }
+
+    }
+
+
+    // -------------------------------------------------
+    // VALIDATE CURRENT STEP ONLY
+    // -------------------------------------------------
+
+    function validateCurrentStep() {
+
+        const section =
+            document.querySelector(
+                `.form-step[data-panel="${currentStep}"]`
+            );
+
+        if (!section) return true;
+
+
+        const fields =
+            section.querySelectorAll(
+                "input, select, textarea"
+            );
+
+
+        for (const field of fields) {
+
+            // Ignore disabled / hidden fields
+
+            if (
+                field.disabled ||
+                field.type === "hidden"
+            ) {
+                continue;
+            }
+
+
+            if (!field.checkValidity()) {
+
+                field.reportValidity();
+
+                return false;
+
+            }
+
+        }
+
+
+        // Special validation for team size
+
+        if (currentStep === 1) {
+
+            const teamSize =
+                document.querySelector(
+                    'input[name="teamSize"]:checked'
+                );
+
+            if (!teamSize) {
+
+                alert(
+                    "Please select a team size."
+                );
+
+                return false;
+
+            }
+
+        }
+
+
+        return true;
+
+    }
+
+
+    // -------------------------------------------------
+    // CONTINUE BUTTON
+    // -------------------------------------------------
+
+    if (nextBtn) {
+
+        nextBtn.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+
+
+                if (!validateCurrentStep()) {
+                    return;
+                }
+
+
+                const teamSize =
+                    getTeamSize();
+
+
+                if (currentStep === 1) {
+
+                    showStep(2);
+
+                }
+
+                else if (currentStep === 2) {
+
+                    showStep(3);
+
+                }
+
+                else if (currentStep === 3) {
+
+                    if (teamSize === "3") {
+                        showStep(4);
+                    }
+                    else {
+                        showStep(5);
+                    }
+
+                }
+
+                else if (currentStep === 4) {
+
+                    showStep(5);
+
+                }
+
+            }
+        );
+
+    }
+
+
+    // -------------------------------------------------
+    // BACK BUTTON
+    // -------------------------------------------------
+
+    if (backBtn) {
+
+        backBtn.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+
+
+                if (currentStep === 5) {
+
+                    if (
+                        getTeamSize() === "3"
+                    ) {
+                        showStep(4);
+                    }
+                    else {
+                        showStep(3);
+                    }
+
+                }
+
+                else if (currentStep === 4) {
+
+                    showStep(3);
+
+                }
+
+                else if (currentStep === 3) {
+
+                    showStep(2);
+
+                }
+
+                else if (currentStep === 2) {
+
+                    showStep(1);
+
+                }
+
+            }
+        );
+
+    }
+
+
+    // -------------------------------------------------
+    // TEAM SIZE CHANGE
+    // -------------------------------------------------
+
+    document
+        .querySelectorAll(
+            'input[name="teamSize"]'
+        )
+        .forEach(radio => {
+
+            radio.addEventListener(
+                "change",
+                function () {
+
+                    updateTeamSizeUI();
+
+                    const isThree =
+                        this.value === "3";
+
+
+                    // Member 3 section
+
+                    if (member3Section) {
+
+                        member3Section.classList.toggle(
+                            "hidden",
+                            !isThree
+                        );
+
+                    }
+
+
+                    // Member 3 step
+
+                    if (member3Step) {
+
+                        member3Step.classList.toggle(
+                            "hidden",
+                            !isThree
+                        );
+
+                    }
+
+
+                    // Required fields
+
+                    if (member3Section) {
+
+                        const fields =
+                            member3Section.querySelectorAll(
+                                "input, select"
+                            );
+
+                        fields.forEach(field => {
+
+                            if (isThree) {
+
+                                field.setAttribute(
+                                    "required",
+                                    ""
+                                );
+
+                            }
+                            else {
+
+                                field.removeAttribute(
+                                    "required"
+                                );
+
+                                field.setCustomValidity(
+                                    ""
+                                );
+
+                            }
+
+                        });
+
+                    }
+
+                }
+            );
+
+        });
+
+
+    // -------------------------------------------------
+    // INITIAL STATE
+    // -------------------------------------------------
+
+    updateTeamSizeUI();
+
+    showStep(1);
+
+});
