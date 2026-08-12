@@ -1,10 +1,15 @@
 /**
+ * =========================================================
  * CODEX 4.0
  * Registration Frontend
  *
- * GitHub → Netlify → Google Apps Script
+ * Frontend:
+ * GitHub / Netlify
+ *
+ * Backend:
+ * Google Apps Script
+ * =========================================================
  */
-
 
 const CONFIG = {
 
@@ -25,524 +30,99 @@ const CONFIG = {
 
     MAX_FILE_SIZE:
         10 * 1024 * 1024
+
 };
 
 
-
-/* =========================================================
-   GLOBAL STATE
-========================================================= */
-
 let currentStep = 1;
+let isSubmitting = false;
 
 
-
-/* =========================================================
-   INITIALIZATION
-========================================================= */
+// =========================================================
+// INITIALIZE
+// =========================================================
 
 document.addEventListener(
     "DOMContentLoaded",
-    () => {
+    function () {
 
-        const qr =
-            document.getElementById(
-                "paymentQR"
-            );
+        initializeQR();
+        initializeTeamSize();
+        initializeReceipt();
+        initializeNavigation();
+        initializeForm();
 
-        const fee =
-            document.getElementById(
-                "displayFee"
-            );
-
-
-        if (qr) {
-
-            qr.src =
-                CONFIG.QR_IMAGE_URL;
-
-        }
-
-
-        if (fee) {
-
-            fee.innerText =
-                `₹${CONFIG.PAYMENT_FEE} per team`;
-
-        }
-
-
-        setupEventListeners();
-
-        setupNavigation();
-
-        updateTeamSizeUI();
-
+        updateTeamSize();
         showStep(1);
 
     }
 );
 
 
+// =========================================================
+// QR
+// =========================================================
 
-/* =========================================================
-   NAVIGATION SETUP
-========================================================= */
+function initializeQR() {
 
-function setupNavigation() {
-
-    const nextBtn =
+    const qr =
         document.getElementById(
-            "nextBtn"
+            "paymentQR"
         );
 
-    const backBtn =
+    const fee =
         document.getElementById(
-            "backBtn"
+            "displayFee"
         );
 
 
-    /* CONTINUE */
+    if (qr) {
 
-    if (nextBtn) {
-
-        nextBtn.addEventListener(
-            "click",
-            () => {
-
-                if (
-                    currentStep === 5
-                ) {
-                    return;
-                }
-
-
-                if (
-                    !validateCurrentStep()
-                ) {
-                    return;
-                }
-
-
-                const nextStep =
-                    getNextStep(
-                        currentStep
-                    );
-
-
-                if (nextStep) {
-
-                    showStep(
-                        nextStep
-                    );
-
-                }
-
-            }
-        );
+        qr.src =
+            CONFIG.QR_IMAGE_URL;
 
     }
 
 
+    if (fee) {
 
-    /* BACK */
-
-    if (backBtn) {
-
-        backBtn.addEventListener(
-            "click",
-            () => {
-
-                if (
-                    currentStep === 1
-                ) {
-                    return;
-                }
-
-
-                const previousStep =
-                    getPreviousStep(
-                        currentStep
-                    );
-
-
-                if (previousStep) {
-
-                    showStep(
-                        previousStep
-                    );
-
-                }
-
-            }
-        );
+        fee.innerText =
+            `₹${CONFIG.PAYMENT_FEE} per team`;
 
     }
 
 }
 
 
+// =========================================================
+// TEAM SIZE
+// =========================================================
 
-/* =========================================================
-   NEXT STEP
-========================================================= */
+function initializeTeamSize() {
 
-function getNextStep(step) {
-
-    const teamSize =
-        getTeamSize();
-
-
-    if (step === 1) {
-
-        return 2;
-
-    }
-
-
-    if (step === 2) {
-
-        return 3;
-
-    }
-
-
-    if (step === 3) {
-
-        if (
-            teamSize === "3"
-        ) {
-
-            return 4;
-
-        }
-
-        return 5;
-
-    }
-
-
-    if (step === 4) {
-
-        return 5;
-
-    }
-
-
-    return null;
-
-}
-
-
-
-/* =========================================================
-   PREVIOUS STEP
-========================================================= */
-
-function getPreviousStep(step) {
-
-    const teamSize =
-        getTeamSize();
-
-
-    if (step === 5) {
-
-        if (
-            teamSize === "3"
-        ) {
-
-            return 4;
-
-        }
-
-        return 3;
-
-    }
-
-
-    if (step === 4) {
-
-        return 3;
-
-    }
-
-
-    if (step === 3) {
-
-        return 2;
-
-    }
-
-
-    if (step === 2) {
-
-        return 1;
-
-    }
-
-
-    return null;
-
-}
-
-
-
-/* =========================================================
-   SHOW STEP
-========================================================= */
-
-function showStep(step) {
-
-    const teamSize =
-        getTeamSize();
-
-
-    /*
-     * Safety:
-     * Member 3 cannot be opened
-     * for a 2-member team.
-     */
-
-    if (
-        step === 4 &&
-        teamSize !== "3"
-    ) {
-
-        step = 5;
-
-    }
-
-
-    currentStep =
-        step;
-
-
-
-    /* -----------------------------------------
-       FORM PANELS
-    ----------------------------------------- */
-
-    const panels =
+    const radios =
         document.querySelectorAll(
-            ".form-step"
+            'input[name="teamSize"]'
         );
 
 
-    panels.forEach(
-        panel => {
+    radios.forEach(
+        function (radio) {
 
-            const panelStep =
-                Number(
-                    panel.dataset.panel
-                );
+            radio.addEventListener(
+                "change",
+                function () {
 
+                    updateTeamSize();
 
-            panel.classList.toggle(
-                "active",
-                panelStep === currentStep
+                }
             );
 
         }
     );
 
-
-
-    /* -----------------------------------------
-       STEPPER
-    ----------------------------------------- */
-
-    const steps =
-        document.querySelectorAll(
-            ".stepper .step"
-        );
-
-
-    steps.forEach(
-        stepButton => {
-
-            const stepNumber =
-                Number(
-                    stepButton.dataset.step
-                );
-
-
-            stepButton.classList.toggle(
-                "active",
-                stepNumber === currentStep
-            );
-
-
-            stepButton.classList.toggle(
-                "completed",
-                stepNumber < currentStep
-            );
-
-
-            /*
-             * Member 3 step only for 3-member teams.
-             */
-
-            if (
-                stepNumber === 4
-            ) {
-
-                stepButton.classList.toggle(
-                    "hidden",
-                    teamSize !== "3"
-                );
-
-            }
-
-        }
-    );
-
-
-
-    /* -----------------------------------------
-       PROGRESS BAR
-    ----------------------------------------- */
-
-    const progressBar =
-        document.getElementById(
-            "progressBar"
-        );
-
-
-    if (progressBar) {
-
-        /*
-         * 5 total stages
-         */
-
-        const percentage =
-            (currentStep / 5) * 100;
-
-
-        progressBar.style.width =
-            `${percentage}%`;
-
-    }
-
-
-
-    /* -----------------------------------------
-       BUTTONS
-    ----------------------------------------- */
-
-    const backBtn =
-        document.getElementById(
-            "backBtn"
-        );
-
-    const nextBtn =
-        document.getElementById(
-            "nextBtn"
-        );
-
-    const submitBtn =
-        document.getElementById(
-            "submitBtn"
-        );
-
-
-
-    /*
-     * BACK
-     */
-
-    if (backBtn) {
-
-        if (
-            currentStep === 1
-        ) {
-
-            backBtn.style.display =
-                "none";
-
-        } else {
-
-            backBtn.style.display =
-                "inline-flex";
-
-        }
-
-    }
-
-
-
-    /*
-     * CONTINUE
-     */
-
-    if (nextBtn) {
-
-        if (
-            currentStep === 5
-        ) {
-
-            nextBtn.style.display =
-                "none";
-
-            nextBtn.classList.add(
-                "hidden"
-            );
-
-        } else {
-
-            nextBtn.style.display =
-                "inline-flex";
-
-            nextBtn.classList.remove(
-                "hidden"
-            );
-
-        }
-
-    }
-
-
-
-    /*
-     * SUBMIT
-     */
-
-    if (submitBtn) {
-
-        if (
-            currentStep === 5
-        ) {
-
-            submitBtn.style.display =
-                "inline-flex";
-
-            submitBtn.classList.remove(
-                "hidden"
-            );
-
-        } else {
-
-            submitBtn.style.display =
-                "none";
-
-            submitBtn.classList.add(
-                "hidden"
-            );
-
-        }
-
-    }
-
-
-
-    clearStatus();
-
 }
 
-
-
-/* =========================================================
-   TEAM SIZE
-========================================================= */
 
 function getTeamSize() {
 
@@ -559,12 +139,7 @@ function getTeamSize() {
 }
 
 
-
-/* =========================================================
-   TEAM SIZE UI
-========================================================= */
-
-function updateTeamSizeUI() {
+function updateTeamSize() {
 
     const teamSize =
         getTeamSize();
@@ -582,70 +157,6 @@ function updateTeamSizeUI() {
         );
 
 
-    const choices =
-        document.querySelectorAll(
-            ".choice"
-        );
-
-
-
-    /* -----------------------------------------
-       FIX 2 / 3 MEMBERS LIGHTING
-    ----------------------------------------- */
-
-    choices.forEach(
-        choice => {
-
-            const radio =
-                choice.querySelector(
-                    'input[name="teamSize"]'
-                );
-
-
-            if (!radio) {
-                return;
-            }
-
-
-            choice.classList.toggle(
-                "active",
-                radio.checked
-            );
-
-        }
-    );
-
-
-
-    /* -----------------------------------------
-       MEMBER 3
-    ----------------------------------------- */
-
-    if (member3Section) {
-
-        member3Section.classList.toggle(
-            "hidden",
-            teamSize !== "3"
-        );
-
-    }
-
-
-    if (member3Step) {
-
-        member3Step.classList.toggle(
-            "hidden",
-            teamSize !== "3"
-        );
-
-    }
-
-
-    /*
-     * Make Member 3 required only
-     * when team size = 3.
-     */
-
     const member3Inputs =
         member3Section
             ? member3Section.querySelectorAll(
@@ -654,73 +165,256 @@ function updateTeamSizeUI() {
             : [];
 
 
-    member3Inputs.forEach(
-        input => {
+    // -------------------------
+    // MEMBER 3
+    // -------------------------
 
-            if (
-                teamSize === "3"
-            ) {
+    if (teamSize === "3") {
+
+        if (member3Section) {
+            member3Section.classList.remove(
+                "hidden"
+            );
+        }
+
+
+        if (member3Step) {
+            member3Step.classList.remove(
+                "hidden"
+            );
+        }
+
+
+        member3Inputs.forEach(
+            function (input) {
 
                 input.setAttribute(
                     "required",
                     ""
                 );
 
-            } else {
+            }
+        );
+
+    } else {
+
+        if (member3Section) {
+            member3Section.classList.add(
+                "hidden"
+            );
+        }
+
+
+        if (member3Step) {
+            member3Step.classList.add(
+                "hidden"
+            );
+        }
+
+
+        member3Inputs.forEach(
+            function (input) {
 
                 input.removeAttribute(
                     "required"
                 );
 
-                input.setCustomValidity(
-                    ""
-                );
+                input.setCustomValidity("");
 
             }
+        );
 
-        }
-    );
+    }
+
+
+    // -------------------------
+    // TEAM SIZE LIGHTING
+    // -------------------------
+
+    document
+        .querySelectorAll(
+            'input[name="teamSize"]'
+        )
+        .forEach(
+            function (radio) {
+
+                const choice =
+                    radio.closest(
+                        ".choice"
+                    );
+
+
+                if (choice) {
+
+                    choice.classList.toggle(
+                        "active",
+                        radio.checked
+                    );
+
+                }
+
+            }
+        );
+
+
+    // -------------------------
+    // IF CURRENT STEP INVALID
+    // -------------------------
+
+    if (
+        currentStep === 4 &&
+        teamSize === "2"
+    ) {
+
+        showStep(5);
+
+    }
 
 }
 
 
+// =========================================================
+// NAVIGATION
+// =========================================================
 
-/* =========================================================
-   EVENT LISTENERS
-========================================================= */
+function initializeNavigation() {
 
-function setupEventListeners() {
-
-    const form =
+    const nextBtn =
         document.getElementById(
-            "registrationForm"
+            "nextBtn"
         );
 
 
-    if (!form) {
-        return;
+    const backBtn =
+        document.getElementById(
+            "backBtn"
+        );
+
+
+    const steps =
+        document.querySelectorAll(
+            ".stepper .step"
+        );
+
+
+    // CONTINUE
+
+    if (nextBtn) {
+
+        nextBtn.addEventListener(
+            "click",
+            function () {
+
+                if (isSubmitting) {
+                    return;
+                }
+
+
+                if (
+                    !validateStep(
+                        currentStep
+                    )
+                ) {
+
+                    return;
+
+                }
+
+
+                const next =
+                    getNextStep(
+                        currentStep
+                    );
+
+
+                if (next) {
+
+                    showStep(next);
+
+                }
+
+            }
+        );
+
     }
 
 
+    // BACK
 
-    /* -----------------------------------------
-       TEAM SIZE RADIO
-    ----------------------------------------- */
+    if (backBtn) {
 
-    const teamSizeRadios =
-        document.getElementsByName(
-            "teamSize"
+        backBtn.addEventListener(
+            "click",
+            function () {
+
+                if (isSubmitting) {
+                    return;
+                }
+
+
+                const previous =
+                    getPreviousStep(
+                        currentStep
+                    );
+
+
+                if (previous) {
+
+                    showStep(
+                        previous
+                    );
+
+                }
+
+            }
         );
 
+    }
 
-    teamSizeRadios.forEach(
-        radio => {
 
-            radio.addEventListener(
-                "change",
-                () => {
+    // STEPPER
 
-                    updateTeamSizeUI();
+    steps.forEach(
+        function (stepButton) {
+
+            stepButton.addEventListener(
+                "click",
+                function () {
+
+                    const target =
+                        Number(
+                            stepButton.dataset.step
+                        );
+
+
+                    if (!target) {
+                        return;
+                    }
+
+
+                    // Don't jump forward.
+
+                    if (
+                        target >
+                        currentStep
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    if (
+                        target === 4 &&
+                        getTeamSize() !== "3"
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    showStep(target);
 
                 }
             );
@@ -728,261 +422,339 @@ function setupEventListeners() {
         }
     );
 
+}
 
 
-    /* -----------------------------------------
-       RECEIPT
-    ----------------------------------------- */
+// =========================================================
+// NEXT STEP
+// =========================================================
 
-    const receiptInput =
-        document.getElementById(
-            "receipt"
-        );
+function getNextStep(step) {
+
+    const teamSize =
+        getTeamSize();
 
 
-    if (receiptInput) {
+    if (step === 1) {
+        return 2;
+    }
 
-        receiptInput.addEventListener(
-            "change",
-            handleReceipt
-        );
+
+    if (step === 2) {
+        return 3;
+    }
+
+
+    if (step === 3) {
+
+        if (teamSize === "3") {
+            return 4;
+        }
+
+        return 5;
 
     }
 
 
-
-    /* -----------------------------------------
-       DRAG AND DROP
-    ----------------------------------------- */
-
-    const dropzone =
-        document.getElementById(
-            "dropzone"
-        );
-
-
-    if (dropzone) {
-
-        dropzone.addEventListener(
-            "dragover",
-            event => {
-
-                event.preventDefault();
-
-                dropzone.classList.add(
-                    "dragging"
-                );
-
-            }
-        );
-
-
-        dropzone.addEventListener(
-            "dragleave",
-            () => {
-
-                dropzone.classList.remove(
-                    "dragging"
-                );
-
-            }
-        );
-
-
-        dropzone.addEventListener(
-            "drop",
-            event => {
-
-                event.preventDefault();
-
-                dropzone.classList.remove(
-                    "dragging"
-                );
-
-
-                const files =
-                    event.dataTransfer.files;
-
-
-                if (
-                    files.length > 0
-                ) {
-
-                    receiptInput.files =
-                        files;
-
-                    handleReceipt({
-                        target: receiptInput
-                    });
-
-                }
-
-            }
-        );
-
+    if (step === 4) {
+        return 5;
     }
 
 
-
-    /* -----------------------------------------
-       FORM SUBMISSION
-    ----------------------------------------- */
-
-    form.addEventListener(
-        "submit",
-        handleSubmit
-    );
+    return null;
 
 }
 
 
+// =========================================================
+// PREVIOUS STEP
+// =========================================================
 
-/* =========================================================
-   RECEIPT HANDLER
-========================================================= */
+function getPreviousStep(step) {
 
-function handleReceipt(event) {
-
-    const input =
-        event.target;
-
-
-    const file =
-        input.files[0];
+    const teamSize =
+        getTeamSize();
 
 
-    const info =
-        document.getElementById(
-            "fileInfo"
+    if (step === 5) {
+
+        if (teamSize === "3") {
+            return 4;
+        }
+
+        return 3;
+
+    }
+
+
+    if (step === 4) {
+        return 3;
+    }
+
+
+    if (step === 3) {
+        return 2;
+    }
+
+
+    if (step === 2) {
+        return 1;
+    }
+
+
+    return null;
+
+}
+
+
+// =========================================================
+// SHOW STEP
+// =========================================================
+
+function showStep(step) {
+
+    const teamSize =
+        getTeamSize();
+
+
+    // Never show Member 3 for a 2-member team.
+
+    if (
+        step === 4 &&
+        teamSize !== "3"
+    ) {
+
+        step = 5;
+
+    }
+
+
+    currentStep =
+        step;
+
+
+    const panels =
+        document.querySelectorAll(
+            ".form-step"
         );
 
 
-    const uploadTitle =
-        document.getElementById(
-            "uploadTitle"
+    const stepButtons =
+        document.querySelectorAll(
+            ".stepper .step"
         );
 
 
-    const uploadSub =
+    // -------------------------
+    // PANELS
+    // -------------------------
+
+    panels.forEach(
+        function (panel) {
+
+            const panelNumber =
+                Number(
+                    panel.dataset.panel
+                );
+
+
+            panel.classList.toggle(
+                "active",
+                panelNumber === currentStep
+            );
+
+
+            if (
+                panelNumber === 4 &&
+                teamSize !== "3"
+            ) {
+
+                panel.classList.add(
+                    "hidden"
+                );
+
+            }
+
+        }
+    );
+
+
+    // -------------------------
+    // STEPPER
+    // -------------------------
+
+    stepButtons.forEach(
+        function (button) {
+
+            const stepNumber =
+                Number(
+                    button.dataset.step
+                );
+
+
+            if (
+                stepNumber === 4
+            ) {
+
+                button.classList.toggle(
+                    "hidden",
+                    teamSize !== "3"
+                );
+
+            }
+
+
+            button.classList.toggle(
+                "active",
+                stepNumber === currentStep
+            );
+
+
+            button.classList.toggle(
+                "completed",
+                stepNumber < currentStep
+            );
+
+        }
+    );
+
+
+    // -------------------------
+    // PROGRESS
+    // -------------------------
+
+    const progressBar =
         document.getElementById(
-            "uploadSub"
+            "progressBar"
         );
 
 
-    if (!file) {
+    if (progressBar) {
 
-        if (info) {
+        let percentage;
 
-            info.innerText =
-                "No file selected";
+
+        if (teamSize === "3") {
+
+            const map = {
+                1: 20,
+                2: 40,
+                3: 60,
+                4: 80,
+                5: 100
+            };
+
+
+            percentage =
+                map[currentStep];
+
+        } else {
+
+            const map = {
+                1: 25,
+                2: 50,
+                3: 75,
+                5: 100
+            };
+
+
+            percentage =
+                map[currentStep];
 
         }
 
-        return;
+
+        progressBar.style.width =
+            `${percentage || 20}%`;
 
     }
 
 
+    // -------------------------
+    // BUTTONS
+    // -------------------------
 
-    const allowedTypes = [
-
-        "image/jpeg",
-
-        "image/png",
-
-        "application/pdf"
-
-    ];
-
-
-
-    if (
-        !allowedTypes.includes(
-            file.type
-        )
-    ) {
-
-        input.value = "";
-
-
-        showStatus(
-            "Please upload a JPG, PNG or PDF payment receipt.",
-            true
+    const backBtn =
+        document.getElementById(
+            "backBtn"
         );
 
 
-        return;
-
-    }
-
-
-
-    if (
-        file.size >
-        CONFIG.MAX_FILE_SIZE
-    ) {
-
-        input.value = "";
-
-
-        showStatus(
-            "Payment receipt must be 10MB or smaller.",
-            true
+    const nextBtn =
+        document.getElementById(
+            "nextBtn"
         );
 
 
-        return;
+    const submitBtn =
+        document.getElementById(
+            "submitBtn"
+        );
+
+
+    if (backBtn) {
+
+        backBtn.style.visibility =
+            currentStep === 1
+                ? "hidden"
+                : "visible";
 
     }
 
 
+    if (nextBtn) {
 
-    if (info) {
-
-        info.innerText =
-            `Selected: ${file.name} (${(
-                file.size /
-                1024 /
-                1024
-            ).toFixed(2)} MB)`;
+        nextBtn.classList.toggle(
+            "hidden",
+            currentStep === 5
+        );
 
     }
 
 
-    if (uploadTitle) {
+    if (submitBtn) {
 
-        uploadTitle.innerText =
-            "File selected ✓";
-
-    }
-
-
-    if (uploadSub) {
-
-        uploadSub.innerText =
-            file.name;
+        submitBtn.classList.toggle(
+            "hidden",
+            currentStep !== 5
+        );
 
     }
 
 
     clearStatus();
 
+
+    const register =
+        document.getElementById(
+            "register"
+        );
+
+
+    if (register) {
+
+        register.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+    }
+
 }
 
 
+// =========================================================
+// VALIDATION
+// =========================================================
 
-/* =========================================================
-   VALIDATE CURRENT STEP
-========================================================= */
-
-function validateCurrentStep() {
+function validateStep(step) {
 
     clearStatus();
 
 
     const panel =
         document.querySelector(
-            `.form-step[data-panel="${currentStep}"]`
+            `.form-step[data-panel="${step}"]`
         );
 
 
@@ -991,40 +763,73 @@ function validateCurrentStep() {
     }
 
 
+    const teamSize =
+        getTeamSize();
 
-    /*
-     * Team Details
-     */
+
+    // Member 3 isn't needed for 2 members.
 
     if (
-        currentStep === 1
+        step === 4 &&
+        teamSize !== "3"
     ) {
 
+        return true;
+
+    }
+
+
+    const fields =
+        panel.querySelectorAll(
+            "input[required], select[required]"
+        );
+
+
+    for (
+        const field of fields
+    ) {
+
+        if (
+            !field.checkValidity()
+        ) {
+
+            field.reportValidity();
+
+            field.focus();
+
+            return false;
+
+        }
+
+    }
+
+
+    // TEAM
+
+    if (step === 1) {
+
         const teamName =
-            document.getElementById(
-                "teamName"
+            document.querySelector(
+                '[name="teamName"]'
             );
 
 
-        const collegeName =
-            document.getElementById(
-                "collegeName"
+        const college =
+            document.querySelector(
+                '[name="collegeName"]'
             );
 
 
         if (
-            !teamName ||
             !teamName.value.trim()
         ) {
 
             showStatus(
-                "Please enter your team name.",
+                "Please enter a team name.",
                 true
             );
 
-
-            teamName?.focus();
-
+            teamName.focus();
 
             return false;
 
@@ -1032,8 +837,7 @@ function validateCurrentStep() {
 
 
         if (
-            !collegeName ||
-            !collegeName.value.trim()
+            !college.value.trim()
         ) {
 
             showStatus(
@@ -1041,76 +845,37 @@ function validateCurrentStep() {
                 true
             );
 
-
-            collegeName?.focus();
-
+            college.focus();
 
             return false;
 
         }
 
-
-        return true;
-
     }
 
 
-
-    /*
-     * Member 1
-     */
+    // MEMBER
 
     if (
-        currentStep === 2
+        step >= 2 &&
+        step <= 4
     ) {
 
-        return validateMember(
-            1
-        );
+        const memberNumber =
+            step - 1;
 
-    }
-
-
-
-    /*
-     * Member 2
-     */
-
-    if (
-        currentStep === 3
-    ) {
-
-        return validateMember(
-            2
-        );
-
-    }
-
-
-
-    /*
-     * Member 3
-     */
-
-    if (
-        currentStep === 4
-    ) {
 
         if (
-            getTeamSize() !== "3"
+            !validateMember(
+                memberNumber
+            )
         ) {
 
-            return true;
+            return false;
 
         }
 
-
-        return validateMember(
-            3
-        );
-
     }
-
 
 
     return true;
@@ -1118,10 +883,9 @@ function validateCurrentStep() {
 }
 
 
-
-/* =========================================================
-   MEMBER VALIDATION
-========================================================= */
+// =========================================================
+// MEMBER VALIDATION
+// =========================================================
 
 function validateMember(number) {
 
@@ -1167,25 +931,15 @@ function validateMember(number) {
         );
 
 
-
     const fields = [
-
         name,
-
         roll,
-
         email,
-
         phone,
-
         year,
-
         branch,
-
         section
-
     ];
-
 
 
     for (
@@ -1197,14 +951,10 @@ function validateMember(number) {
             !field.value.trim()
         ) {
 
-            showStatus(
-                `Please complete all details for Member ${number}.`,
-                true
-            );
-
-
-            field?.focus();
-
+            if (field) {
+                field.reportValidity();
+                field.focus();
+            }
 
             return false;
 
@@ -1213,101 +963,44 @@ function validateMember(number) {
     }
 
 
-
-    /*
-     * Mobile
-     */
-
-    const phoneValue =
-        phone.value.trim();
-
+    // PHONE
 
     if (
         !/^[0-9]{10}$/.test(
-            phoneValue
+            phone.value.trim()
         )
     ) {
 
         showStatus(
-            `Member ${number}: please enter a valid 10-digit mobile number.`,
+            `Member ${number}: enter a valid 10-digit mobile number.`,
             true
         );
-
 
         phone.focus();
 
-
         return false;
 
     }
 
 
-
-    /*
-     * Email
-     */
-
-    const emailValue =
-        email.value
-            .trim()
-            .toLowerCase();
-
+    // EMAIL
 
     if (
         !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-            emailValue
+            email.value.trim()
         )
     ) {
 
         showStatus(
-            `Member ${number}: please enter a valid email address.`,
+            `Member ${number}: enter a valid email address.`,
             true
         );
-
 
         email.focus();
 
-
         return false;
 
     }
-
-
-
-    /*
-     * Year
-     */
-
-    const allowedYears = [
-
-        "2nd Year",
-
-        "3rd Year",
-
-        "4th Year"
-
-    ];
-
-
-    if (
-        !allowedYears.includes(
-            year.value
-        )
-    ) {
-
-        showStatus(
-            `Member ${number}: select 2nd Year, 3rd Year or 4th Year.`,
-            true
-        );
-
-
-        year.focus();
-
-
-        return false;
-
-    }
-
 
 
     return true;
@@ -1315,71 +1008,365 @@ function validateMember(number) {
 }
 
 
+// =========================================================
+// RECEIPT
+// =========================================================
 
-/* =========================================================
-   VALIDATE ENTIRE FORM
-========================================================= */
+function initializeReceipt() {
 
-function validateEntireForm() {
+    const receipt =
+        document.getElementById(
+            "receipt"
+        );
+
+
+    if (!receipt) {
+        return;
+    }
+
+
+    receipt.addEventListener(
+        "change",
+        function (event) {
+
+            const file =
+                event.target.files[0];
+
+
+            const info =
+                document.getElementById(
+                    "fileInfo"
+                );
+
+
+            if (!file) {
+
+                if (info) {
+                    info.innerText =
+                        "No file selected";
+                }
+
+                return;
+
+            }
+
+
+            const allowedTypes = [
+                "image/jpeg",
+                "image/png",
+                "application/pdf"
+            ];
+
+
+            if (
+                !allowedTypes.includes(
+                    file.type
+                )
+            ) {
+
+                event.target.value =
+                    "";
+
+
+                if (info) {
+
+                    info.innerText =
+                        "Invalid file type. Use JPG, PNG or PDF.";
+
+                }
+
+
+                showStatus(
+                    "Please upload a JPG, PNG or PDF payment receipt.",
+                    true
+                );
+
+                return;
+
+            }
+
+
+            if (
+                file.size >
+                CONFIG.MAX_FILE_SIZE
+            ) {
+
+                event.target.value =
+                    "";
+
+
+                if (info) {
+
+                    info.innerText =
+                        "No file selected";
+
+                }
+
+
+                showStatus(
+                    "Payment receipt must be 10MB or smaller.",
+                    true
+                );
+
+                return;
+
+            }
+
+
+            if (info) {
+
+                info.innerText =
+                    `Selected: ${file.name} ` +
+                    `(${(
+                        file.size /
+                        1024 /
+                        1024
+                    ).toFixed(2)} MB)`;
+
+            }
+
+
+            clearStatus();
+
+        }
+    );
+
+}
+
+
+// =========================================================
+// FORM SUBMISSION
+// =========================================================
+
+function initializeForm() {
+
+    const form =
+        document.getElementById(
+            "registrationForm"
+        );
+
+
+    if (!form) {
+        return;
+    }
+
+
+    form.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            if (isSubmitting) {
+                return;
+            }
+
+
+            // Validate all visible steps.
+
+            if (
+                !validateAllSteps()
+            ) {
+
+                return;
+
+            }
+
+
+            const submitBtn =
+                document.getElementById(
+                    "submitBtn"
+                );
+
+
+            const status =
+                document.getElementById(
+                    "statusMessage"
+                );
+
+
+            isSubmitting =
+                true;
+
+
+            if (submitBtn) {
+
+                submitBtn.disabled =
+                    true;
+
+                submitBtn.innerText =
+                    "Submitting Registration...";
+
+            }
+
+
+            if (status) {
+
+                status.classList.remove(
+                    "hidden"
+                );
+
+                status.innerText =
+                    "Uploading registration and payment receipt...";
+
+            }
+
+
+            try {
+
+                const formData =
+                    new FormData(
+                        form
+                    );
+
+
+                const data =
+                    Object.fromEntries(
+                        formData.entries()
+                    );
+
+
+                // FIXED PAYMENT
+
+                data.payAmount =
+                    "300";
+
+
+                // RECEIPT
+
+                const receipt =
+                    document.getElementById(
+                        "receipt"
+                    );
+
+
+                const file =
+                    receipt?.files[0];
+
+
+                if (!file) {
+
+                    throw new Error(
+                        "Payment receipt is required."
+                    );
+
+                }
+
+
+                data.receiptBase64 =
+                    await convertFileToBase64(
+                        file
+                    );
+
+
+                data.receiptType =
+                    file.type;
+
+
+                data.receiptName =
+                    file.name;
+
+
+                // SEND
+
+                if (status) {
+
+                    status.innerText =
+                        "Submitting registration...";
+
+                }
+
+
+                await fetch(
+                    CONFIG.API_URL,
+                    {
+                        method: "POST",
+
+                        mode: "no-cors",
+
+                        cache: "no-cache",
+
+                        body:
+                            JSON.stringify(
+                                data
+                            )
+                    }
+                );
+
+
+                // Apps Script receives the data,
+                // generates Registration ID,
+                // stores it in Sheets,
+                // and saves receipt in Drive.
+                //
+                // Participant does NOT see the ID.
+
+                showSuccess();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Registration error:",
+                    error
+                );
+
+
+                showStatus(
+                    error.message ||
+                    "Unable to submit registration. Please try again.",
+                    true
+                );
+
+
+                if (submitBtn) {
+
+                    submitBtn.disabled =
+                        false;
+
+                    submitBtn.innerText =
+                        "Submit Registration ✓";
+
+                }
+
+
+                isSubmitting =
+                    false;
+
+            }
+
+        }
+    );
+
+}
+
+
+// =========================================================
+// VALIDATE COMPLETE FORM
+// =========================================================
+
+function validateAllSteps() {
 
     const teamSize =
         getTeamSize();
 
 
-
-    /* TEAM */
-
-    if (
-        !validateTeamDetails()
-    ) {
-
-        showStep(1);
-
-        return false;
-
-    }
-
-
-
-    /* MEMBER 1 */
-
-    if (
-        !validateMember(1)
-    ) {
-
-        showStep(2);
-
-        return false;
-
-    }
-
-
-
-    /* MEMBER 2 */
-
-    if (
-        !validateMember(2)
-    ) {
-
-        showStep(3);
-
-        return false;
-
-    }
-
-
-
-    /* MEMBER 3 */
-
-    if (
+    const steps =
         teamSize === "3"
+            ? [1, 2, 3, 4]
+            : [1, 2, 3];
+
+
+    for (
+        const step of steps
     ) {
 
         if (
-            !validateMember(3)
+            !validateStep(step)
         ) {
 
-            showStep(4);
+            showStep(step);
 
             return false;
 
@@ -1388,154 +1375,40 @@ function validateEntireForm() {
     }
 
 
+    // -------------------------
+    // FOURTH YEAR LIMIT
+    // -------------------------
 
-    /* 4TH YEAR RULE */
-
-    if (
-        !validateFourthYearRule()
-    ) {
-
-        return false;
-
-    }
+    let fourthYearCount =
+        0;
 
 
-
-    /* DUPLICATES */
-
-    if (
-        !validateDuplicates()
-    ) {
-
-        return false;
-
-    }
-
-
-
-    /* PAYMENT */
-
-    if (
-        !validatePayment()
-    ) {
-
-        showStep(5);
-
-        return false;
-
-    }
-
-
-
-    return true;
-
-}
-
-
-
-/* =========================================================
-   TEAM VALIDATION
-========================================================= */
-
-function validateTeamDetails() {
-
-    const teamName =
-        document.getElementById(
-            "teamName"
-        );
-
-
-    const collegeName =
-        document.getElementById(
-            "collegeName"
-        );
-
-
-    if (
-        !teamName ||
-        !teamName.value.trim()
-    ) {
-
-        showStatus(
-            "Please enter your team name.",
-            true
-        );
-
-
-        return false;
-
-    }
-
-
-    if (
-        !collegeName ||
-        !collegeName.value.trim()
-    ) {
-
-        showStatus(
-            "Please enter your college name.",
-            true
-        );
-
-
-        return false;
-
-    }
-
-
-    return true;
-
-}
-
-
-
-/* =========================================================
-   FOURTH YEAR RULE
-========================================================= */
-
-function validateFourthYearRule() {
-
-    const teamSize =
-        getTeamSize();
-
-
-    const years = [];
-
-
-    const memberCount =
+    const members =
         teamSize === "3"
-            ? 3
-            : 2;
+            ? [1, 2, 3]
+            : [1, 2];
 
 
-    for (
-        let i = 1;
-        i <= memberCount;
-        i++
-    ) {
+    members.forEach(
+        function (number) {
 
-        const year =
-            document.querySelector(
-                `[name="m${i}_year"]`
-            );
+            const year =
+                document.querySelector(
+                    `[name="m${number}_year"]`
+                );
 
 
-        if (year) {
+            if (
+                year &&
+                year.value === "4th Year"
+            ) {
 
-            years.push(
-                year.value
-            );
+                fourthYearCount++;
+
+            }
 
         }
-
-    }
-
-
-    const fourthYearCount =
-        years.filter(
-            year =>
-                year === "4th Year"
-        ).length;
+    );
 
 
     if (
@@ -1547,149 +1420,17 @@ function validateFourthYearRule() {
             true
         );
 
-
         return false;
 
     }
 
 
-    return true;
+    // -------------------------
+    // PAYMENT
+    // -------------------------
 
-}
+    showStep(5);
 
-
-
-/* =========================================================
-   DUPLICATE EMAIL / PHONE
-========================================================= */
-
-function validateDuplicates() {
-
-    const teamSize =
-        getTeamSize();
-
-
-    const memberCount =
-        teamSize === "3"
-            ? 3
-            : 2;
-
-
-    const phones = [];
-
-    const emails = [];
-
-
-
-    for (
-        let i = 1;
-        i <= memberCount;
-        i++
-    ) {
-
-        const phone =
-            document.querySelector(
-                `[name="m${i}_phone"]`
-            );
-
-
-        const email =
-            document.querySelector(
-                `[name="m${i}_email"]`
-            );
-
-
-        if (
-            !phone ||
-            !email
-        ) {
-
-            continue;
-
-        }
-
-
-        const phoneValue =
-            phone.value.trim();
-
-
-        const emailValue =
-            email.value
-                .trim()
-                .toLowerCase();
-
-
-
-        if (
-            phones.includes(
-                phoneValue
-            )
-        ) {
-
-            showStatus(
-                "Each team member must have a different mobile number.",
-                true
-            );
-
-
-            showStep(
-                i
-            );
-
-
-            return false;
-
-        }
-
-
-
-        if (
-            emails.includes(
-                emailValue
-            )
-        ) {
-
-            showStatus(
-                "Each team member must have a different email ID.",
-                true
-            );
-
-
-            showStep(
-                i
-            );
-
-
-            return false;
-
-        }
-
-
-
-        phones.push(
-            phoneValue
-        );
-
-
-        emails.push(
-            emailValue
-        );
-
-    }
-
-
-
-    return true;
-
-}
-
-
-
-/* =========================================================
-   PAYMENT VALIDATION
-========================================================= */
-
-function validatePayment() {
 
     const utr =
         document.querySelector(
@@ -1703,7 +1444,6 @@ function validatePayment() {
         );
 
 
-
     if (
         !utr ||
         !utr.value.trim()
@@ -1714,14 +1454,11 @@ function validatePayment() {
             true
         );
 
-
         utr?.focus();
-
 
         return false;
 
     }
-
 
 
     if (
@@ -1731,23 +1468,19 @@ function validatePayment() {
     ) {
 
         showStatus(
-            "Please enter a valid UPI Transaction ID / UTR (8–30 characters).",
+            "Please enter a valid UPI Transaction ID / UTR.",
             true
         );
 
-
         utr.focus();
-
 
         return false;
 
     }
 
 
-
     if (
         !receipt ||
-        !receipt.files ||
         !receipt.files[0]
     ) {
 
@@ -1756,62 +1489,9 @@ function validatePayment() {
             true
         );
 
-
         return false;
 
     }
-
-
-
-    const file =
-        receipt.files[0];
-
-
-    const allowedTypes = [
-
-        "image/jpeg",
-
-        "image/png",
-
-        "application/pdf"
-
-    ];
-
-
-
-    if (
-        !allowedTypes.includes(
-            file.type
-        )
-    ) {
-
-        showStatus(
-            "Payment receipt must be JPG, PNG or PDF.",
-            true
-        );
-
-
-        return false;
-
-    }
-
-
-
-    if (
-        file.size >
-        CONFIG.MAX_FILE_SIZE
-    ) {
-
-        showStatus(
-            "Payment receipt must be 10MB or smaller.",
-            true
-        );
-
-
-        return false;
-
-    }
-
 
 
     return true;
@@ -1819,541 +1499,19 @@ function validatePayment() {
 }
 
 
-
-/* =========================================================
-   SUBMIT
-========================================================= */
-
-async function handleSubmit(event) {
-
-    event.preventDefault();
-
-
-    clearStatus();
-
-
-
-    /*
-     * Always validate complete form.
-     */
-
-    if (
-        !validateEntireForm()
-    ) {
-
-        return;
-
-    }
-
-
-
-    const form =
-        document.getElementById(
-            "registrationForm"
-        );
-
-
-    const submitBtn =
-        document.getElementById(
-            "submitBtn"
-        );
-
-
-    const nextBtn =
-        document.getElementById(
-            "nextBtn"
-        );
-
-
-    const backBtn =
-        document.getElementById(
-            "backBtn"
-        );
-
-
-    const statusMsg =
-        document.getElementById(
-            "statusMessage"
-        );
-
-
-    const receiptInput =
-        document.getElementById(
-            "receipt"
-        );
-
-
-
-    submitBtn.disabled =
-        true;
-
-
-    if (nextBtn) {
-
-        nextBtn.disabled =
-            true;
-
-    }
-
-
-    if (backBtn) {
-
-        backBtn.disabled =
-            true;
-
-    }
-
-
-    submitBtn.innerText =
-        "Submitting Registration...";
-
-
-    statusMsg.classList.remove(
-        "hidden"
-    );
-
-
-    statusMsg.innerText =
-        "Uploading registration and payment receipt...";
-
-
-
-    try {
-
-
-        /* -----------------------------------------
-           FORM DATA
-        ----------------------------------------- */
-
-        const formData =
-            new FormData(form);
-
-
-        const data =
-            Object.fromEntries(
-                formData.entries()
-            );
-
-
-
-        /* -----------------------------------------
-           FIXED PAYMENT
-        ----------------------------------------- */
-
-        data.payAmount =
-            String(
-                CONFIG.PAYMENT_FEE
-            );
-
-
-
-        /* -----------------------------------------
-           TOKEN
-        ----------------------------------------- */
-
-        data.submissionToken =
-            createToken();
-
-
-
-        /* -----------------------------------------
-           RECEIPT
-        ----------------------------------------- */
-
-        const file =
-            receiptInput.files[0];
-
-
-        if (!file) {
-
-            throw new Error(
-                "Payment receipt is required."
-            );
-
-        }
-
-
-        data.receiptBase64 =
-            await convertFileToBase64(
-                file
-            );
-
-
-        data.receiptType =
-            file.type;
-
-
-        data.receiptName =
-            file.name;
-
-
-
-        /* -----------------------------------------
-           PROGRESS
-        ----------------------------------------- */
-
-        const progressBar =
-            document.getElementById(
-                "progressBar"
-            );
-
-
-        if (progressBar) {
-
-            progressBar.style.width =
-                "100%";
-
-        }
-
-
-
-        /* -----------------------------------------
-           SEND TO GOOGLE APPS SCRIPT
-        ----------------------------------------- */
-
-        await fetch(
-            CONFIG.API_URL,
-            {
-
-                method:
-                    "POST",
-
-                mode:
-                    "no-cors",
-
-                cache:
-                    "no-cache",
-
-                body:
-                    JSON.stringify(
-                        data
-                    )
-
-            }
-        );
-
-
-
-        /* -----------------------------------------
-           WAIT FOR REGISTRATION ID
-        ----------------------------------------- */
-
-        statusMsg.innerText =
-            "Registration received. Confirming your Registration ID...";
-
-
-        const registrationId =
-            await pollForRegistrationId(
-                data.submissionToken
-            );
-
-
-
-        /* -----------------------------------------
-           SUCCESS
-        ----------------------------------------- */
-
-        showSuccess(
-            registrationId
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Submission error:",
-            error
-        );
-
-
-        showStatus(
-            error.message ||
-            "Something went wrong. Please try again.",
-            true
-        );
-
-
-        submitBtn.disabled =
-            false;
-
-
-        submitBtn.innerText =
-            "Submit Registration";
-
-
-        if (nextBtn) {
-
-            nextBtn.disabled =
-                false;
-
-        }
-
-
-        if (backBtn) {
-
-            backBtn.disabled =
-                false;
-
-        }
-
-    }
-
-}
-
-
-
-/* =========================================================
-   CREATE TOKEN
-========================================================= */
-
-function createToken() {
-
-    if (
-        window.crypto &&
-        window.crypto.getRandomValues
-    ) {
-
-        const bytes =
-            new Uint8Array(
-                18
-            );
-
-
-        window.crypto.getRandomValues(
-            bytes
-        );
-
-
-        return Array.from(
-            bytes,
-            byte =>
-                byte
-                    .toString(16)
-                    .padStart(
-                        2,
-                        "0"
-                    )
-        ).join("");
-
-    }
-
-
-    return (
-        `${Date.now()}${Math.random()
-            .toString(36)
-            .slice(2)}`
-    );
-
-}
-
-
-
-/* =========================================================
-   GET REGISTRATION ID
-========================================================= */
-
-function pollForRegistrationId(
-    token,
-    attempts = 20
-) {
-
-    return new Promise(
-        (
-            resolve,
-            reject
-        ) => {
-
-            let count = 0;
-
-
-            const check =
-                () => {
-
-                    count++;
-
-
-                    const callbackName =
-                        `codexCallback_${Date.now()}_${Math.random()
-                            .toString(36)
-                            .slice(2)}`;
-
-
-                    const script =
-                        document.createElement(
-                            "script"
-                        );
-
-
-                    let finished =
-                        false;
-
-
-
-                    const cleanup =
-                        () => {
-
-                            delete window[
-                                callbackName
-                            ];
-
-
-                            script.remove();
-
-                        };
-
-
-
-                    window[
-                        callbackName
-                    ] =
-                        result => {
-
-                            if (
-                                finished
-                            ) {
-
-                                return;
-
-                            }
-
-
-                            finished =
-                                true;
-
-
-                            cleanup();
-
-
-
-                            if (
-                                result &&
-                                result.success &&
-                                result.registrationId
-                            ) {
-
-                                resolve(
-                                    result.registrationId
-                                );
-
-
-                                return;
-
-                            }
-
-
-
-                            if (
-                                count <
-                                attempts
-                            ) {
-
-                                setTimeout(
-                                    check,
-                                    1000
-                                );
-
-
-                            } else {
-
-                                reject(
-                                    new Error(
-                                        "Registration was submitted, but the Registration ID could not be confirmed. Please contact the organizers."
-                                    )
-                                );
-
-                            }
-
-                        };
-
-
-
-                    script.onerror =
-                        () => {
-
-                            if (
-                                finished
-                            ) {
-
-                                return;
-
-                            }
-
-
-                            finished =
-                                true;
-
-
-                            cleanup();
-
-
-
-                            if (
-                                count <
-                                attempts
-                            ) {
-
-                                setTimeout(
-                                    check,
-                                    1000
-                                );
-
-
-                            } else {
-
-                                reject(
-                                    new Error(
-                                        "Unable to confirm Registration ID. Please contact the organizers."
-                                    )
-                                );
-
-                            }
-
-                        };
-
-
-
-                    script.src =
-                        `${CONFIG.API_URL}` +
-                        `?action=getRegistrationId` +
-                        `&token=${encodeURIComponent(
-                            token
-                        )}` +
-                        `&callback=${encodeURIComponent(
-                            callbackName
-                        )}` +
-                        `&_=${Date.now()}`;
-
-
-
-                    document.body.appendChild(
-                        script
-                    );
-
-                };
-
-
-            check();
-
-        }
-    );
-
-}
-
-
-
-/* =========================================================
-   FILE → BASE64
-========================================================= */
+// =========================================================
+// FILE → BASE64
+// =========================================================
 
 function convertFileToBase64(
     file
 ) {
 
     return new Promise(
-        (
+        function (
             resolve,
             reject
-        ) => {
+        ) {
 
             const reader =
                 new FileReader();
@@ -2365,23 +1523,25 @@ function convertFileToBase64(
 
 
             reader.onload =
-                () => {
+                function () {
 
                     const result =
                         reader.result;
 
 
                     resolve(
-                        result.split(
-                            ","
-                        )[1]
+                        result.split(",")[1]
                     );
 
                 };
 
 
             reader.onerror =
-                reject;
+                function (error) {
+
+                    reject(error);
+
+                };
 
         }
     );
@@ -2389,14 +1549,11 @@ function convertFileToBase64(
 }
 
 
+// =========================================================
+// SUCCESS
+// =========================================================
 
-/* =========================================================
-   SUCCESS SCREEN
-========================================================= */
-
-function showSuccess(
-    registrationId
-) {
+function showSuccess() {
 
     const form =
         document.getElementById(
@@ -2404,29 +1561,10 @@ function showSuccess(
         );
 
 
-    const stepper =
-        document.getElementById(
-            "stepper"
-        );
-
-
-    const progressTrack =
-        document.querySelector(
-            ".progress-track"
-        );
-
-
-    const successScreen =
+    const success =
         document.getElementById(
             "successScreen"
         );
-
-
-    const displayRegID =
-        document.getElementById(
-            "displayRegID"
-        );
-
 
 
     if (form) {
@@ -2438,59 +1576,30 @@ function showSuccess(
     }
 
 
-    if (stepper) {
+    if (success) {
 
-        stepper.classList.add(
+        success.classList.remove(
             "hidden"
         );
 
     }
 
 
-    if (progressTrack) {
-
-        progressTrack.classList.add(
-            "hidden"
-        );
-
-    }
-
-
-    if (successScreen) {
-
-        successScreen.classList.remove(
-            "hidden"
-        );
-
-    }
-
-
-    if (displayRegID) {
-
-        displayRegID.innerText =
-            registrationId;
-
-    }
-
-
-    window.scrollTo(
-        {
-            top: 0,
-            behavior: "smooth"
-        }
-    );
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
 
 }
 
 
-
-/* =========================================================
-   STATUS MESSAGE
-========================================================= */
+// =========================================================
+// STATUS
+// =========================================================
 
 function showStatus(
     message,
-    isError = false
+    isError
 ) {
 
     const status =
@@ -2500,9 +1609,7 @@ function showStatus(
 
 
     if (!status) {
-
         return;
-
     }
 
 
@@ -2520,21 +1627,8 @@ function showStatus(
             ? "var(--error)"
             : "var(--text-muted)";
 
-
-    status.scrollIntoView(
-        {
-            behavior: "smooth",
-            block: "center"
-        }
-    );
-
 }
 
-
-
-/* =========================================================
-   CLEAR STATUS
-========================================================= */
 
 function clearStatus() {
 
@@ -2545,9 +1639,7 @@ function clearStatus() {
 
 
     if (!status) {
-
         return;
-
     }
 
 
@@ -2560,9 +1652,3 @@ function clearStatus() {
         "";
 
 }
-
-
-
-/* =========================================================
-   END
-========================================================= */
