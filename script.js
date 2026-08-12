@@ -58,68 +58,46 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-/* =========================================================
-   TEAM SIZE
-========================================================= */
+// =====================================================
+// TEAM SIZE INTERACTIVE SELECTION
+// =====================================================
 
-function setupTeamSize() {
+function updateTeamSizeUI() {
 
-    const radios =
-        document.querySelectorAll('input[name="teamSize"]');
-
-    const member3Section =
-        document.getElementById("member3Section");
-
-    const member3Step =
-        document.getElementById("member3Step");
-
-    const member3Inputs =
-        member3Section
-            ? member3Section.querySelectorAll("input, select")
-            : [];
+    const radios = document.querySelectorAll(
+        'input[name="teamSize"]'
+    );
 
     radios.forEach(radio => {
 
-        radio.addEventListener("change", () => {
+        const choice = radio.closest('.choice');
 
-            const isThree =
-                radio.value === "3";
+        if (!choice) return;
 
-            if (member3Section) {
-                member3Section.classList.toggle(
-                    "hidden",
-                    !isThree
-                );
-            }
+        choice.classList.toggle(
+            'active',
+            radio.checked
+        );
 
-            if (member3Step) {
-                member3Step.classList.toggle(
-                    "hidden",
-                    !isThree
-                );
-            }
+    });
+}
 
-            member3Inputs.forEach(input => {
 
-                if (isThree) {
-                    input.setAttribute("required", "");
-                } else {
-                    input.removeAttribute("required");
-                    input.setCustomValidity("");
-                }
+document.querySelectorAll(
+    'input[name="teamSize"]'
+).forEach(radio => {
 
-            });
+    radio.addEventListener('change', function () {
 
-            // Reset navigation when team size changes
-            maxStepReached = Math.min(maxStepReached, 3);
-
-            updateNavigation();
-        });
+        updateTeamSizeUI();
 
     });
 
-}
+});
 
+
+// Set correct state when page loads
+updateTeamSizeUI();
 
 /* =========================================================
    NAVIGATION
