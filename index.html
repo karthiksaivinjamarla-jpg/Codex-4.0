@@ -13,43 +13,34 @@
 
     <link
         href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
+        rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- Background -->
     <div class="ambient ambient-one"></div>
     <div class="ambient ambient-two"></div>
     <div class="grid-bg"></div>
 
-
     <!-- HEADER -->
     <header class="site-header">
 
-        <a class="brand" href="#top" aria-label="CODEX 4.0 home">
-
+        <a class="brand" href="#top">
             <span class="brand-mark">&lt;/&gt;</span>
 
             <span>
                 <strong>CODEX <em>4.0</em></strong>
                 <small>INTER-COLLEGE CODING EVENT</small>
             </span>
-
         </a>
 
-
-        <nav class="top-nav" aria-label="Main navigation">
-
+        <nav class="top-nav">
             <a href="#about">About</a>
             <a href="#register">Register</a>
             <a href="#payment">Payment</a>
-
         </nav>
-
 
         <a href="#register" class="nav-cta">
             Register Now <span>→</span>
@@ -58,9 +49,7 @@
     </header>
 
 
-
     <main id="top">
-
 
         <!-- HERO -->
         <section class="hero-shell" id="about">
@@ -72,23 +61,19 @@
                     REGISTRATIONS OPEN
                 </div>
 
-
                 <h1>
                     CODEX <span>4.0</span>
                 </h1>
 
-
                 <h2>
                     BUILD <i>•</i> THINK <i>•</i> COMPETE
                 </h2>
-
 
                 <p>
                     Bring your team, sharpen your logic, solve challenging
                     problems and compete with coding minds from colleges
                     across the region.
                 </p>
-
 
                 <div class="hero-actions">
 
@@ -101,7 +86,6 @@
                     </a>
 
                 </div>
-
 
                 <div class="hero-points">
 
@@ -128,22 +112,17 @@
             </div>
 
 
-
             <!-- HERO GRAPHIC -->
-            <div class="hero-visual reveal delay-1" aria-hidden="true">
+            <div class="hero-visual reveal delay-1">
 
                 <div class="code-window">
 
                     <div class="window-bar">
-
                         <span></span>
                         <span></span>
                         <span></span>
-
                         <label>codex.cpp</label>
-
                     </div>
-
 
                     <pre><span>01</span> <b>int</b> solve() {
 <span>02</span>     <b>for</b> (<b>int</b> i = 0; i &lt; n; i++) {
@@ -152,23 +131,13 @@
 <span>05</span>     <b>return</b> <mark>WIN</mark>;
 <span>06</span> }</pre>
 
-
                     <div class="terminal-output">
-
                         <span>OUTPUT</span>
-
-                        <strong>
-                            Hello, CODEX!
-                        </strong>
-
-                        <small>
-                            execution successful ✓
-                        </small>
-
+                        <strong>Hello, CODEX!</strong>
+                        <small>execution successful ✓</small>
                     </div>
 
                 </div>
-
 
                 <div class="floating-chip chip-one">
                     &lt;code/&gt;
@@ -180,16 +149,12 @@
 
                 <div class="trophy">
                     ◆
-                    <small>
-                        CODEX<br>
-                        4.0
-                    </small>
+                    <small>CODEX<br>4.0</small>
                 </div>
 
             </div>
 
         </section>
-
 
 
         <!-- STATS -->
@@ -218,15 +183,12 @@
         </section>
 
 
-
         <!-- REGISTRATION -->
         <section class="registration-wrap" id="register">
-
 
             <div class="section-heading reveal">
 
                 <div>
-
                     <span class="section-kicker">
                         REGISTRATION
                     </span>
@@ -236,12 +198,10 @@
                     </h2>
 
                     <p>
-                        Complete each step.
-                        Your details are validated before submission.
+                        Complete each step. Your details are validated
+                        before submission.
                     </p>
-
                 </div>
-
 
                 <div class="live-pill">
                     <span></span>
@@ -251,10 +211,7 @@
             </div>
 
 
-
-            <!-- FORM -->
             <form id="registrationForm" novalidate>
-
 
                 <!-- STEPPER -->
                 <div class="stepper" id="stepper">
@@ -262,33 +219,36 @@
                     <button
                         type="button"
                         class="step active"
-                        data-step="1"
-                    >
+                        data-step="1">
+
                         <span>01</span>
                         <b>Team</b>
                         <small>Details</small>
+
                     </button>
 
 
                     <button
                         type="button"
                         class="step"
-                        data-step="2"
-                    >
+                        data-step="2">
+
                         <span>02</span>
                         <b>Member 1</b>
                         <small>Leader</small>
+
                     </button>
 
 
                     <button
                         type="button"
                         class="step"
-                        data-step="3"
-                    >
+                        data-step="3">
+
                         <span>03</span>
                         <b>Member 2</b>
                         <small>Participant</small>
+
                     </button>
 
 
@@ -296,55 +256,45 @@
                         type="button"
                         class="step hidden"
                         data-step="4"
-                        id="member3Step"
-                    >
+                        id="member3Step">
+
                         <span>04</span>
                         <b>Member 3</b>
                         <small>Optional</small>
+
                     </button>
 
 
                     <button
                         type="button"
                         class="step"
-                        data-step="5"
-                    >
+                        data-step="5">
+
                         <span>05</span>
                         <b>Payment</b>
                         <small>Confirm</small>
+
                     </button>
 
                 </div>
 
 
-
                 <!-- PROGRESS -->
                 <div class="progress-track">
-
-                    <div
-                        id="progressBar"
-                        style="width:20%"
-                    ></div>
-
+                    <div id="progressBar"></div>
                 </div>
-
 
 
                 <div class="form-layout">
 
-
                     <div class="form-main">
 
 
-                        <!-- =========================
-                             STEP 1
-                        ========================== -->
-
+                        <!-- STEP 1 -->
                         <section
                             class="form-step active"
                             data-panel="1"
-                            id="section-team"
-                        >
+                            id="section-team">
 
                             <div class="panel-heading">
 
@@ -353,25 +303,16 @@
                                 </span>
 
                                 <div>
-
-                                    <h3>
-                                        Team details
-                                    </h3>
-
+                                    <h3>Team details</h3>
                                     <p>
                                         Start with your team identity.
                                     </p>
-
                                 </div>
 
                             </div>
 
 
-
                             <div class="fields-grid">
-
-
-                                <!-- TEAM NAME -->
 
                                 <div class="field full">
 
@@ -386,18 +327,10 @@
                                         placeholder="Enter a unique team name"
                                         minlength="2"
                                         maxlength="60"
-                                        required
-                                    >
-
-                                    <small class="field-error">
-                                        Please enter a valid team name.
-                                    </small>
+                                        required>
 
                                 </div>
 
-
-
-                                <!-- COLLEGE -->
 
                                 <div class="field">
 
@@ -412,14 +345,10 @@
                                         placeholder="Full college name"
                                         minlength="2"
                                         maxlength="150"
-                                        required
-                                    >
+                                        required>
 
                                 </div>
 
-
-
-                                <!-- TEAM SIZE -->
 
                                 <div class="field">
 
@@ -427,9 +356,7 @@
                                         Team Size <i>*</i>
                                     </label>
 
-
                                     <div class="choice-row">
-
 
                                         <label class="choice active">
 
@@ -437,8 +364,7 @@
                                                 type="radio"
                                                 name="teamSize"
                                                 value="2"
-                                                checked
-                                            >
+                                                checked>
 
                                             <span>
                                                 2 Members
@@ -447,21 +373,18 @@
                                         </label>
 
 
-
                                         <label class="choice">
 
                                             <input
                                                 type="radio"
                                                 name="teamSize"
-                                                value="3"
-                                            >
+                                                value="3">
 
                                             <span>
                                                 3 Members
                                             </span>
 
                                         </label>
-
 
                                     </div>
 
@@ -472,15 +395,10 @@
                         </section>
 
 
-
-                        <!-- =========================
-                             STEP 2
-                        ========================== -->
-
+                        <!-- STEP 2 -->
                         <section
                             class="form-step"
-                            data-panel="2"
-                        >
+                            data-panel="2">
 
                             <div class="panel-heading">
 
@@ -489,7 +407,6 @@
                                 </span>
 
                                 <div>
-
                                     <h3>
                                         Team member 1
                                     </h3>
@@ -497,7 +414,6 @@
                                     <p>
                                         Team leader information.
                                     </p>
-
                                 </div>
 
                                 <span class="leader-tag">
@@ -507,12 +423,9 @@
                             </div>
 
 
-
                             <div class="fields-grid member-fields">
 
-
                                 <div class="field">
-
                                     <label>
                                         Full Name <i>*</i>
                                     </label>
@@ -521,15 +434,11 @@
                                         name="m1_name"
                                         type="text"
                                         maxlength="80"
-                                        required
-                                    >
-
+                                        required>
                                 </div>
 
 
-
                                 <div class="field">
-
                                     <label>
                                         Roll Number <i>*</i>
                                     </label>
@@ -538,15 +447,11 @@
                                         name="m1_roll"
                                         type="text"
                                         maxlength="40"
-                                        required
-                                    >
-
+                                        required>
                                 </div>
 
 
-
                                 <div class="field">
-
                                     <label>
                                         Email ID <i>*</i>
                                     </label>
@@ -556,15 +461,11 @@
                                         type="email"
                                         maxlength="120"
                                         placeholder="example@email.com"
-                                        required
-                                    >
-
+                                        required>
                                 </div>
 
 
-
                                 <div class="field">
-
                                     <label>
                                         Mobile Number <i>*</i>
                                     </label>
@@ -576,11 +477,8 @@
                                         pattern="[0-9]{10}"
                                         maxlength="10"
                                         placeholder="10-digit number"
-                                        required
-                                    >
-
+                                        required>
                                 </div>
-
 
 
                                 <div class="field">
@@ -591,8 +489,7 @@
 
                                     <select
                                         name="m1_year"
-                                        required
-                                    >
+                                        required>
 
                                         <option value="">
                                             Select Year
@@ -613,7 +510,6 @@
                                     </select>
 
                                 </div>
-
 
 
                                 <div class="field">
@@ -627,11 +523,9 @@
                                         type="text"
                                         maxlength="80"
                                         placeholder="e.g. CSE"
-                                        required
-                                    >
+                                        required>
 
                                 </div>
-
 
 
                                 <div class="field">
@@ -642,8 +536,7 @@
 
                                     <select
                                         name="m1_section"
-                                        required
-                                    >
+                                        required>
 
                                         <option value="">
                                             Select Section
@@ -664,15 +557,10 @@
                         </section>
 
 
-
-                        <!-- =========================
-                             STEP 3
-                        ========================== -->
-
+                        <!-- STEP 3 -->
                         <section
                             class="form-step"
-                            data-panel="3"
-                        >
+                            data-panel="3">
 
                             <div class="panel-heading">
 
@@ -681,7 +569,6 @@
                                 </span>
 
                                 <div>
-
                                     <h3>
                                         Team member 2
                                     </h3>
@@ -689,18 +576,14 @@
                                     <p>
                                         Add your second participant.
                                     </p>
-
                                 </div>
 
                             </div>
 
 
-
                             <div class="fields-grid member-fields">
 
-
                                 <div class="field">
-
                                     <label>
                                         Full Name <i>*</i>
                                     </label>
@@ -709,15 +592,11 @@
                                         name="m2_name"
                                         type="text"
                                         maxlength="80"
-                                        required
-                                    >
-
+                                        required>
                                 </div>
 
 
-
                                 <div class="field">
-
                                     <label>
                                         Roll Number <i>*</i>
                                     </label>
@@ -726,15 +605,11 @@
                                         name="m2_roll"
                                         type="text"
                                         maxlength="40"
-                                        required
-                                    >
-
+                                        required>
                                 </div>
 
 
-
                                 <div class="field">
-
                                     <label>
                                         Email ID <i>*</i>
                                     </label>
@@ -744,15 +619,11 @@
                                         type="email"
                                         maxlength="120"
                                         placeholder="example@email.com"
-                                        required
-                                    >
-
+                                        required>
                                 </div>
 
 
-
                                 <div class="field">
-
                                     <label>
                                         Mobile Number <i>*</i>
                                     </label>
@@ -764,11 +635,8 @@
                                         pattern="[0-9]{10}"
                                         maxlength="10"
                                         placeholder="10-digit number"
-                                        required
-                                    >
-
+                                        required>
                                 </div>
-
 
 
                                 <div class="field">
@@ -779,8 +647,7 @@
 
                                     <select
                                         name="m2_year"
-                                        required
-                                    >
+                                        required>
 
                                         <option value="">
                                             Select Year
@@ -803,7 +670,6 @@
                                 </div>
 
 
-
                                 <div class="field">
 
                                     <label>
@@ -815,11 +681,9 @@
                                         type="text"
                                         maxlength="80"
                                         placeholder="e.g. CSE"
-                                        required
-                                    >
+                                        required>
 
                                 </div>
-
 
 
                                 <div class="field">
@@ -830,8 +694,7 @@
 
                                     <select
                                         name="m2_section"
-                                        required
-                                    >
+                                        required>
 
                                         <option value="">
                                             Select Section
@@ -852,16 +715,11 @@
                         </section>
 
 
-
-                        <!-- =========================
-                             STEP 4
-                        ========================== -->
-
+                        <!-- STEP 4 -->
                         <section
                             class="form-step hidden"
                             data-panel="4"
-                            id="member3Section"
-                        >
+                            id="member3Section">
 
                             <div class="panel-heading">
 
@@ -870,15 +728,13 @@
                                 </span>
 
                                 <div>
-
                                     <h3>
                                         Team member 3
                                     </h3>
 
                                     <p>
-                                        Required only for a 3-member team.
+                                        Required for a 3-member team.
                                     </p>
-
                                 </div>
 
                                 <span class="optional-tag">
@@ -888,12 +744,9 @@
                             </div>
 
 
-
                             <div class="fields-grid member-fields">
 
-
                                 <div class="field">
-
                                     <label>
                                         Full Name <i>*</i>
                                     </label>
@@ -901,15 +754,11 @@
                                     <input
                                         name="m3_name"
                                         type="text"
-                                        maxlength="80"
-                                    >
-
+                                        maxlength="80">
                                 </div>
 
 
-
                                 <div class="field">
-
                                     <label>
                                         Roll Number <i>*</i>
                                     </label>
@@ -917,15 +766,11 @@
                                     <input
                                         name="m3_roll"
                                         type="text"
-                                        maxlength="40"
-                                    >
-
+                                        maxlength="40">
                                 </div>
 
 
-
                                 <div class="field">
-
                                     <label>
                                         Email ID <i>*</i>
                                     </label>
@@ -934,15 +779,11 @@
                                         name="m3_email"
                                         type="email"
                                         maxlength="120"
-                                        placeholder="example@email.com"
-                                    >
-
+                                        placeholder="example@email.com">
                                 </div>
 
 
-
                                 <div class="field">
-
                                     <label>
                                         Mobile Number <i>*</i>
                                     </label>
@@ -953,11 +794,8 @@
                                         inputmode="numeric"
                                         pattern="[0-9]{10}"
                                         maxlength="10"
-                                        placeholder="10-digit number"
-                                    >
-
+                                        placeholder="10-digit number">
                                 </div>
-
 
 
                                 <div class="field">
@@ -989,7 +827,6 @@
                                 </div>
 
 
-
                                 <div class="field">
 
                                     <label>
@@ -999,11 +836,9 @@
                                     <input
                                         name="m3_branch"
                                         type="text"
-                                        maxlength="80"
-                                    >
+                                        maxlength="80">
 
                                 </div>
-
 
 
                                 <div class="field">
@@ -1033,16 +868,11 @@
                         </section>
 
 
-
-                        <!-- =========================
-                             STEP 5 PAYMENT
-                        ========================== -->
-
+                        <!-- STEP 5 PAYMENT -->
                         <section
                             class="form-step"
                             data-panel="5"
-                            id="payment"
-                        >
+                            id="payment">
 
                             <div class="panel-heading">
 
@@ -1051,7 +881,6 @@
                                 </span>
 
                                 <div>
-
                                     <h3>
                                         Payment & confirmation
                                     </h3>
@@ -1059,18 +888,14 @@
                                     <p>
                                         Pay ₹300 per team and upload the receipt.
                                     </p>
-
                                 </div>
 
                             </div>
 
 
-
                             <div class="payment-grid">
 
-
                                 <!-- QR -->
-
                                 <div class="qr-card">
 
                                     <div class="qr-label">
@@ -1082,8 +907,7 @@
                                         <img
                                             id="paymentQR"
                                             src=""
-                                            alt="CODEX 4.0 payment QR code"
-                                        >
+                                            alt="CODEX 4.0 payment QR code">
 
                                     </div>
 
@@ -1098,11 +922,8 @@
                                 </div>
 
 
-
                                 <!-- PAYMENT DETAILS -->
-
                                 <div class="payment-fields">
-
 
                                     <div class="fixed-fee">
 
@@ -1117,9 +938,6 @@
 
                                     </div>
 
-
-
-                                    <!-- UTR -->
 
                                     <div class="field">
 
@@ -1137,8 +955,7 @@
                                             maxlength="30"
                                             pattern="[A-Za-z0-9]{8,30}"
                                             placeholder="Enter transaction ID / UTR"
-                                            required
-                                        >
+                                            required>
 
                                         <small>
                                             Enter the reference number shown after payment.
@@ -1147,9 +964,6 @@
                                     </div>
 
 
-
-                                    <!-- RECEIPT -->
-
                                     <div class="field">
 
                                         <label>
@@ -1157,12 +971,10 @@
                                             <i>*</i>
                                         </label>
 
-
                                         <label
                                             class="dropzone"
                                             id="dropzone"
-                                            for="receipt"
-                                        >
+                                            for="receipt">
 
                                             <span class="upload-icon">
                                                 ↑
@@ -1180,17 +992,14 @@
                                                 JPG, PNG or PDF · Max 10MB
                                             </strong>
 
-
                                             <input
                                                 type="file"
                                                 id="receipt"
                                                 name="receipt"
                                                 accept=".jpg,.jpeg,.png,.pdf"
-                                                required
-                                            >
+                                                required>
 
                                         </label>
-
 
                                         <small id="fileInfo">
                                             No file selected
@@ -1201,7 +1010,6 @@
                                 </div>
 
                             </div>
-
 
 
                             <div class="payment-notes">
@@ -1217,38 +1025,38 @@
                         </section>
 
 
-
                         <!-- NAVIGATION -->
-
                         <div class="form-actions">
-
 
                             <button
                                 type="button"
                                 class="secondary-btn"
-                                id="backBtn"
-                            >
+                                id="backBtn">
+
                                 ← Back
+
                             </button>
 
 
                             <button
                                 type="button"
                                 class="primary-btn next-btn"
-                                id="nextBtn"
-                            >
+                                id="nextBtn">
+
                                 Continue
                                 <span>→</span>
+
                             </button>
 
 
                             <button
                                 type="submit"
                                 class="primary-btn submit-btn hidden"
-                                id="submitBtn"
-                            >
+                                id="submitBtn">
+
                                 Submit Registration
                                 <span>✓</span>
+
                             </button>
 
                         </div>
@@ -1257,31 +1065,23 @@
                         <div
                             id="statusMessage"
                             class="status-message hidden"
-                            role="alert"
-                        ></div>
-
+                            role="alert">
+                        </div>
 
                     </div>
 
 
-
-                    <!-- SIDE CARD -->
-
+                    <!-- SIDE INFO -->
                     <aside class="event-card">
 
                         <div class="aside-top">
-
-                            <span>
-                                CODEX 4.0
-                            </span>
-
+                            <span>CODEX 4.0</span>
                             <span class="live-dot"></span>
-
                         </div>
 
-
                         <h3>
-                            Registration<br>
+                            Registration
+                            <br>
                             <span>at a glance</span>
                         </h3>
 
@@ -1291,15 +1091,8 @@
                             <span>⌁</span>
 
                             <div>
-
-                                <small>
-                                    TEAM SIZE
-                                </small>
-
-                                <b>
-                                    2 or 3 members
-                                </b>
-
+                                <small>TEAM SIZE</small>
+                                <b>2 or 3 members</b>
                             </div>
 
                         </div>
@@ -1310,15 +1103,8 @@
                             <span>₹</span>
 
                             <div>
-
-                                <small>
-                                    REGISTRATION FEE
-                                </small>
-
-                                <b>
-                                    ₹300 per team
-                                </b>
-
+                                <small>REGISTRATION FEE</small>
+                                <b>₹300 per team</b>
                             </div>
 
                         </div>
@@ -1329,15 +1115,8 @@
                             <span>✓</span>
 
                             <div>
-
-                                <small>
-                                    ELIGIBILITY
-                                </small>
-
-                                <b>
-                                    2nd / 3rd / 4th Year
-                                </b>
-
+                                <small>ELIGIBILITY</small>
+                                <b>2nd / 3rd / 4th Year</b>
                             </div>
 
                         </div>
@@ -1348,16 +1127,11 @@
                             <span>!</span>
 
                             <div>
-
-                                <small>
-                                    4TH YEAR RULE
-                                </small>
-
+                                <small>4TH YEAR RULE</small>
                                 <b>
-                                    A team can have a maximum of one
-                                    4th-year student.
+                                    Maximum one 4th-year student
+                                    per team.
                                 </b>
-
                             </div>
 
                         </div>
@@ -1374,8 +1148,9 @@
                                 </b>
 
                                 <small>
-                                    Registration details and receipts
-                                    are sent directly to the event backend.
+                                    Registration details and
+                                    receipts are sent directly
+                                    to the event backend.
                                 </small>
 
                             </div>
@@ -1384,7 +1159,6 @@
 
                     </aside>
 
-
                 </div>
 
             </form>
@@ -1392,13 +1166,10 @@
         </section>
 
 
-
         <!-- SUCCESS -->
-
         <section
             id="successScreen"
-            class="success-screen hidden"
-        >
+            class="success-screen hidden">
 
             <div class="success-ring">
                 ✓
@@ -1409,59 +1180,43 @@
             </span>
 
             <h2>
-                Registration successful!
+                Registration Submitted Successfully!
             </h2>
 
             <p>
-                Your CODEX 4.0 team has been registered successfully.
-                Save the Registration ID below for future reference.
+                Thank you for registering for
+                <strong>CODEX 4.0</strong>.
             </p>
 
-
-            <div class="registration-id">
-
-                <small>
-                    YOUR REGISTRATION ID
-                </small>
-
-                <strong id="displayRegID">
-                    CODEX4-XXXX
-                </strong>
-
-            </div>
-
+            <p>
+                Your registration details and payment
+                receipt have been submitted successfully.
+            </p>
 
             <div class="pending-badge">
-
                 <span></span>
-
                 Payment pending verification
-
             </div>
-
 
             <button
                 type="button"
                 class="primary-btn"
-                onclick="window.location.reload()"
-            >
+                onclick="window.location.reload()">
+
                 Register Another Team
                 <span>↗</span>
+
             </button>
 
         </section>
 
-
     </main>
 
 
-
     <!-- FOOTER -->
-
     <footer class="footer">
 
         <div>
-
             <strong>
                 &lt;/&gt; Coders' Club
             </strong>
@@ -1469,7 +1224,6 @@
             <span>
                 Building the future, one line of code at a time.
             </span>
-
         </div>
 
         <p>
@@ -1477,7 +1231,6 @@
         </p>
 
     </footer>
-
 
 
     <script src="script.js"></script>
