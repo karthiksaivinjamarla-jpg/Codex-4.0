@@ -11,7 +11,7 @@ const CONFIG = {
         "https://script.google.com/macros/s/AKfycbwqbA-ujJmA0dHwx9z8YY9fuk86DdjkpxU-y0m1sZ9fvNBLc4qHa1apQEiy23hVOfkBKQ/exec",
 
     QR_IMAGE_URL:
-        "https://raw.githubusercontent.com/karthiksaivinjamarla-jpg/Codex-4.0/main/codex-payment-qr.png",
+        "./codex-payment-qr.png",
 
     EVENT_NAME: "CODEX 4.0",
     ORGANIZER: "Coders' Club",
