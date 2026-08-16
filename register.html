@@ -9,6 +9,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Registration-page layout fixes */
+        .event-card{overflow:hidden}
+        .event-card h3{line-height:1.08;margin:14px 0 22px}
+        .aside-list{display:grid!important;gap:0!important}
+        .aside-list>div{display:grid!important;grid-template-columns:32px minmax(0,1fr)!important;align-items:start!important;gap:10px!important;padding:15px 0!important;border-top:1px solid rgba(148,163,184,.12)!important}
+        .aside-list>div>b{width:28px!important;height:28px!important;display:grid!important;place-items:center!important;border-radius:8px!important;background:rgba(139,92,246,.10)!important;color:#c4b5fd!important;font-size:13px!important;font-weight:700!important;flex:none!important}
+        .aside-list>div>span{display:block!important;min-width:0!important;color:#64748b!important;font-size:8px!important;line-height:1.35!important;letter-spacing:1.2px!important;font-weight:600!important}
+        .aside-list>div>span strong{display:block!important;color:#f1f5f9!important;font-size:11px!important;line-height:1.45!important;letter-spacing:0!important;font-weight:700!important;margin-top:3px!important;white-space:normal!important}
+        .secure-box{display:grid!important;grid-template-columns:28px minmax(0,1fr)!important;gap:10px!important;align-items:start!important;margin-top:18px!important;padding:14px!important;border:1px solid rgba(34,211,238,.16)!important;border-radius:10px!important;background:rgba(34,211,238,.035)!important}
+        .secure-box>b{width:28px!important;height:28px!important;display:grid!important;place-items:center!important;border-radius:50%!important;color:#22d3ee!important;background:rgba(34,211,238,.07)!important;font-size:12px!important}
+        .secure-box>span{display:block!important;color:#64748b!important;font-size:9px!important;line-height:1.5!important;letter-spacing:0!important}
+        .secure-box>span strong{display:block!important;color:#e2e8f0!important;font-size:10px!important;margin-bottom:2px!important}
+        .choice-row{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;width:100%!important}
+        .choice{min-width:0!important}
+        .choice span{padding:10px 8px!important;font-size:10px!important;white-space:nowrap!important}
+        @media(max-width:850px){.form-layout{grid-template-columns:1fr!important}.event-card{position:static!important}.top-nav{display:none}}
+        @media(max-width:520px){.choice span{font-size:9px!important;padding:9px 5px!important}.event-card{padding:18px!important}}
+    </style>
 </head>
 <body>
     <div class="ambient ambient-one"></div>
