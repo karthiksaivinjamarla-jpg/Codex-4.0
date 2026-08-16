@@ -1,177 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#070b1f">
-    <title>Register | CODEX 4.0</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <style>
-        /* Registration-page layout fixes */
-        .event-card{overflow:hidden}
-        .event-card h3{line-height:1.08;margin:14px 0 22px}
-        .aside-list{display:grid!important;gap:0!important}
-        .aside-list>div{display:grid!important;grid-template-columns:32px minmax(0,1fr)!important;align-items:start!important;gap:10px!important;padding:15px 0!important;border-top:1px solid rgba(148,163,184,.12)!important}
-        .aside-list>div>b{width:28px!important;height:28px!important;display:grid!important;place-items:center!important;border-radius:8px!important;background:rgba(139,92,246,.10)!important;color:#c4b5fd!important;font-size:13px!important;font-weight:700!important;flex:none!important}
-        .aside-list>div>span{display:block!important;min-width:0!important;color:#64748b!important;font-size:8px!important;line-height:1.35!important;letter-spacing:1.2px!important;font-weight:600!important}
-        .aside-list>div>span strong{display:block!important;color:#f1f5f9!important;font-size:11px!important;line-height:1.45!important;letter-spacing:0!important;font-weight:700!important;margin-top:3px!important;white-space:normal!important}
-        .secure-box{display:grid!important;grid-template-columns:28px minmax(0,1fr)!important;gap:10px!important;align-items:start!important;margin-top:18px!important;padding:14px!important;border:1px solid rgba(34,211,238,.16)!important;border-radius:10px!important;background:rgba(34,211,238,.035)!important}
-        .secure-box>b{width:28px!important;height:28px!important;display:grid!important;place-items:center!important;border-radius:50%!important;color:#22d3ee!important;background:rgba(34,211,238,.07)!important;font-size:12px!important}
-        .secure-box>span{display:block!important;color:#64748b!important;font-size:9px!important;line-height:1.5!important;letter-spacing:0!important}
-        .secure-box>span strong{display:block!important;color:#e2e8f0!important;font-size:10px!important;margin-bottom:2px!important}
-        .choice-row{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;width:100%!important}
-        .choice{min-width:0!important}
-        .choice span{padding:10px 8px!important;font-size:10px!important;white-space:nowrap!important}
-        @media(max-width:850px){.form-layout{grid-template-columns:1fr!important}.event-card{position:static!important}.top-nav{display:none}}
-        @media(max-width:520px){.choice span{font-size:9px!important;padding:9px 5px!important}.event-card{padding:18px!important}}
-    </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="theme-color" content="#05070d">
+<title>Register | CODEX 4.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#05070d;--header:#070914;--panel:#080d18;--panel2:#0c1320;--text:#f7f9fc;--muted:#8f9bad;--line:rgba(255,255,255,.12);--accent:#39ff74;--accent2:#00e5ff;--accent3:#7c3cff;--danger:#fb7185;--soft:rgba(57,255,116,.08);--shadow:rgba(0,0,0,.5)}
+body.light{--bg:#fbfbfe;--header:#fff;--panel:#fff;--panel2:#f7f7fb;--text:#101522;--muted:#687287;--line:rgba(20,25,45,.12);--accent:#6540f5;--accent2:#4c7cff;--accent3:#6b35e8;--soft:rgba(101,64,245,.07);--shadow:rgba(40,45,80,.12)}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;overflow-x:hidden;transition:.3s}.grid-bg{position:fixed;inset:0;z-index:-3;background-image:linear-gradient(color-mix(in srgb,var(--accent) 5%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--accent) 5%,transparent) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(#000,transparent 90%)}.ambient{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:-2;opacity:.12}.ambient.one{width:420px;height:420px;background:var(--accent);top:-160px;right:-100px}.ambient.two{width:380px;height:380px;background:var(--accent3);left:-180px;top:45%}
+.theme-switch{position:absolute;top:9px;left:50%;transform:translateX(-50%);z-index:300;height:38px;padding:3px;border:1px solid var(--line);border-radius:24px;background:var(--panel);display:flex;box-shadow:0 10px 30px var(--shadow)}.theme-switch button{height:30px;border:0;background:transparent;color:var(--muted);padding:0 14px;border-radius:18px;font:700 10px 'Fira Code';cursor:pointer}.theme-switch button.active{background:var(--text);color:var(--bg)}
+.site-header{height:112px;position:sticky;top:0;z-index:200;background:color-mix(in srgb,var(--header) 94%,transparent);border-bottom:1px solid var(--line);backdrop-filter:blur(18px);padding-top:44px}.header-inner{max-width:1180px;height:68px;margin:auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:22px}.brand{display:flex;gap:10px;align-items:center;color:var(--text);text-decoration:none;min-width:205px}.brand-mark{font:700 29px 'Fira Code';color:var(--accent)}.brand strong{display:block;font-size:18px}.brand em{font-style:normal;color:var(--accent3)}.brand small{display:block;font:7px 'Fira Code';letter-spacing:1.5px;color:var(--muted)}.top-nav{display:flex;gap:25px}.top-nav a{color:var(--muted);text-decoration:none;font:700 9px 'Fira Code';text-transform:uppercase}.top-nav a:hover{color:var(--accent)}.nav-cta{background:var(--accent);color:#041008;text-decoration:none;padding:11px 18px;border-radius:7px;font-size:10px;font-weight:900}.nav-cta:hover{transform:translateY(-2px)}body.light .nav-cta{background:var(--accent3);color:#fff}
+.registration-wrap{max-width:1180px;margin:auto;padding:55px 24px 80px}.section-heading{display:flex;justify-content:space-between;align-items:end;margin-bottom:24px}.section-kicker{font:700 9px 'Fira Code';color:var(--accent);letter-spacing:2px}.section-heading h2{font-size:36px;letter-spacing:-1.5px;margin:5px 0}.section-heading p{color:var(--muted);font-size:12px}.live-pill{display:flex;gap:8px;align-items:center;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);background:var(--soft);padding:8px 11px;border-radius:999px;font:700 9px 'Fira Code'}.live-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}.stepper{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:9px}.step{border:0;background:transparent;color:var(--muted);text-align:left;padding:9px 10px;cursor:pointer;border-radius:9px;display:grid;grid-template-columns:28px 1fr;column-gap:7px}.step span{grid-row:span 2;width:26px;height:26px;border:1px solid var(--muted);border-radius:50%;display:grid;place-items:center;font:10px 'Fira Code'}.step b{font-size:10px;align-self:end}.step small{font-size:8px;color:var(--muted)}.step.active{color:var(--text);background:var(--soft)}.step.active span{background:var(--accent);border-color:var(--accent);color:#041008;box-shadow:0 0 20px color-mix(in srgb,var(--accent) 35%,transparent)}.step.active small{color:var(--accent)}.step.completed span{border-color:color-mix(in srgb,var(--accent) 60%,transparent);color:var(--accent)}.hidden{display:none!important}.progress-track{height:3px;background:var(--panel2);border-radius:99px;margin-bottom:18px}.progress-track div{height:100%;width:20%;background:linear-gradient(90deg,var(--accent),var(--accent3));border-radius:99px;transition:.35s}.form-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:18px}.form-step{display:none;background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:28px;min-height:420px;animation:slideIn .25s ease}.form-step.active{display:block}@keyframes slideIn{from{opacity:.5;transform:translateY(7px)}to{opacity:1;transform:none}}.panel-heading{display:flex;align-items:center;gap:12px;margin-bottom:28px}.panel-icon{width:38px;height:38px;border-radius:10px;background:var(--soft);border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);display:grid;place-items:center;color:var(--accent);font:600 12px 'Fira Code'}.panel-heading h3{font-size:19px}.panel-heading p{font-size:11px;color:var(--muted)}.leader-tag,.optional-tag{margin-left:auto;font:700 8px 'Fira Code';letter-spacing:1px;padding:6px 8px;border-radius:999px}.leader-tag{color:var(--accent2);background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.15)}.optional-tag{color:var(--accent3);background:var(--soft);border:1px solid color-mix(in srgb,var(--accent3) 20%,transparent)}.fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.field.full{grid-column:1/-1}.field label{display:block;font-size:10px;font-weight:700;color:var(--text);margin-bottom:7px}.field label i{color:var(--accent3);font-style:normal}.field input,.field select{width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:12px 13px;font:12px Inter;outline:none;transition:.2s}.field input::placeholder{color:var(--muted)}.field input:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 11%,transparent)}.field small{display:block;color:var(--muted);font-size:9px;margin-top:6px}.choice-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice{min-width:0;cursor:pointer;position:relative}.choice input{position:absolute;opacity:0;pointer-events:none}.choice span{display:block;border:1px solid var(--line);border-radius:8px;padding:12px 8px;text-align:center;color:var(--muted);font-size:10px;transition:.2s}.choice.active span,.choice input:checked+span{border-color:var(--accent);background:var(--soft);color:var(--text);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 25%,transparent),0 0 18px color-mix(in srgb,var(--accent) 8%,transparent)}
+.payment-grid{display:grid;grid-template-columns:230px 1fr;gap:25px}.qr-card{border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:18px;text-align:center}.qr-label{font:600 9px 'Fira Code';color:var(--accent);letter-spacing:1.5px;margin-bottom:12px}.qr-frame{background:#fff;border-radius:10px;padding:10px;display:inline-flex;margin-bottom:10px}.qr-frame img{width:150px;height:150px;object-fit:contain;display:block}.qr-card strong{display:block;color:var(--accent);font-size:22px}.qr-card small{color:var(--muted);font-size:9px}.payment-fields{display:grid;gap:15px}.fixed-fee{display:flex;align-items:center;justify-content:space-between;border:1px solid color-mix(in srgb,var(--accent3) 25%,transparent);background:var(--soft);padding:14px;border-radius:9px}.fixed-fee span{font-size:10px;color:var(--muted)}.fixed-fee strong{font-size:18px;color:var(--text)}.fixed-fee small{font-size:8px;color:var(--muted)}.dropzone{min-height:120px;border:1px dashed color-mix(in srgb,var(--accent) 55%,transparent);background:var(--soft);border-radius:10px;display:flex!important;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;text-align:center;gap:4px}.dropzone:hover{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 11%,transparent)}.dropzone input{display:none}.upload-icon{font-size:24px;color:var(--accent)}.dropzone b{font-size:11px}.dropzone span:not(.upload-icon){font-size:9px;color:var(--muted)}.dropzone strong{font-size:8px;color:var(--muted)}.payment-notes{margin-top:17px;border:1px solid color-mix(in srgb,var(--accent) 18%,transparent);background:var(--soft);border-radius:9px;padding:11px;color:var(--muted);font-size:10px}.payment-notes span{color:var(--accent);margin-right:7px}.form-actions{display:flex;justify-content:space-between;gap:10px;margin-top:14px}.secondary-btn,.primary-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:12px 18px;border-radius:8px;font-weight:800;font-size:11px;cursor:pointer;text-decoration:none}.secondary-btn{background:transparent;color:var(--muted);border:1px solid var(--line)}.secondary-btn:disabled{opacity:.35}.primary-btn{border:0;background:var(--accent);color:#041008;box-shadow:0 10px 30px color-mix(in srgb,var(--accent) 15%,transparent)}body.light .primary-btn{background:var(--accent3);color:#fff}.next-btn,.submit-btn{margin-left:auto}.status-message{margin-top:12px;padding:11px 13px;border-radius:8px;border:1px solid color-mix(in srgb,var(--danger) 20%,transparent);background:color-mix(in srgb,var(--danger) 6%,transparent);color:var(--danger);font-size:10px}
+.event-card{border:1px solid color-mix(in srgb,var(--accent3) 25%,transparent);border-radius:15px;background:var(--panel);padding:22px;height:max-content;position:sticky;top:125px}.aside-top{display:flex;justify-content:space-between;align-items:center}.aside-top>span:first-child{font:700 8px 'Fira Code';letter-spacing:2px;color:var(--accent3)}.event-card h3{font-size:28px;line-height:1.05;margin:14px 0 22px}.event-card h3 span{color:var(--muted)}.aside-list{display:grid;gap:0}.aside-list>div{display:grid;grid-template-columns:32px minmax(0,1fr);align-items:start;gap:10px;padding:15px 0;border-top:1px solid var(--line)}.aside-list>div>b{width:28px;height:28px;display:grid;place-items:center;border-radius:8px;background:var(--soft);color:var(--accent);font-size:13px}.aside-list>div>span{display:block;color:var(--muted);font-size:8px;line-height:1.35;letter-spacing:1.2px;font-weight:600}.aside-list strong{display:block;color:var(--text);font-size:11px;line-height:1.45;letter-spacing:0;margin-top:3px}.secure-box{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start;margin-top:18px;padding:14px;border:1px solid color-mix(in srgb,var(--accent2) 18%,transparent);border-radius:10px;background:color-mix(in srgb,var(--accent2) 4%,transparent)}.secure-box>b{width:28px;height:28px;display:grid;place-items:center;border-radius:50%;color:var(--accent2);background:color-mix(in srgb,var(--accent2) 7%,transparent)}.secure-box span{display:block;color:var(--muted);font-size:9px;line-height:1.5}.secure-box strong{display:block;color:var(--text);font-size:10px;margin-bottom:2px}.success-screen{max-width:650px;margin:80px auto;padding:55px 25px;text-align:center}.success-icon{width:80px;height:80px;background:var(--accent);color:#041008;font-size:40px;line-height:80px;border-radius:50%;margin:0 auto 25px}.success-screen h2{font-size:32px}.success-screen p{color:var(--muted);margin:8px 0 25px}.footer{border-top:1px solid var(--line);padding:25px;text-align:center;color:var(--muted);font-size:9px}
+@media(max-width:900px){.top-nav{display:none}.form-layout{grid-template-columns:1fr}.event-card{position:static}.theme-switch{left:auto;right:14px;transform:none}.hero{grid-template-columns:1fr}}@media(max-width:600px){.header-inner{padding:0 16px}.brand{min-width:0}.brand small{display:none}.registration-wrap{padding:35px 16px 60px}.section-heading{align-items:flex-start;gap:12px}.section-heading h2{font-size:29px}.stepper{grid-template-columns:repeat(5,minmax(70px,1fr));overflow-x:auto}.fields-grid,.payment-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.form-step{padding:20px}.event-card{padding:18px}.theme-switch button{padding:0 10px}}
+</style>
 </head>
 <body>
-    <div class="ambient ambient-one"></div>
-    <div class="ambient ambient-two"></div>
-    <div class="grid-bg"></div>
-
-    <header class="site-header">
-        <a class="brand" href="index.html">
-            <span class="brand-mark">&lt;/&gt;</span>
-            <span><strong>CODEX <em>4.0</em></strong><small>INTER-COLLEGE CODING EVENT</small></span>
-        </a>
-        <nav class="top-nav">
-            <a href="index.html#about">About</a>
-            <a href="index.html#highlights">Highlights</a>
-            <a href="index.html#timeline">Timeline</a>
-        </nav>
-        <a href="index.html" class="nav-cta">← Home</a>
-    </header>
-
-    <main class="registration-wrap register-page">
-        <div class="section-heading reveal">
-            <div>
-                <span class="section-kicker">REGISTRATION</span>
-                <h2>Register your team</h2>
-                <p>Fill in the details step-by-step and complete your payment.</p>
-            </div>
-            <div class="live-pill"><span class="live-dot"></span> LIVE FORM</div>
-        </div>
-
-        <form id="registrationForm" novalidate>
-            <div class="stepper" id="stepper">
-                <button type="button" class="step active" data-step="1"><span>01</span><b>Team</b><small>Details</small></button>
-                <button type="button" class="step" data-step="2"><span>02</span><b>Member 1</b><small>Leader</small></button>
-                <button type="button" class="step" data-step="3"><span>03</span><b>Member 2</b><small>Participant</small></button>
-                <button type="button" class="step hidden" data-step="4" id="member3Step"><span>04</span><b>Member 3</b><small>Participant</small></button>
-                <button type="button" class="step" data-step="5"><span>05</span><b>Payment</b><small>Confirm</small></button>
-            </div>
-
-            <div class="progress-track"><div id="progressBar"></div></div>
-
-            <div class="form-layout">
-                <div class="form-main">
-                    <section class="form-step active" data-panel="1" id="section-team">
-                        <div class="panel-heading"><span class="panel-icon">⌘</span><div><h3>Team details</h3><p>Start with your team identity.</p></div></div>
-                        <div class="fields-grid">
-                            <div class="field full"><label>Team Name <i>*</i></label><input name="teamName" type="text" placeholder="Enter a unique team name" minlength="2" maxlength="60" required></div>
-                            <div class="field"><label>College Name <i>*</i></label><input name="collegeName" type="text" placeholder="Full college name" minlength="2" maxlength="150" required></div>
-                            <div class="field"><label>Team Size <i>*</i></label>
-                                <div class="choice-row">
-                                    <label class="choice active"><input type="radio" name="teamSize" value="2" checked><span>2 Members</span></label>
-                                    <label class="choice"><input type="radio" name="teamSize" value="3"><span>3 Members</span></label>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section class="form-step" data-panel="2">
-                        <div class="panel-heading"><span class="panel-icon">01</span><div><h3>Team member 1</h3><p>Team leader information.</p></div><span class="leader-tag">LEADER</span></div>
-                        <div class="fields-grid member-fields">
-                            <div class="field"><label>Full Name <i>*</i></label><input name="m1_name" type="text" maxlength="80" required></div>
-                            <div class="field"><label>Roll Number <i>*</i></label><input name="m1_roll" type="text" maxlength="40" required></div>
-                            <div class="field"><label>Email ID <i>*</i></label><input name="m1_email" type="email" maxlength="120" placeholder="example@email.com" required></div>
-                            <div class="field"><label>Mobile Number <i>*</i></label><input name="m1_phone" type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="10-digit number" required></div>
-                            <div class="field"><label>Year of Study <i>*</i></label><select name="m1_year" required><option value="">Select Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select></div>
-                            <div class="field"><label>Branch <i>*</i></label><input name="m1_branch" type="text" maxlength="80" placeholder="e.g. CSE" required></div>
-                            <div class="field"><label>Section <i>*</i></label><select name="m1_section" required><option value="">Select Section</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
-                        </div>
-                    </section>
-
-                    <section class="form-step" data-panel="3">
-                        <div class="panel-heading"><span class="panel-icon">02</span><div><h3>Team member 2</h3><p>Add your second participant.</p></div></div>
-                        <div class="fields-grid member-fields">
-                            <div class="field"><label>Full Name <i>*</i></label><input name="m2_name" type="text" maxlength="80" required></div>
-                            <div class="field"><label>Roll Number <i>*</i></label><input name="m2_roll" type="text" maxlength="40" required></div>
-                            <div class="field"><label>Email ID <i>*</i></label><input name="m2_email" type="email" maxlength="120" placeholder="example@email.com" required></div>
-                            <div class="field"><label>Mobile Number <i>*</i></label><input name="m2_phone" type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="10-digit number" required></div>
-                            <div class="field"><label>Year of Study <i>*</i></label><select name="m2_year" required><option value="">Select Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select></div>
-                            <div class="field"><label>Branch <i>*</i></label><input name="m2_branch" type="text" maxlength="80" placeholder="e.g. CSE" required></div>
-                            <div class="field"><label>Section <i>*</i></label><select name="m2_section" required><option value="">Select Section</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
-                        </div>
-                    </section>
-
-                    <section class="form-step" data-panel="4" id="member3Section">
-                        <div class="panel-heading"><span class="panel-icon">03</span><div><h3>Team member 3</h3><p>Add your third participant.</p></div><span class="optional-tag">3-MEMBER TEAM</span></div>
-                        <div class="fields-grid member-fields">
-                            <div class="field"><label>Full Name <i>*</i></label><input name="m3_name" type="text" maxlength="80"></div>
-                            <div class="field"><label>Roll Number <i>*</i></label><input name="m3_roll" type="text" maxlength="40"></div>
-                            <div class="field"><label>Email ID <i>*</i></label><input name="m3_email" type="email" maxlength="120" placeholder="example@email.com"></div>
-                            <div class="field"><label>Mobile Number <i>*</i></label><input name="m3_phone" type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="10-digit number"></div>
-                            <div class="field"><label>Year of Study <i>*</i></label><select name="m3_year"><option value="">Select Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select></div>
-                            <div class="field"><label>Branch <i>*</i></label><input name="m3_branch" type="text" maxlength="80" placeholder="e.g. CSE"></div>
-                            <div class="field"><label>Section <i>*</i></label><select name="m3_section"><option value="">Select Section</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
-                        </div>
-                    </section>
-
-                    <section class="form-step" data-panel="5" id="paymentSection">
-                        <div class="panel-heading"><span class="panel-icon">₹</span><div><h3>Payment & confirmation</h3><p>Pay ₹300 per team and upload the receipt.</p></div></div>
-                        <div class="payment-grid">
-                            <div class="qr-card">
-                                <div class="qr-label">SCAN TO PAY</div>
-                                <div class="qr-frame"><img id="paymentQR" src="./codex-payment-qr.png" alt="CODEX 4.0 payment QR"></div>
-                                <strong id="displayFee">₹300 per team</strong>
-                                <small>Use any supported UPI app.</small>
-                            </div>
-                            <div class="payment-fields">
-                                <div class="fixed-fee"><span>Registration fee</span><strong>₹300</strong><small>Fixed per team</small></div>
-                                <div class="field"><label>UPI Transaction ID / UTR <i>*</i></label><input name="utr" type="text" maxlength="30" pattern="[A-Za-z0-9]{8,30}" placeholder="Enter the transaction/reference number" required><small>Enter the reference number shown after payment.</small></div>
-                                <div class="field"><label>Payment Receipt <i>*</i></label><label class="dropzone" for="receipt"><span class="upload-icon">↑</span><b>Drop your file here</b><span>or click to choose a file</span><strong>JPG, PNG or PDF · Max 10MB</strong><input id="receipt" name="receipt" type="file" accept="image/jpeg,image/png,application/pdf" required></label><small id="fileInfo">No file selected</small></div>
-                            </div>
-                        </div>
-                        <div class="payment-notes"><span>✓</span> Payment is submitted with your registration. Organizers will verify the transaction separately.</div>
-                    </section>
-
-                    <div class="form-actions">
-                        <button type="button" class="secondary-btn" id="backBtn">← Back</button>
-                        <button type="button" class="primary-btn next-btn" id="nextBtn">Continue <span>→</span></button>
-                        <button type="submit" class="primary-btn submit-btn hidden" id="submitBtn">Submit Registration <span>✓</span></button>
-                    </div>
-                    <div id="statusMessage" class="status-message hidden"></div>
-                </div>
-
-                <aside class="event-card">
-                    <div class="aside-top"><span>CODEX 4.0</span><span class="live-dot"></span></div>
-                    <h3>Registration<br><span>at a glance</span></h3>
-                    <div class="aside-list">
-                        <div><b>⌁</b><span>TEAM SIZE<strong>2 or 3 members</strong></span></div>
-                        <div><b>₹</b><span>REGISTRATION FEE<strong>₹300 per team</strong></span></div>
-                        <div><b>✓</b><span>ELIGIBILITY<strong>2nd / 3rd / 4th Year</strong></span></div>
-                        <div><b>!</b><span>4TH YEAR RULE<strong>Maximum one 4th-year student per team.</strong></span></div>
-                    </div>
-                    <div class="secure-box"><b>◎</b><span><strong>Your data is secure</strong>Registration details and receipts are sent directly to the event backend.</span></div>
-                </aside>
-            </div>
-        </form>
-    </main>
-
-    <section id="successScreen" class="success-screen hidden">
-        <div class="success-icon">✓</div>
-        <h2>Registration successful</h2>
-        <p>Thank you for registering for CODEX 4.0.</p>
-        <a href="index.html" class="primary-btn">Back to CODEX 4.0 <span>→</span></a>
-    </section>
-
-    <footer class="footer"><div class="registration-wrap"><strong>〈/〉 Coders' Club</strong><br><span>Building the future, one line of code at a time.</span></div></footer>
-    <script src="script.js"></script>
-</body>
-</html>
+<div class="grid-bg"></div><div class="ambient one"></div><div class="ambient two"></div>
+<header class="site-header"><div class="theme-switch"><button data-theme="dark">DARK</button><button data-theme="light">LIGHT</button></div><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">&lt;/&gt;</span><span><strong>CODEX <em>4.0</em></strong><small>INTER-COLLEGE CODING EVENT</small></span></a><nav class="top-nav"><a href="index.html#about">About</a><a href="index.html#highlights">Highlights</a><a href="index.html#timeline">Timeline</a></nav><a href="index.html" class="nav-cta">← Home</a></div></header>
+<main class="registration-wrap register-page"><div class="section-heading"><div><span class="section-kicker">REGISTRATION</span><h2>Register your team</h2><p>Fill in the details step-by-step and complete your payment.</p></div><div class="live-pill"><span class="live-dot"></span> LIVE FORM</div></div>
+<form id="registrationForm" novalidate>
+<div class="stepper" id="stepper"><button type="button" class="step active" data-step="1"><span>01</span><b>Team</b><small>Details</small></button><button type="button" class="step" data-step="2"><span>02</span><b>Member 1</b><small>Leader</small></button><button type="button" class="step" data-step="3"><span>03</span><b>Member 2</b><small>Participant</small></button><button type="button" class="step hidden" data-step="4" id="member3Step"><span>04</span><b>Member 3</b><small>Participant</small></button><button type="button" class="step" data-step="5"><span>05</span><b>Payment</b><small>Confirm</small></button></div>
+<div class="progress-track"><div id="progressBar"></div></div>
+<div class="form-layout"><div class="form-main">
+<section class="form-step active" data-panel="1"><div class="panel-heading"><span class="panel-icon">⌘</span><div><h3>Team details</h3><p>Start with your team identity.</p></div></div><div class="fields-grid"><div class="field full"><label>Team Name <i>*</i></label><input name="teamName" type="text" placeholder="Enter a unique team name" minlength="2" maxlength="60" required></div><div class="field"><label>College Name <i>*</i></label><input name="collegeName" type="text" placeholder="Full college name" minlength="2" maxlength="150" required></div><div class="field"><label>Team Size <i>*</i></label><div class="choice-row"><label class="choice active"><input type="radio" name="teamSize" value="2" checked><span>2 Members</span></label><label class="choice"><input type="radio" name="teamSize" value="3"><span>3 Members</span></label></div></div></div></section>
+<section class="form-step" data-panel="2"><div class="panel-heading"><span class="panel-icon">01</span><div><h3>Team member 1</h3><p>Team leader information.</p></div><span class="leader-tag">LEADER</span></div><div class="fields-grid"><div class="field"><label>Full Name <i>*</i></label><input name="m1_name" maxlength="80" required></div><div class="field"><label>Roll Number <i>*</i></label><input name="m1_roll" maxlength="40" required></div><div class="field"><label>Email ID <i>*</i></label><input name="m1_email" type="email" maxlength="120" placeholder="example@email.com" required></div><div class="field"><label>Mobile Number <i>*</i></label><input name="m1_phone" type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="10-digit number" required></div><div class="field"><label>Year of Study <i>*</i></label><select name="m1_year" required><option value="">Select Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select></div><div class="field"><label>Branch <i>*</i></label><input name="m1_branch" maxlength="80" placeholder="e.g. CSE" required></div><div class="field"><label>Section <i>*</i></label><select name="m1_section" required><option value="">Select Section</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div></div></section>
+<section class="form-step" data-panel="3"><div class="panel-heading"><span class="panel-icon">02</span><div><h3>Team member 2</h3><p>Add your second participant.</p></div></div><div class="fields-grid"><div class="field"><label>Full Name <i>*</i></label><input name="m2_name" maxlength="80" required></div><div class="field"><label>Roll Number <i>*</i></label><input name="m2_roll" maxlength="40" required></div><div class="field"><label>Email ID <i>*</i></label><input name="m2_email" type="email" maxlength="120" placeholder="example@email.com" required></div><div class="field"><label>Mobile Number <i>*</i></label><input name="m2_phone" type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="10-digit number" required></div><div class="field"><label>Year of Study <i>*</i></label><select name="m2_year" required><option value="">Select Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select></div><div class="field"><label>Branch <i>*</i></label><input name="m2_branch" maxlength="80" placeholder="e.g. CSE" required></div><div class="field"><label>Section <i>*</i></label><select name="m2_section" required><option value="">Select Section</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div></div></section>
+<section class="form-step hidden" data-panel="4" id="member3Section"><div class="panel-heading"><span class="panel-icon">03</span><div><h3>Team member 3</h3><p>Add your third participant.</p></div><span class="optional-tag">3-MEMBER TEAM</span></div><div class="fields-grid"><div class="field"><label>Full Name <i>*</i></label><input name="m3_name" maxlength="80"></div><div class="field"><label>Roll Number <i>*</i></label><input name="m3_roll" maxlength="40"></div><div class="field"><label>Email ID <i>*</i></label><input name="m3_email" type="email" maxlength="120" placeholder="example@email.com"></div><div class="field"><label>Mobile Number <i>*</i></label><input name="m3_phone" type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="10-digit number"></div><div class="field"><label>Year of Study <i>*</i></label><select name="m3_year"><option value="">Select Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select></div><div class="field"><label>Branch <i>*</i></label><input name="m3_branch" maxlength="80" placeholder="e.g. CSE"></div><div class="field"><label>Section <i>*</i></label><select name="m3_section"><option value="">Select Section</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div></div></section>
+<section class="form-step" data-panel="5"><div class="panel-heading"><span class="panel-icon">₹</span><div><h3>Payment & confirmation</h3><p>Pay ₹300 per team and upload the receipt.</p></div></div><div class="payment-grid"><div class="qr-card"><div class="qr-label">SCAN TO PAY</div><div class="qr-frame"><img id="paymentQR" src="./codex-payment-qr.png" alt="CODEX 4.0 payment QR"></div><strong id="displayFee">₹300 per team</strong><small>Use any supported UPI app.</small></div><div class="payment-fields"><div class="fixed-fee"><span>Registration fee</span><strong>₹300</strong><small>Fixed per team</small></div><div class="field"><label>UPI Transaction ID / UTR <i>*</i></label><input name="utr" type="text" maxlength="30" pattern="[A-Za-z0-9]{8,30}" placeholder="Enter the transaction/reference number" required><small>Enter the reference number shown after payment.</small></div><div class="field"><label>Payment Receipt <i>*</i></label><label class="dropzone" for="receipt"><span class="upload-icon">↑</span><b>Drop your file here</b><span>or click to choose a file</span><strong>JPG, PNG or PDF · Max 10MB</strong><input id="receipt" name="receipt" type="file" accept="image/jpeg,image/png,application/pdf" required></label><small id="fileInfo">No file selected</small></div></div></div><div class="payment-notes"><span>✓</span> Payment is submitted with your registration. Organizers will verify the transaction separately.</div></section>
+<div class="form-actions"><button type="button" class="secondary-btn" id="backBtn">← Back</button><button type="button" class="primary-btn next-btn" id="nextBtn">Continue <span>→</span></button><button type="submit" class="primary-btn submit-btn hidden" id="submitBtn">Submit Registration <span>✓</span></button></div><div id="statusMessage" class="status-message hidden"></div>
+</div>
+<aside class="event-card"><div class="aside-top"><span>CODEX 4.0</span><span class="live-dot"></span></div><h3>Registration<br><span>at a glance</span></h3><div class="aside-list"><div><b>⌁</b><span>TEAM SIZE<strong>2 or 3 members</strong></span></div><div><b>₹</b><span>REGISTRATION FEE<strong>₹300 per team</strong></span></div><div><b>✓</b><span>ELIGIBILITY<strong>2nd / 3rd / 4th Year</strong></span></div><div><b>!</b><span>4TH YEAR RULE<strong>Maximum one 4th-year student per team.</strong></span></div></div><div class="secure-box"><b>◎</b><span><strong>Your data is secure</strong>Registration details and receipts are sent directly to the event backend.</span></div></aside>
+</div></form></main>
+<section id="successScreen" class="success-screen hidden"><div class="success-icon">✓</div><h2>Registration successful</h2><p>Thank you for registering for CODEX 4.0.</p><a href="index.html" class="primary-btn">Back to CODEX 4.0 <span>→</span></a></section>
+<footer class="footer">Coders' Club · CODEX 4.0 · Inter-College Coding Event</footer>
+<script src="script.js"></script>
+<script>(function(){const k='codex-theme';function set(t){document.body.classList.toggle('light',t==='light');localStorage.setItem(k,t);document.querySelectorAll('[data-theme]').forEach(b=>b.classList.toggle('active',b.dataset.theme===t))}set(localStorage.getItem(k)||'dark');document.querySelectorAll('[data-theme]').forEach(b=>b.addEventListener('click',()=>set(b.dataset.theme)))}())</script>
+</body></html>
