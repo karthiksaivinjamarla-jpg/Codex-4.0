@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#070b1f">
+    <title>Register | CODEX 4.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+    <div class="grid-bg"></div>
+
+    <header class="site-header">
+        <a class="brand" href="index.html">
+            <span class="brand-mark">&lt;/&gt;</span>
+            <span><strong>CODEX <em>4.0</em></strong><small>INTER-COLLEGE CODING EVENT</small></span>
+        </a>
+        <nav class="top-nav">
+            <a href="index.html#about">About</a>
+            <a href="index.html#highlights">Highlights</a>
+            <a href="index.html#timeline">Timeline</a>
+        </nav>
+        <a href="index.html" class="nav-cta">← Home</a>
+    </header>
+
+    <main class="registration-wrap register-page">
+        <div class="section-heading reveal">
+            <div>
+                <span class="section-kicker">REGISTRATION</span>
+                <h2>Register your team</h2>
+                <p>Fill in the details step-by-step and complete your payment.</p>
+            </div>
+            <div class="live-pill"><span class="live-dot"></span> LIVE FORM</div>
+        </div>
+
+        <form id="registrationForm" novalidate>
+            <div class="stepper" id="stepper">
+                <button type="button" class="step active" data-step="1"><span>01</span><b>Team</b><small>Details</small></button>
+                <button type="button" class="step" data-step="2"><span>02</span><b>Member 1</b><small>Leader</small></button>
+                <button type="button" class="step" data-step="3"><span>03</span><b>Member 2</b><small>Participant</small></button>
+                <button type="button" class="step hidden" data-step="4" id="member3Step"><span>04</span><b>Member 3</b><small>Participant</small></button>
+                <button type="button" class="step" data-step="5"><span>05</span><b>Payment</b><small>Confirm</small></button>
+            </div>
+
+            <div class="progress-track"><div id="progressBar"></div></div>
+
+            <div class="form-layout">
+                <div class="form-main">
+                    <section class="form-step active" data-panel="1" id="section-team">
+                        <div class="panel-heading"><span class="panel-icon">⌘</span><div><h3>Team details</h3><p>Start with your team identity.</p></div></div>
+                        <div class="fields-grid">
+                            <div class="field full"><label>Team Name <i>*</i></label><input name="teamName" type="text" placeholder="Enter a unique team name" minlength="2" maxlength="60" required></div>
+                            <div class="field"><label>College Name <i>*</i></label><input name="collegeName" type="text" placeholder="Full college name" minlength="2" maxlength="150" required></div>
+                            <div class="field"><label>Team Size <i>*</i></label>
+                                <div class="choice-row">
+                                    <label class="choice active"><input type="radio" name="teamSize" value="2" checked><span>2 Members</span></label>
+                                    <label class="choice"><input type="radio" name="teamSize" value="3"><span>3 Members</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="form-step" data-panel="2">
+                        <div class="panel-heading"><span class="panel-icon">01</span><div><h3>Team member 1</h3><p>Team leader information.</p></div><span class="leader-tag">LEADER</span></div>
+                        <div class="fields-grid member-fields">
+                            <div class="field"><label>Full Name <i>*</i></label><input name="m1_name" type="text" maxlength="80" required></div>
+                            <div class="field"><label>Roll Number <i>*</i></label><input name="m1_roll" type="text" maxlength="40" required></div>
+                            <div class="field"><label>Email ID <i>*</i></label><input name="m1_email" type="email" maxlength="120" placeholder="example@email.com" required></div>
+                            <div class="field"><label>Mobile Number <i>*</i></label><input name="m1_phone" type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="10-digit number" required></div>
+                            <div class="field"><label>Year of Study <i>*</i></label><select name="m1_year" required><option value="">Select Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select></div>
+                            <div class="field"><label>Branch <i>*</i></label><input name="m1_branch" type="text" maxlength="80" placeholder="e.g. CSE" required></div>
+                            <div class="field"><label>Section <i>*</i></label><select name="m1_section" required><option value="">Select Section</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+                        </div>
+                    </section>
+
+                    <section class="form-step" data-panel="3">
+                        <div class="panel-heading"><span class="panel-icon">02</span><div><h3>Team member 2</h3><p>Add your second participant.</p></div></div>
+                        <div class="fields-grid member-fields">
+                            <div class="field"><label>Full Name <i>*</i></label><input name="m2_name" type="text" maxlength="80" required></div>
+                            <div class="field"><label>Roll Number <i>*</i></label><input name="m2_roll" type="text" maxlength="40" required></div>
+                            <div class="field"><label>Email ID <i>*</i></label><input name="m2_email" type="email" maxlength="120" placeholder="example@email.com" required></div>
+                            <div class="field"><label>Mobile Number <i>*</i></label><input name="m2_phone" type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="10-digit number" required></div>
+                            <div class="field"><label>Year of Study <i>*</i></label><select name="m2_year" required><option value="">Select Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select></div>
+                            <div class="field"><label>Branch <i>*</i></label><input name="m2_branch" type="text" maxlength="80" placeholder="e.g. CSE" required></div>
+                            <div class="field"><label>Section <i>*</i></label><select name="m2_section" required><option value="">Select Section</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+                        </div>
+                    </section>
+
+                    <section class="form-step" data-panel="4" id="member3Section">
+                        <div class="panel-heading"><span class="panel-icon">03</span><div><h3>Team member 3</h3><p>Add your third participant.</p></div><span class="optional-tag">3-MEMBER TEAM</span></div>
+                        <div class="fields-grid member-fields">
+                            <div class="field"><label>Full Name <i>*</i></label><input name="m3_name" type="text" maxlength="80"></div>
+                            <div class="field"><label>Roll Number <i>*</i></label><input name="m3_roll" type="text" maxlength="40"></div>
+                            <div class="field"><label>Email ID <i>*</i></label><input name="m3_email" type="email" maxlength="120" placeholder="example@email.com"></div>
+                            <div class="field"><label>Mobile Number <i>*</i></label><input name="m3_phone" type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="10-digit number"></div>
+                            <div class="field"><label>Year of Study <i>*</i></label><select name="m3_year"><option value="">Select Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select></div>
+                            <div class="field"><label>Branch <i>*</i></label><input name="m3_branch" type="text" maxlength="80" placeholder="e.g. CSE"></div>
+                            <div class="field"><label>Section <i>*</i></label><select name="m3_section"><option value="">Select Section</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+                        </div>
+                    </section>
+
+                    <section class="form-step" data-panel="5" id="paymentSection">
+                        <div class="panel-heading"><span class="panel-icon">₹</span><div><h3>Payment & confirmation</h3><p>Pay ₹300 per team and upload the receipt.</p></div></div>
+                        <div class="payment-grid">
+                            <div class="qr-card">
+                                <div class="qr-label">SCAN TO PAY</div>
+                                <div class="qr-frame"><img id="paymentQR" src="./codex-payment-qr.png" alt="CODEX 4.0 payment QR"></div>
+                                <strong id="displayFee">₹300 per team</strong>
+                                <small>Use any supported UPI app.</small>
+                            </div>
+                            <div class="payment-fields">
+                                <div class="fixed-fee"><span>Registration fee</span><strong>₹300</strong><small>Fixed per team</small></div>
+                                <div class="field"><label>UPI Transaction ID / UTR <i>*</i></label><input name="utr" type="text" maxlength="30" pattern="[A-Za-z0-9]{8,30}" placeholder="Enter the transaction/reference number" required><small>Enter the reference number shown after payment.</small></div>
+                                <div class="field"><label>Payment Receipt <i>*</i></label><label class="dropzone" for="receipt"><span class="upload-icon">↑</span><b>Drop your file here</b><span>or click to choose a file</span><strong>JPG, PNG or PDF · Max 10MB</strong><input id="receipt" name="receipt" type="file" accept="image/jpeg,image/png,application/pdf" required></label><small id="fileInfo">No file selected</small></div>
+                            </div>
+                        </div>
+                        <div class="payment-notes"><span>✓</span> Payment is submitted with your registration. Organizers will verify the transaction separately.</div>
+                    </section>
+
+                    <div class="form-actions">
+                        <button type="button" class="secondary-btn" id="backBtn">← Back</button>
+                        <button type="button" class="primary-btn next-btn" id="nextBtn">Continue <span>→</span></button>
+                        <button type="submit" class="primary-btn submit-btn hidden" id="submitBtn">Submit Registration <span>✓</span></button>
+                    </div>
+                    <div id="statusMessage" class="status-message hidden"></div>
+                </div>
+
+                <aside class="event-card">
+                    <div class="aside-top"><span>CODEX 4.0</span><span class="live-dot"></span></div>
+                    <h3>Registration<br><span>at a glance</span></h3>
+                    <div class="aside-list">
+                        <div><b>⌁</b><span>TEAM SIZE<strong>2 or 3 members</strong></span></div>
+                        <div><b>₹</b><span>REGISTRATION FEE<strong>₹300 per team</strong></span></div>
+                        <div><b>✓</b><span>ELIGIBILITY<strong>2nd / 3rd / 4th Year</strong></span></div>
+                        <div><b>!</b><span>4TH YEAR RULE<strong>Maximum one 4th-year student per team.</strong></span></div>
+                    </div>
+                    <div class="secure-box"><b>◎</b><span><strong>Your data is secure</strong>Registration details and receipts are sent directly to the event backend.</span></div>
+                </aside>
+            </div>
+        </form>
+    </main>
+
+    <section id="successScreen" class="success-screen hidden">
+        <div class="success-icon">✓</div>
+        <h2>Registration successful</h2>
+        <p>Thank you for registering for CODEX 4.0.</p>
+        <a href="index.html" class="primary-btn">Back to CODEX 4.0 <span>→</span></a>
+    </section>
+
+    <footer class="footer"><div class="registration-wrap"><strong>〈/〉 Coders' Club</strong><br><span>Building the future, one line of code at a time.</span></div></footer>
+    <script src="script.js"></script>
+</body>
+</html>
