@@ -1,0 +1,48 @@
+name: Apply CODEX shared theme
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  apply-theme:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Attach shared theme to all pages
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          pages = [Path('index.html'), Path('register.html')]
+          css_tag = '<link rel="stylesheet" href="theme.css">'
+          js_tag = '<script src="theme.js"></script>'
+
+          for path in pages:
+              if not path.exists():
+                  continue
+              text = path.read_text(encoding='utf-8')
+
+              if css_tag not in text:
+                  text = text.replace('</head>', f'{css_tag}\n</head>', 1)
+
+              if js_tag not in text:
+                  text = text.replace('</body>', f'{js_tag}\n</body>', 1)
+
+              path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html register.html theme.css theme.js
+          git diff --cached --quiet && exit 0
+          git commit -m "feat: apply CODEX orange theme to all pages [skip ci]"
+          git push
