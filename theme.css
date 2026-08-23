@@ -1,0 +1,97 @@
+/* CODEX 4.0 shared brand theme */
+:root {
+  --codex-orange: #E64B2E;
+  --codex-cream: #D6D3CF;
+  --codex-white: #F2F2F2;
+  --codex-grey: #9A9A9A;
+  --codex-black: #0D0D0D;
+}
+
+body,
+body:not(.light) {
+  --bg: #0D0D0D !important;
+  --header: #0D0D0D !important;
+  --panel: #0D0D0D !important;
+  --panel2: #171717 !important;
+  --text: #F2F2F2 !important;
+  --muted: #9A9A9A !important;
+  --line: rgba(214,211,207,.20) !important;
+  --accent: #E64B2E !important;
+  --accent2: #D6D3CF !important;
+  --accent3: #E64B2E !important;
+  --shadow: rgba(0,0,0,.60) !important;
+  --grid: rgba(230,75,46,.055) !important;
+  --soft: rgba(230,75,46,.075) !important;
+  --danger: #E64B2E !important;
+}
+
+body.light {
+  --bg: #F2F2F2 !important;
+  --header: #F2F2F2 !important;
+  --panel: #FFFFFF !important;
+  --panel2: #D6D3CF !important;
+  --text: #0D0D0D !important;
+  --muted: #666666 !important;
+  --line: rgba(13,13,13,.13) !important;
+  --accent: #E64B2E !important;
+  --accent2: #9A9A9A !important;
+  --accent3: #E64B2E !important;
+  --shadow: rgba(13,13,13,.12) !important;
+  --grid: rgba(230,75,46,.045) !important;
+  --soft: rgba(230,75,46,.07) !important;
+  --danger: #E64B2E !important;
+}
+
+html { background: var(--bg) !important; }
+body { background: var(--bg) !important; color: var(--text) !important; }
+.theme-switch {
+  position: fixed !important;
+  top: 10px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 9999 !important;
+  background: var(--panel) !important;
+  border-color: var(--line) !important;
+}
+.theme-switch button.active { background: var(--accent) !important; color: #FFFFFF !important; }
+.theme-switch button:hover { color: var(--accent) !important; }
+.site-header { padding-top: 48px !important; height: 116px !important; }
+.register-btn,
+.nav-cta,
+.primary-btn { background: var(--accent) !important; color: #FFFFFF !important; border-color: var(--accent) !important; }
+.register-btn:hover,
+.nav-cta:hover,
+.primary-btn:hover { background: #C83D25 !important; border-color: #C83D25 !important; }
+.brand-title span,
+.brand em,
+.hero h1 span,
+body.light .hero h1 span,
+.section-title .kicker,
+body.light .section-title .kicker,
+.eyebrow,
+body.light .eyebrow,
+.prompt,
+.stat-icon,
+.hicon,
+.time-num,
+.info-box h3,
+.final-box strong,
+.section-kicker,
+.live-pill,
+.live-dot,
+.qr-label,
+.qr-card strong,
+.upload-icon,
+.payment-notes span,
+.panel-icon,
+.guideline:before { color: var(--accent) !important; }
+body.light .code-wall { background: linear-gradient(135deg, transparent 35%, rgba(230,75,46,.06)) !important; border-color: rgba(230,75,46,.16) !important; }
+body.light .code-wall:after { color: rgba(230,75,46,.45) !important; }
+body.light .screen:before { color: var(--accent) !important; }
+body.light .screen { box-shadow: 0 12px 40px rgba(230,75,46,.16) !important; }
+.timeline:before { background: linear-gradient(90deg, var(--accent), var(--accent)) !important; }
+.choice.active span,
+.choice input:checked + span,
+.highlight:hover { border-color: var(--accent) !important; }
+@media (max-width: 900px) { .theme-switch { left: auto !important; right: 14px !important; transform: none !important; } }
+@media (max-width: 600px) { .site-header { padding-top: 48px !important; } .theme-switch { right: 10px !important; } }
