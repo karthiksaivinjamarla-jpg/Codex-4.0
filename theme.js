@@ -17,35 +17,64 @@
     if (meta) meta.setAttribute('content', value === 'light' ? '#F2F2F2' : '#0D0D0D');
   }
 
-  function addFaq() {
-    if (document.getElementById('codex-faq') || !document.querySelector('main')) return;
-    const anchor = document.querySelector('#contact');
-    if (!anchor) return;
+  function addMeta(name, content, property) {
+    if (!content) return;
+    const selector = property ? `meta[property="${property}"]` : `meta[name="${name}"]`;
+    let meta = document.head.querySelector(selector);
+    if (!meta) {
+      meta = document.createElement('meta');
+      if (property) meta.setAttribute('property', property);
+      else meta.setAttribute('name', name);
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', content);
+  }
 
-    const section = document.createElement('section');
-    section.id = 'codex-faq';
-    section.className = 'section codex-faq-section';
-    section.innerHTML = `
-      <div class="section-title">
-        <span class="kicker">QUICK ANSWERS</span>
-        <h2>Frequently Asked Questions</h2>
-        <p>Common questions about CODEX 4.0. Official rules and updates will be published by the organizers.</p>
-      </div>
-      <div class="codex-faq-list">
-        <details><summary>What is the maximum team size?</summary><p>Teams can have 2–3 members.</p></details>
-        <details><summary>Can a team have a final-year candidate?</summary><p>Yes. A team can have at most one final-year candidate.</p></details>
-        <details><summary>What is the registration fee?</summary><p>The registration fee is ₹300 per team.</p></details>
-        <details><summary>When are the two rounds?</summary><p>Round 1 — Vibe 2 Vibe is scheduled for 20 August 2026. Round 2 — CodeSprint is scheduled for 2 September 2026.</p></details>
-        <details><summary>Where will the event be held?</summary><p>The venue will be announced once finalized.</p></details>
-        <details><summary>What is the prize pool?</summary><p>Prize details will be announced once finalized.</p></details>
-      </div>`;
-    anchor.parentNode.insertBefore(section, anchor.nextSibling);
+  function setupPromotionMetadata() {
+    addMeta('description', 'CODEX 4.0 — an inter-college coding event by Coders\' Club GPREC. Build. Think. Compete.');
+    addMeta('robots', 'index,follow');
+    addMeta('', 'CODEX 4.0 | Inter-College Coding Event', 'og:title');
+    addMeta('', 'Inter-college coding competition by Coders\' Club GPREC. Team up, solve problems and compete.', 'og:description');
+    addMeta('', 'website', 'og:type');
+    addMeta('', 'https://karthiksaivinjamarla-jpg.github.io/Codex-4.0/', 'og:url');
+    addMeta('', 'CODEX 4.0', 'og:site_name');
+    addMeta('', 'summary_large_image', 'twitter:card');
+    addMeta('', 'CODEX 4.0 | Inter-College Coding Event', 'twitter:title');
+    addMeta('', 'Inter-college coding competition by Coders\' Club GPREC.', 'twitter:description');
+  }
+
+  function setupAccessibility() {
+    document.querySelectorAll('[data-theme]').forEach((button) => {
+      button.setAttribute('type', 'button');
+      button.setAttribute('aria-label', `${button.dataset.theme === 'light' ? 'Switch to light' : 'Switch to dark'} theme`);
+    });
+
+    document.querySelectorAll('a').forEach((link) => {
+      const href = link.getAttribute('href') || '';
+      if (href.startsWith('http') && !link.getAttribute('aria-label')) {
+        const label = link.textContent.trim();
+        if (label) link.setAttribute('aria-label', label);
+      }
+    });
+
+    document.querySelectorAll('button, a').forEach((el) => el.classList.add('keyboard-focusable'));
+  }
+
+  function setupSmoothInteractions() {
+    document.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', () => {
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) target.setAttribute('tabindex', '-1');
+      });
+    });
   }
 
   let saved = DEFAULT;
   try { saved = localStorage.getItem(KEY) || DEFAULT; } catch (_) {}
   applyTheme(saved);
-  addFaq();
+  setupPromotionMetadata();
+  setupAccessibility();
+  setupSmoothInteractions();
 
   document.querySelectorAll('[data-theme]').forEach((button) => {
     button.addEventListener('click', () => applyTheme(button.dataset.theme));
