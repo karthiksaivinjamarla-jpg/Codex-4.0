@@ -257,6 +257,9 @@ function doPost(e) {
 
     sheet.appendRow(outputRow);
 
+    // Send automated confirmation email to leader & members
+    sendConfirmationEmails(data, registrationId);
+
     return jsonResponse({
       success: true,
       registrationId: registrationId,
@@ -561,4 +564,97 @@ function jsonResponse(data) {
   return ContentService
     .createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/* =========================================================
+   AUTOMATED CONFIRMATION EMAILS
+   ========================================================= */
+
+function sendConfirmationEmails(data, registrationId) {
+  try {
+    const emails = [];
+    if (data.m1_email) emails.push(String(data.m1_email).trim());
+    if (data.m2_email) emails.push(String(data.m2_email).trim());
+    if (data.teamSize === "3" && data.m3_email) emails.push(String(data.m3_email).trim());
+
+    if (emails.length === 0) return;
+
+    const subject = `CODEX 4.0 Registration Confirmation - [${registrationId}]`;
+    const recipient = emails[0];
+    const cc = emails.slice(1).join(",");
+
+    let membersListHtml = `
+      <li style="margin-bottom: 8px;"><b>Leader:</b> ${escapeHtml(data.m1_name)} (${escapeHtml(data.m1_roll)}) &mdash; ${escapeHtml(data.m1_branch)} Sec ${escapeHtml(data.m1_section)}, ${escapeHtml(data.m1_year)}</li>
+      <li style="margin-bottom: 8px;"><b>Member 2:</b> ${escapeHtml(data.m2_name)} (${escapeHtml(data.m2_roll)}) &mdash; ${escapeHtml(data.m2_branch)} Sec ${escapeHtml(data.m2_section)}, ${escapeHtml(data.m2_year)}</li>
+    `;
+
+    if (data.teamSize === "3" && data.m3_name) {
+      membersListHtml += `<li style="margin-bottom: 8px;"><b>Member 3:</b> ${escapeHtml(data.m3_name)} (${escapeHtml(data.m3_roll)}) &mdash; ${escapeHtml(data.m3_branch)} Sec ${escapeHtml(data.m3_section)}, ${escapeHtml(data.m3_year)}</li>`;
+    }
+
+    const htmlBody = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0D0D0D; color: #F2F2F2; padding: 30px 20px; max-width: 600px; margin: 0 auto; border-radius: 12px; border: 1px solid #262626;">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <div style="font-family: monospace; font-size: 26px; font-weight: bold; color: #E64B2E; letter-spacing: 1px;">&lt;/&gt; CODEX 4.0</div>
+          <div style="color: #9A9A9A; font-size: 11px; letter-spacing: 1.5px; margin-top: 4px; text-transform: uppercase;">Inter-College Coding Event &middot; Coders' Club</div>
+        </div>
+
+        <div style="background-color: #171717; border: 1px dashed #E64B2E; border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 24px;">
+          <div style="font-size: 10px; font-family: monospace; letter-spacing: 2px; color: #B5B5B5; text-transform: uppercase;">Official Registration ID</div>
+          <div style="font-size: 32px; font-weight: 800; font-family: monospace; color: #E64B2E; margin: 6px 0;">${registrationId}</div>
+          <div style="display: inline-block; font-size: 11px; color: #f59e0b; background: rgba(245,158,11,0.1); padding: 4px 12px; border-radius: 20px;">Payment Status: Under Review</div>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 24px; color: #F2F2F2;">
+          <tr style="border-bottom: 1px solid #262626;">
+            <td style="padding: 10px 0; color: #9A9A9A; width: 35%;">Team Name</td>
+            <td style="padding: 10px 0; font-weight: bold;">${escapeHtml(data.teamName)}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #262626;">
+            <td style="padding: 10px 0; color: #9A9A9A;">College</td>
+            <td style="padding: 10px 0; font-weight: bold;">${escapeHtml(data.collegeName)}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #262626;">
+            <td style="padding: 10px 0; color: #9A9A9A;">Team Size</td>
+            <td style="padding: 10px 0;">${escapeHtml(data.teamSize)} Members</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #262626;">
+            <td style="padding: 10px 0; color: #9A9A9A;">UPI UTR / Ref</td>
+            <td style="padding: 10px 0; font-family: monospace;">${escapeHtml(data.utr)}</td>
+          </tr>
+        </table>
+
+        <div style="background-color: #171717; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+          <div style="font-size: 11px; font-family: monospace; letter-spacing: 1.2px; color: #B5B5B5; margin-bottom: 10px; text-transform: uppercase;">Team Members</div>
+          <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #F2F2F2; line-height: 1.6;">
+            ${membersListHtml}
+          </ul>
+        </div>
+
+        <div style="border-top: 1px solid #262626; padding-top: 16px; text-align: center; color: #666; font-size: 11px; line-height: 1.5;">
+          Please retain this email and your <b>Registration ID</b> for event check-in and contest credentials.<br>
+          Organizers: Coders' Club &middot; CODEX 4.0
+        </div>
+      </div>
+    `;
+
+    MailApp.sendEmail({
+      to: recipient,
+      cc: cc || undefined,
+      subject: subject,
+      htmlBody: htmlBody
+    });
+  } catch (emailErr) {
+    Logger.log("Confirmation email could not be sent: " + emailErr.message);
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }

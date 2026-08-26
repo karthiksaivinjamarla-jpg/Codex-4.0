@@ -4,11 +4,14 @@ const CONFIG = {
     EVENT_NAME: "CODEX 4.0",
     ORGANIZER: "Coders' Club",
     PAYMENT_FEE: 300,
+    UPI_ID: "9392687157@ybl",
     MAX_FILE_SIZE: 10 * 1024 * 1024
 };
 
 let currentStep = 1;
 let maxReachedStep = 1;
+let lastSubmittedData = null;
+let lookupInterval = null;
 
 /* =========================================================
    INITIALIZATION
@@ -22,8 +25,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setupTeamSize();
     setupNavigation();
+    setupPaymentHelpers();
     setupFileUpload();
+    setupRealtimeValidation();
     setupFormSubmission();
+    setupConfirmationPassActions();
     compactTeamSizeSelector();
     showStep(1);
 });
@@ -58,8 +64,6 @@ function setupTeamSize() {
             updateTeamSizeUI();
             updateMember3State();
 
-            /* Changing team size changes the step sequence, so restart
-               progression from Team Details. Existing typed data is kept. */
             maxReachedStep = 1;
             currentStep = 1;
             showStep(1);
@@ -91,7 +95,7 @@ function updateMember3State() {
 }
 
 /* =========================================================
-   STEP SEQUENCE
+   STEP SEQUENCE & NAVIGATION
 ========================================================= */
 function getStepSequence() {
     return getTeamSize() === "3" ? [1, 2, 3, 4, 5] : [1, 2, 3, 5];
@@ -109,9 +113,6 @@ function setupNavigation() {
             const target = Number(button.dataset.step);
             const sequence = getStepSequence();
 
-            /* A section can be opened directly once it has already been
-               completed/reached. This lets users edit earlier details and
-               then jump directly to any already-filled section. */
             if (sequence.includes(target) && target <= maxReachedStep) {
                 showStep(target);
             }
@@ -201,7 +202,216 @@ function updateNavigation() {
 }
 
 /* =========================================================
-   STEP VALIDATION
+   PAYMENT HELPERS & UPI INTEGRATION
+========================================================= */
+function setupPaymentHelpers() {
+    const copyBtn = document.getElementById("copyUpiBtn");
+    const upiLink = document.getElementById("upiPayLink");
+
+    if (copyBtn) {
+        copyBtn.addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(CONFIG.UPI_ID);
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = "✓ Copied UPI ID!";
+                copyBtn.classList.add("copied");
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.classList.remove("copied");
+                }, 2000);
+            } catch (e) {
+                prompt("Copy this UPI ID:", CONFIG.UPI_ID);
+            }
+        });
+    }
+
+    if (upiLink) {
+        upiLink.href = `upi://pay?pa=${CONFIG.UPI_ID}&pn=${encodeURIComponent(CONFIG.EVENT_NAME)}&am=${CONFIG.PAYMENT_FEE}&cu=INR`;
+    }
+}
+
+/* =========================================================
+   FILE UPLOAD & LIVE PREVIEW
+========================================================= */
+function setupFileUpload() {
+    const receiptInput = document.getElementById("receipt");
+    const fileInfo = document.getElementById("fileInfo");
+    const dropzoneLabel = document.getElementById("dropzoneLabel");
+    const dropzonePrompt = document.getElementById("dropzonePrompt");
+    const previewContainer = document.getElementById("previewContainer");
+    const previewMedia = document.getElementById("previewMedia");
+    const previewFileName = document.getElementById("previewFileName");
+    const previewFileSize = document.getElementById("previewFileSize");
+    const removeFileBtn = document.getElementById("removeFileBtn");
+
+    if (!receiptInput) return;
+
+    function handleFile(file) {
+        if (!file) {
+            resetPreview();
+            return;
+        }
+
+        const allowed = ["image/jpeg", "image/png", "application/pdf"];
+        if (!allowed.includes(file.type)) {
+            receiptInput.value = "";
+            resetPreview();
+            showStatus("Please upload a JPG, PNG or PDF payment receipt.", true);
+            return;
+        }
+
+        if (file.size > CONFIG.MAX_FILE_SIZE) {
+            receiptInput.value = "";
+            resetPreview();
+            showStatus("Payment receipt must be 10MB or smaller.", true);
+            return;
+        }
+
+        clearStatus();
+        const sizeFormatted = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+        if (fileInfo) fileInfo.textContent = `Selected: ${file.name} (${sizeFormatted})`;
+
+        if (previewFileName) previewFileName.textContent = file.name;
+        if (previewFileSize) previewFileSize.textContent = sizeFormatted;
+
+        if (previewMedia) {
+            previewMedia.innerHTML = "";
+            if (file.type.startsWith("image/")) {
+                const img = document.createElement("img");
+                img.src = URL.createObjectURL(file);
+                img.alt = "Receipt preview";
+                img.className = "receipt-thumbnail";
+                previewMedia.appendChild(img);
+            } else {
+                const pdfBadge = document.createElement("div");
+                pdfBadge.className = "pdf-badge";
+                pdfBadge.innerHTML = "<span>PDF</span><b>Document</b>";
+                previewMedia.appendChild(pdfBadge);
+            }
+        }
+
+        if (dropzonePrompt) dropzonePrompt.classList.add("hidden");
+        if (previewContainer) previewContainer.classList.remove("hidden");
+    }
+
+    function resetPreview() {
+        receiptInput.value = "";
+        if (fileInfo) fileInfo.textContent = "No file selected";
+        if (dropzonePrompt) dropzonePrompt.classList.remove("hidden");
+        if (previewContainer) previewContainer.classList.add("hidden");
+        if (previewMedia) previewMedia.innerHTML = "";
+    }
+
+    receiptInput.addEventListener("change", () => {
+        handleFile(receiptInput.files[0]);
+    });
+
+    if (removeFileBtn) {
+        removeFileBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            resetPreview();
+        });
+    }
+
+    if (dropzoneLabel) {
+        ["dragenter", "dragover"].forEach(eventName => {
+            dropzoneLabel.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzoneLabel.classList.add("dragover");
+            }, false);
+        });
+
+        ["dragleave", "drop"].forEach(eventName => {
+            dropzoneLabel.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzoneLabel.classList.remove("dragover");
+            }, false);
+        });
+
+        dropzoneLabel.addEventListener("drop", (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files && files.length > 0) {
+                receiptInput.files = files;
+                handleFile(files[0]);
+            }
+        });
+    }
+}
+
+/* =========================================================
+   REAL-TIME VALIDATION & FIELD CHECKS
+========================================================= */
+function setupRealtimeValidation() {
+    const yearSelects = document.querySelectorAll('select[name$="_year"]');
+    yearSelects.forEach(select => {
+        select.addEventListener("change", () => {
+            checkYearConstraints();
+        });
+    });
+
+    const contactInputs = document.querySelectorAll('input[name$="_phone"], input[name$="_email"]');
+    contactInputs.forEach(input => {
+        input.addEventListener("blur", () => {
+            checkContactUniqueness();
+        });
+    });
+}
+
+function checkYearConstraints() {
+    const teamSize = getTeamSize();
+    const count = teamSize === "3" ? 3 : 2;
+    let fourthYearCount = 0;
+
+    for (let i = 1; i <= count; i++) {
+        const val = document.querySelector(`[name="m${i}_year"]`)?.value;
+        if (val === "4th Year") fourthYearCount++;
+    }
+
+    if (fourthYearCount > 1) {
+        showStatus("Note: CODEX 4.0 rules allow a maximum of ONE 4th-year student per team.", true);
+        return false;
+    } else {
+        clearStatus();
+        return true;
+    }
+}
+
+function checkContactUniqueness() {
+    const teamSize = getTeamSize();
+    const count = teamSize === "3" ? 3 : 2;
+    const phones = new Set();
+    const emails = new Set();
+
+    for (let i = 1; i <= count; i++) {
+        const phone = document.querySelector(`[name="m${i}_phone"]`)?.value.trim();
+        const email = document.querySelector(`[name="m${i}_email"]`)?.value.trim().toLowerCase();
+
+        if (phone) {
+            if (phones.has(phone)) {
+                showStatus(`Mobile number ${phone} is entered more than once. Each member must have a unique phone number.`, true);
+                return false;
+            }
+            phones.add(phone);
+        }
+
+        if (email) {
+            if (emails.has(email)) {
+                showStatus(`Email ${email} is entered more than once. Each member must have a unique email ID.`, true);
+                return false;
+            }
+            emails.add(email);
+        }
+    }
+    clearStatus();
+    return true;
+}
+
+/* =========================================================
+   STEP & FORM VALIDATION
 ========================================================= */
 function validateCurrentStep() {
     const panel = document.querySelector(`.form-step[data-panel="${currentStep}"]`);
@@ -220,49 +430,12 @@ function validateCurrentStep() {
         return false;
     }
 
+    if (!checkYearConstraints()) return false;
+    if (!checkContactUniqueness()) return false;
+
     return true;
 }
 
-/* =========================================================
-   FILE UPLOAD
-========================================================= */
-function setupFileUpload() {
-    const receipt = document.getElementById("receipt");
-    const fileInfo = document.getElementById("fileInfo");
-    if (!receipt) return;
-
-    receipt.addEventListener("change", () => {
-        const file = receipt.files[0];
-        if (!file) {
-            if (fileInfo) fileInfo.textContent = "No file selected";
-            return;
-        }
-
-        const allowed = ["image/jpeg", "image/png", "application/pdf"];
-        if (!allowed.includes(file.type)) {
-            receipt.value = "";
-            if (fileInfo) fileInfo.textContent = "Invalid file. Use JPG, PNG or PDF.";
-            showStatus("Please upload a JPG, PNG or PDF payment receipt.", true);
-            return;
-        }
-
-        if (file.size > CONFIG.MAX_FILE_SIZE) {
-            receipt.value = "";
-            if (fileInfo) fileInfo.textContent = "File is too large. Maximum size is 10MB.";
-            showStatus("Payment receipt must be 10MB or smaller.", true);
-            return;
-        }
-
-        if (fileInfo) {
-            fileInfo.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-        }
-        clearStatus();
-    });
-}
-
-/* =========================================================
-   COMPLETE VALIDATION
-========================================================= */
 function validateCompleteForm(form) {
     const teamSize = getTeamSize();
 
@@ -285,7 +458,7 @@ function validateCompleteForm(form) {
 
     const allowedYears = ["2nd Year", "3rd Year", "4th Year"];
     if (years.some(y => !allowedYears.includes(y))) {
-        showStatus("Only 2nd Year, 3rd Year and 4th Year students are allowed.", true);
+        showStatus("Only 2nd Year, 3rd Year and 4th Year students are eligible.", true);
         return false;
     }
 
@@ -369,7 +542,7 @@ function setupFormSubmission() {
         try {
             submitBtn.disabled = true;
             submitBtn.innerHTML = "Submitting Registration...";
-            showStatus("Uploading registration and payment receipt...", false);
+            showStatus("Uploading registration and payment receipt to backend...", false);
 
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
@@ -381,6 +554,8 @@ function setupFormSubmission() {
             data.receiptType = file.type;
             data.receiptName = file.name;
 
+            lastSubmittedData = data;
+
             await fetch(CONFIG.API_URL, {
                 method: "POST",
                 mode: "no-cors",
@@ -388,7 +563,8 @@ function setupFormSubmission() {
                 body: JSON.stringify(data)
             });
 
-            showSuccess();
+            showSuccess(data);
+            pollForRegistrationId(data.submissionToken);
         } catch (error) {
             console.error("Registration submission error:", error);
             showStatus(error.message || "Unable to submit registration. Please try again.", true);
@@ -417,18 +593,129 @@ function convertFileToBase64(file) {
 }
 
 /* =========================================================
-   SUCCESS / STATUS
+   SUCCESS / CONFIRMATION PASS
 ========================================================= */
-function showSuccess() {
+function showSuccess(data) {
     document.getElementById("registrationForm")?.classList.add("hidden");
+    const successScreen = document.getElementById("successScreen");
+    if (!successScreen) return;
 
-    /* Remove the payment-verification message from the final screen. */
-    document.querySelector("#successScreen .pending-badge")?.remove();
-
-    document.getElementById("successScreen")?.classList.remove("hidden");
+    successScreen.classList.remove("hidden");
     window.scrollTo({ top: 0, behavior: "smooth" });
+
+    // Populate pass details
+    document.getElementById("passTeamName").textContent = data.teamName || "-";
+    document.getElementById("passCollege").textContent = data.collegeName || "-";
+    document.getElementById("passTeamSize").textContent = `${data.teamSize || 2} Members`;
+    document.getElementById("passUtr").textContent = data.utr || "-";
+    document.getElementById("passRegId").textContent = "GENERATING ID...";
+
+    const memberList = document.getElementById("passMemberList");
+    if (memberList) {
+        memberList.innerHTML = "";
+        const count = data.teamSize === "3" ? 3 : 2;
+
+        for (let i = 1; i <= count; i++) {
+            const li = document.createElement("li");
+            const isLeader = i === 1;
+            const name = data[`m${i}_name`] || `Member ${i}`;
+            const roll = data[`m${i}_roll`] || "-";
+            const branch = data[`m${i}_branch`] || "-";
+            const year = data[`m${i}_year`] || "-";
+            const section = data[`m${i}_section`] || "-";
+
+            li.innerHTML = `
+                <div class="member-badge">${isLeader ? "👑 LEADER" : "MEMBER " + i}</div>
+                <div class="member-info">
+                    <strong>${escapeHtml(name)}</strong>
+                    <small>Roll: ${escapeHtml(roll)} · ${escapeHtml(branch)} (Sec ${escapeHtml(section)}) · ${escapeHtml(year)}</small>
+                </div>
+            `;
+            memberList.appendChild(li);
+        }
+    }
 }
 
+/* =========================================================
+   REGISTRATION ID POLLING VIA JSONP
+========================================================= */
+window.handleRegistrationIdResponse = function(response) {
+    if (response && response.success && response.registrationId) {
+        const idElem = document.getElementById("passRegId");
+        if (idElem) {
+            idElem.textContent = response.registrationId;
+            idElem.classList.add("highlight-pulse");
+        }
+        if (lookupInterval) {
+            clearInterval(lookupInterval);
+            lookupInterval = null;
+        }
+    }
+};
+
+function pollForRegistrationId(token) {
+    let attempts = 0;
+    const maxAttempts = 15;
+
+    function query() {
+        attempts++;
+        const scriptId = "jsonp_reg_lookup";
+        const oldScript = document.getElementById(scriptId);
+        if (oldScript) oldScript.remove();
+
+        const script = document.createElement("script");
+        script.id = scriptId;
+        script.src = `${CONFIG.API_URL}?action=getRegistrationId&token=${encodeURIComponent(token)}&callback=handleRegistrationIdResponse&_t=${Date.now()}`;
+        document.body.appendChild(script);
+
+        if (attempts >= maxAttempts && lookupInterval) {
+            clearInterval(lookupInterval);
+            lookupInterval = null;
+            const idElem = document.getElementById("passRegId");
+            if (idElem && idElem.textContent === "GENERATING ID...") {
+                idElem.textContent = "CONFIRMED (See Email)";
+            }
+        }
+    }
+
+    setTimeout(query, 1500);
+    lookupInterval = setInterval(query, 4000);
+}
+
+function setupConfirmationPassActions() {
+    const printBtn = document.getElementById("printSlipBtn");
+    const copyRegIdBtn = document.getElementById("copyRegIdBtn");
+
+    if (printBtn) {
+        printBtn.addEventListener("click", () => {
+            window.print();
+        });
+    }
+
+    if (copyRegIdBtn) {
+        copyRegIdBtn.addEventListener("click", async () => {
+            const regId = document.getElementById("passRegId")?.textContent || "";
+            if (regId && regId !== "GENERATING ID...") {
+                try {
+                    await navigator.clipboard.writeText(regId);
+                    const original = copyRegIdBtn.textContent;
+                    copyRegIdBtn.textContent = "✓ Copied ID!";
+                    setTimeout(() => {
+                        copyRegIdBtn.textContent = original;
+                    }, 2000);
+                } catch (e) {
+                    prompt("Copy Registration ID:", regId);
+                }
+            } else {
+                alert("Please wait a moment while your Registration ID is assigned.");
+            }
+        });
+    }
+}
+
+/* =========================================================
+   UTILITIES
+========================================================= */
 function showStatus(message, isError = false) {
     const status = document.getElementById("statusMessage");
     if (!status) return;
@@ -442,4 +729,14 @@ function clearStatus() {
     if (!status) return;
     status.classList.add("hidden");
     status.textContent = "";
+}
+
+function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }

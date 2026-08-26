@@ -115,3 +115,341 @@
     }
 
 }
+
+/* =====================================================
+   PAYMENT HELPERS & LIVE PREVIEW
+   ===================================================== */
+
+.upi-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin: 12px 0 8px;
+    flex-wrap: wrap;
+}
+
+.copy-upi-btn, .upi-pay-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.copy-upi-btn {
+    background: var(--soft, rgba(230,75,46,.08));
+    color: var(--text, #f7f9fc);
+    border: 1px solid var(--line, rgba(255,255,255,.15));
+}
+
+.copy-upi-btn:hover {
+    border-color: var(--accent, #e64b2e);
+    color: var(--accent, #e64b2e);
+}
+
+.copy-upi-btn.copied {
+    background: #10b981;
+    border-color: #10b981;
+    color: #ffffff;
+}
+
+.upi-pay-btn {
+    background: var(--accent, #e64b2e);
+    color: #ffffff;
+    border: 1px solid var(--accent, #e64b2e);
+}
+
+.upi-pay-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.preview-container {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+    border-radius: 9px;
+    background: var(--panel2, rgba(255,255,255,.05));
+    border: 1px solid var(--line, rgba(255,255,255,.1));
+    text-align: left;
+    width: 100%;
+}
+
+.preview-media {
+    width: 55px;
+    height: 55px;
+    border-radius: 6px;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    background: #000;
+    flex-shrink: 0;
+}
+
+.receipt-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pdf-badge {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #ef4444;
+    font-size: 10px;
+}
+
+.pdf-badge span {
+    font-weight: 900;
+    font-size: 13px;
+}
+
+.preview-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+}
+
+.preview-details strong {
+    font-size: 12px;
+    color: var(--text, #f7f9fc);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.preview-details span {
+    font-size: 10px;
+    color: var(--muted, #94a3b8);
+}
+
+.remove-file-btn {
+    background: transparent;
+    border: 0;
+    color: var(--danger, #fb7185);
+    font-size: 10px;
+    cursor: pointer;
+    text-align: left;
+    padding: 0;
+    margin-top: 4px;
+    text-decoration: underline;
+}
+
+/* =====================================================
+   REGISTRATION CONFIRMATION PASS / TICKET
+   ===================================================== */
+
+.registration-pass {
+    border: 1px solid var(--line, rgba(255,255,255,.15));
+    border-radius: 16px;
+    background: var(--panel, #080d18);
+    padding: 28px;
+    margin: 25px auto;
+    text-align: left;
+    max-width: 640px;
+    box-shadow: 0 20px 50px var(--shadow, rgba(0,0,0,.5));
+}
+
+.pass-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--line, rgba(255,255,255,.12));
+    padding-bottom: 14px;
+}
+
+.pass-brand {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 16px;
+}
+
+.pass-brand span {
+    color: var(--accent, #e64b2e);
+    font-family: 'Fira Code', monospace;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.pass-badge {
+    font: 700 9px 'Fira Code', monospace;
+    letter-spacing: 1.5px;
+    background: var(--soft, rgba(230,75,46,.1));
+    color: var(--accent, #e64b2e);
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--accent, #e64b2e) 30%, transparent);
+}
+
+.pass-id-block {
+    text-align: center;
+    padding: 22px 0;
+    border-bottom: 1px dashed var(--line, rgba(255,255,255,.15));
+}
+
+.pass-id-block small {
+    display: block;
+    font: 700 9px 'Fira Code', monospace;
+    letter-spacing: 2px;
+    color: var(--muted, #94a3b8);
+}
+
+.pass-id-block strong {
+    font: 800 32px 'Fira Code', monospace;
+    color: var(--accent, #e64b2e);
+    display: block;
+    margin: 6px 0;
+    letter-spacing: 1px;
+}
+
+.pass-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted, #94a3b8);
+    background: var(--panel2, rgba(255,255,255,.05));
+    padding: 5px 14px;
+    border-radius: 99px;
+    border: 1px solid var(--line, rgba(255,255,255,.1));
+}
+
+.pass-status-pill b {
+    color: #f59e0b;
+}
+
+.pass-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line, rgba(255,255,255,.12));
+}
+
+.pass-grid span {
+    display: block;
+    font: 600 8px 'Fira Code', monospace;
+    letter-spacing: 1.2px;
+    color: var(--muted, #94a3b8);
+}
+
+.pass-grid strong {
+    display: block;
+    font-size: 13px;
+    color: var(--text, #f7f9fc);
+    margin-top: 3px;
+}
+
+.pass-members {
+    padding: 18px 0;
+}
+
+.pass-members > span {
+    display: block;
+    font: 600 8px 'Fira Code', monospace;
+    letter-spacing: 1.2px;
+    color: var(--muted, #94a3b8);
+    margin-bottom: 10px;
+}
+
+.pass-members ul {
+    list-style: none;
+    display: grid;
+    gap: 10px;
+}
+
+.pass-members li {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: var(--panel2, rgba(255,255,255,.03));
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--line, rgba(255,255,255,.08));
+}
+
+.member-badge {
+    font: 700 8px 'Fira Code', monospace;
+    letter-spacing: 1px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: var(--soft, rgba(230,75,46,.1));
+    color: var(--accent, #e64b2e);
+    border: 1px solid color-mix(in srgb, var(--accent, #e64b2e) 25%, transparent);
+    white-space: nowrap;
+}
+
+.member-info strong {
+    display: block;
+    font-size: 13px;
+    color: var(--text, #f7f9fc);
+}
+
+.member-info small {
+    display: block;
+    font-size: 10px;
+    color: var(--muted, #94a3b8);
+}
+
+.pass-footer {
+    text-align: center;
+    font-size: 10px;
+    color: var(--muted, #94a3b8);
+    padding-top: 14px;
+    border-top: 1px solid var(--line, rgba(255,255,255,.12));
+}
+
+.pass-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background: #fff !important;
+        color: #000 !important;
+    }
+    .site-header, .theme-switch, .footer, .grid-bg, .ambient,
+    .pass-actions, .success-ring, h2, #successMessageText {
+        display: none !important;
+    }
+    .registration-pass {
+        border: 2px solid #000 !important;
+        background: #fff !important;
+        color: #000 !important;
+        box-shadow: none !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 20px !important;
+    }
+    .pass-brand span, .pass-id-block strong, .member-badge {
+        color: #000 !important;
+    }
+    .pass-grid strong, .member-info strong {
+        color: #000 !important;
+    }
+    .pass-grid span, .pass-members > span, .member-info small, .pass-footer, .pass-status-pill {
+        color: #444 !important;
+    }
+    .pass-members li, .pass-status-pill {
+        border: 1px solid #ccc !important;
+        background: #fafafa !important;
+    }
+}
