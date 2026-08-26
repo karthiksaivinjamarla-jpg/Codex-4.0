@@ -69,12 +69,20 @@
     });
   }
 
+  function setupRegistrationAccess() {
+    const authScript = document.createElement('script');
+    authScript.src = './auth-bridge.js';
+    authScript.defer = true;
+    document.head.appendChild(authScript);
+  }
+
   let saved = DEFAULT;
   try { saved = localStorage.getItem(KEY) || DEFAULT; } catch (_) {}
   applyTheme(saved);
   setupPromotionMetadata();
   setupAccessibility();
   setupSmoothInteractions();
+  setupRegistrationAccess();
 
   document.querySelectorAll('[data-theme]').forEach((button) => {
     button.addEventListener('click', () => applyTheme(button.dataset.theme));
