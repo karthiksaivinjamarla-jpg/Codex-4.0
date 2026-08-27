@@ -7,11 +7,7 @@ const AUTH_CONFIG = {
 };
 
 const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true
-  }
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
 });
 
 function showMessage(text, type = "error") {
@@ -38,6 +34,26 @@ function setBusy(button, busyText, busy) {
   }
 }
 
+function jsonp(action, params = {}) {
+  return new Promise((resolve, reject) => {
+    const callbackName = "codexAuthCallback_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
+    const script = document.createElement("script");
+    const query = new URLSearchParams({ action, callback: callbackName, _t: Date.now().toString(), ...params });
+    const timeout = setTimeout(() => { cleanup(); reject(new Error("Registration backend did not respond. Please try again.")); }, 20000);
+
+    function cleanup() {
+      clearTimeout(timeout);
+      delete window[callbackName];
+      script.remove();
+    }
+
+    window[callbackName] = data => { cleanup(); resolve(data); };
+    script.onerror = () => { cleanup(); reject(new Error("Unable to connect to the registration backend.")); };
+    script.src = `${AUTH_CONFIG.API_URL}?${query.toString()}`;
+    document.body.appendChild(script);
+  });
+}
+
 async function getSession() {
   if (!supabaseClient) return null;
   const { data, error } = await supabaseClient.auth.getSession();
@@ -54,27 +70,8 @@ async function getVerifiedUser() {
 
 async function checkExistingRegistration(session) {
   if (!session?.access_token) return { exists: false };
-
-  const query = new URLSearchParams({
-    action: "checkRegistration",
-    accessToken: session.access_token,
-    _t: Date.now().toString()
-  });
-
-  const response = await fetch(`${AUTH_CONFIG.API_URL}?${query.toString()}`, {
-    method: "GET",
-    cache: "no-store"
-  });
-
-  const text = await response.text();
-  let result;
-  try {
-    result = JSON.parse(text);
-  } catch (_) {
-    throw new Error("The registration backend returned an invalid response.");
-  }
-
-  if (!result.success) throw new Error(result.message || "Unable to check registration status.");
+  const result = await jsonp("checkRegistration", { accessToken: session.access_token });
+  if (!result?.success) throw new Error(result?.message || "Unable to check registration status.");
   return result;
 }
 
@@ -92,7 +89,6 @@ function showAuthenticated(session, user, registration) {
     showAlreadyRegistered(registration.registrationId);
     return;
   }
-
   sessionStorage.setItem(AUTH_CONFIG.SESSION_HINT_KEY, "1");
   sessionStorage.setItem("codex-auth-email", user.email || "");
   document.getElementById("methods")?.classList.add("hidden");
@@ -102,7 +98,6 @@ function showAuthenticated(session, user, registration) {
 
 async function handleAuthenticatedSession(session) {
   if (!session) return false;
-
   try {
     const user = await getVerifiedUser();
     if (!user?.email) throw new Error("Your authenticated account did not provide an email address.");
@@ -118,16 +113,10 @@ async function handleAuthenticatedSession(session) {
 
 async function sendMagicLink() {
   clearMessage();
-  if (!supabaseClient) {
-    showMessage("Supabase authentication is not configured correctly.");
-    return;
-  }
+  if (!supabaseClient) { showMessage("Supabase authentication is not configured correctly."); return; }
 
   const email = document.getElementById("email")?.value.trim().toLowerCase();
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showMessage("Please enter a valid email address.");
-    return;
-  }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showMessage("Please enter a valid email address."); return; }
 
   const button = document.getElementById("sendMagicLink");
   setBusy(button, "SENDING LINK...", true);
@@ -136,12 +125,8 @@ async function sendMagicLink() {
     const redirectTo = `${window.location.origin}${window.location.pathname}`;
     const { error } = await supabaseClient.auth.signInWithOtp({
       email,
-      options: {
-        emailRedirectTo: redirectTo,
-        shouldCreateUser: true
-      }
+      options: { emailRedirectTo: redirectTo, shouldCreateUser: true }
     });
-
     if (error) throw error;
     showMessage("✓ Login link sent. Check your email and open the link to continue.", "success");
     const hint = document.getElementById("emailHint");
@@ -156,20 +141,13 @@ async function sendMagicLink() {
 
 async function signInWithGoogle() {
   clearMessage();
-  if (!supabaseClient) {
-    showMessage("Supabase authentication is not configured correctly.");
-    return;
-  }
+  if (!supabaseClient) { showMessage("Supabase authentication is not configured correctly."); return; }
 
   const button = document.getElementById("googleButton");
   setBusy(button, "OPENING GOOGLE...", true);
-
   try {
     const redirectTo = `${window.location.origin}${window.location.pathname}`;
-    const { error } = await supabaseClient.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo }
-    });
+    const { error } = await supabaseClient.auth.signInWithOAuth({ provider: "google", options: { redirectTo } });
     if (error) throw error;
   } catch (error) {
     console.error("Google sign-in error:", error);
@@ -182,17 +160,11 @@ async function continueToRegistration() {
   clearMessage();
   try {
     const session = await getSession();
-    if (!session) {
-      showMessage("Please verify your account before continuing.");
-      return;
-    }
+    if (!session) { showMessage("Please verify your account before continuing."); return; }
 
     const user = await getVerifiedUser();
     const registration = await checkExistingRegistration(session);
-    if (registration.exists) {
-      showAlreadyRegistered(registration.registrationId);
-      return;
-    }
+    if (registration.exists) { showAlreadyRegistered(registration.registrationId); return; }
 
     sessionStorage.setItem(AUTH_CONFIG.SESSION_HINT_KEY, "1");
     sessionStorage.setItem("codex-auth-email", user.email || "");
@@ -206,27 +178,17 @@ function initAuthEvents() {
   document.getElementById("sendMagicLink")?.addEventListener("click", sendMagicLink);
   document.getElementById("googleButton")?.addEventListener("click", signInWithGoogle);
   document.getElementById("continueBtn")?.addEventListener("click", continueToRegistration);
-
   document.getElementById("email")?.addEventListener("keydown", event => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      sendMagicLink();
-    }
+    if (event.key === "Enter") { event.preventDefault(); sendMagicLink(); }
   });
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  if (!supabaseClient) {
-    showMessage("Supabase authentication is not configured. Please contact the event team.");
-    return;
-  }
+  if (!supabaseClient) { showMessage("Supabase authentication is not configured. Please contact the event team."); return; }
 
   initAuthEvents();
-
   supabaseClient.auth.onAuthStateChange((event, session) => {
-    if (event === "SIGNED_IN" && session) {
-      setTimeout(() => handleAuthenticatedSession(session), 0);
-    }
+    if (event === "SIGNED_IN" && session) setTimeout(() => handleAuthenticatedSession(session), 0);
     if (event === "SIGNED_OUT") {
       sessionStorage.removeItem(AUTH_CONFIG.SESSION_HINT_KEY);
       sessionStorage.removeItem("codex-auth-email");
