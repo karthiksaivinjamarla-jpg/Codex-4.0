@@ -1,7 +1,6 @@
 const SUPABASE_URL = window.CODEX_SUPABASE_CONFIG?.url || "";
 const SUPABASE_PUBLISHABLE_KEY = window.CODEX_SUPABASE_CONFIG?.publishableKey || "";
 const AUTH_CONFIG = {
-  API_URL: "https://script.google.com/macros/s/AKfycbwqbA-ujJmA0dHwx9z8YY9fuk86DdjkpxU-y0m1sZ9fvNBLc4qHa1apQEiy23hVOfkBKQ/exec",
   REGISTRATION_URL: "./register.html",
   SESSION_HINT_KEY: "codex-auth-ready"
 };
@@ -34,26 +33,6 @@ function setBusy(button, busyText, busy) {
   }
 }
 
-function jsonp(action, params = {}) {
-  return new Promise((resolve, reject) => {
-    const callbackName = "codexAuthCallback_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
-    const script = document.createElement("script");
-    const query = new URLSearchParams({ action, callback: callbackName, _t: Date.now().toString(), ...params });
-    const timeout = setTimeout(() => { cleanup(); reject(new Error("Registration backend did not respond. Please try again.")); }, 20000);
-
-    function cleanup() {
-      clearTimeout(timeout);
-      delete window[callbackName];
-      script.remove();
-    }
-
-    window[callbackName] = data => { cleanup(); resolve(data); };
-    script.onerror = () => { cleanup(); reject(new Error("Unable to connect to the registration backend.")); };
-    script.src = `${AUTH_CONFIG.API_URL}?${query.toString()}`;
-    document.body.appendChild(script);
-  });
-}
-
 async function getSession() {
   if (!supabaseClient) return null;
   const { data, error } = await supabaseClient.auth.getSession();
@@ -68,13 +47,6 @@ async function getVerifiedUser() {
   return data.user || null;
 }
 
-async function checkExistingRegistration(session) {
-  if (!session?.access_token) return { exists: false };
-  const result = await jsonp("checkRegistration", { accessToken: session.access_token });
-  if (!result?.success) throw new Error(result?.message || "Unable to check registration status.");
-  return result;
-}
-
 function showAlreadyRegistered(id) {
   document.getElementById("methods")?.classList.add("hidden");
   document.getElementById("continueBtn")?.classList.remove("show");
@@ -84,11 +56,7 @@ function showAlreadyRegistered(id) {
   showMessage("This account has already been used for a CODEX 4.0 registration.", "error");
 }
 
-function showAuthenticated(session, user, registration) {
-  if (registration?.exists) {
-    showAlreadyRegistered(registration.registrationId);
-    return;
-  }
+function showAuthenticated(session, user) {
   sessionStorage.setItem(AUTH_CONFIG.SESSION_HINT_KEY, "1");
   sessionStorage.setItem("codex-auth-email", user.email || "");
   document.getElementById("methods")?.classList.add("hidden");
@@ -101,8 +69,7 @@ async function handleAuthenticatedSession(session) {
   try {
     const user = await getVerifiedUser();
     if (!user?.email) throw new Error("Your authenticated account did not provide an email address.");
-    const registration = await checkExistingRegistration(session);
-    showAuthenticated(session, user, registration);
+    showAuthenticated(session, user);
     return true;
   } catch (error) {
     console.error("Authentication session check failed:", error);
@@ -163,13 +130,13 @@ async function continueToRegistration() {
     if (!session) { showMessage("Please verify your account before continuing."); return; }
 
     const user = await getVerifiedUser();
-    const registration = await checkExistingRegistration(session);
-    if (registration.exists) { showAlreadyRegistered(registration.registrationId); return; }
+    if (!user?.email) { showMessage("Your authenticated account did not provide an email address."); return; }
 
     sessionStorage.setItem(AUTH_CONFIG.SESSION_HINT_KEY, "1");
     sessionStorage.setItem("codex-auth-email", user.email || "");
     window.location.href = AUTH_CONFIG.REGISTRATION_URL;
   } catch (error) {
+    console.error("Unable to continue to registration:", error);
     showMessage(error.message || "Unable to continue. Please sign in again.");
   }
 }
