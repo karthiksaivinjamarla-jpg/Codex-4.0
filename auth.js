@@ -1,50 +1,18 @@
+const SUPABASE_URL = window.CODEX_SUPABASE_CONFIG?.url || "";
+const SUPABASE_PUBLISHABLE_KEY = window.CODEX_SUPABASE_CONFIG?.publishableKey || "";
 const AUTH_CONFIG = {
   API_URL: "https://script.google.com/macros/s/AKfycbwqbA-ujJmA0dHwx9z8YY9fuk86DdjkpxU-y0m1sZ9fvNBLc4qHa1apQEiy23hVOfkBKQ/exec",
   REGISTRATION_URL: "./register.html",
-  AUTH_TOKEN_KEY: "codex-auth-token",
-  AUTH_EMAIL_KEY: "codex-auth-email",
-  GOOGLE_CLIENT_ID: ""
+  SESSION_HINT_KEY: "codex-auth-ready"
 };
 
-let otpCooldownTimer = null;
-
-function jsonp(action, params = {}) {
-  return new Promise((resolve, reject) => {
-    const callbackName = "codexAuthCallback_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
-    const script = document.createElement("script");
-    const query = new URLSearchParams({ action, callback: callbackName, _t: Date.now(), ...params });
-    const timeout = setTimeout(() => {
-      cleanup();
-      reject(new Error("Authentication server did not respond. Please try again."));
-    }, 20000);
-
-    function cleanup() {
-      clearTimeout(timeout);
-      delete window[callbackName];
-      script.remove();
-    }
-
-    window[callbackName] = (data) => {
-      cleanup();
-      resolve(data);
-    };
-
-    script.onerror = () => {
-      cleanup();
-      reject(new Error("Unable to connect to the authentication server."));
-    };
-
-    script.src = `${AUTH_CONFIG.API_URL}?${query.toString()}`;
-    document.body.appendChild(script);
-  });
-}
-
-async function postAuth(action, payload) {
-  // Apps Script web apps do not provide a browser-readable CORS response
-  // for this deployment, so auth responses use the same JSONP-compatible
-  // GET service pattern as the existing Registration-ID lookup.
-  return jsonp(action, payload);
-}
+const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
 
 function showMessage(text, type = "error") {
   const el = document.getElementById("message");
@@ -58,210 +26,218 @@ function clearMessage() {
   if (el) el.className = "message";
 }
 
+function setBusy(button, busyText, busy) {
+  if (!button) return;
+  if (busy) {
+    button.dataset.originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = busyText;
+  } else {
+    button.disabled = false;
+    button.textContent = button.dataset.originalText || "CONTINUE";
+  }
+}
+
+async function getSession() {
+  if (!supabaseClient) return null;
+  const { data, error } = await supabaseClient.auth.getSession();
+  if (error) throw error;
+  return data.session || null;
+}
+
+async function getVerifiedUser() {
+  if (!supabaseClient) throw new Error("Supabase authentication is not configured.");
+  const { data, error } = await supabaseClient.auth.getUser();
+  if (error) throw error;
+  return data.user || null;
+}
+
+async function checkExistingRegistration(session) {
+  if (!session?.access_token) return { exists: false };
+
+  const query = new URLSearchParams({
+    action: "checkRegistration",
+    accessToken: session.access_token,
+    _t: Date.now().toString()
+  });
+
+  const response = await fetch(`${AUTH_CONFIG.API_URL}?${query.toString()}`, {
+    method: "GET",
+    cache: "no-store"
+  });
+
+  const text = await response.text();
+  let result;
+  try {
+    result = JSON.parse(text);
+  } catch (_) {
+    throw new Error("The registration backend returned an invalid response.");
+  }
+
+  if (!result.success) throw new Error(result.message || "Unable to check registration status.");
+  return result;
+}
+
 function showAlreadyRegistered(id) {
   document.getElementById("methods")?.classList.add("hidden");
+  document.getElementById("continueBtn")?.classList.remove("show");
   document.getElementById("already")?.classList.add("show");
   const idEl = document.getElementById("existingId");
   if (idEl) idEl.textContent = id || "ALREADY REGISTERED";
-  showMessage("This email has already been used for a CODEX 4.0 registration.", "error");
+  showMessage("This account has already been used for a CODEX 4.0 registration.", "error");
 }
 
-function startCooldown(seconds) {
-  const button = document.getElementById("sendOtp");
-  const hint = document.getElementById("otpHint");
-  let remaining = Number(seconds) || 60;
-  if (button) button.disabled = true;
-
-  clearInterval(otpCooldownTimer);
-  otpCooldownTimer = setInterval(() => {
-    remaining -= 1;
-    if (hint) hint.textContent = `You can request another OTP in ${remaining}s.`;
-    if (remaining <= 0) {
-      clearInterval(otpCooldownTimer);
-      otpCooldownTimer = null;
-      if (button) {
-        button.disabled = false;
-        button.textContent = "SEND OTP AGAIN";
-      }
-      if (hint) hint.textContent = "You can request a new OTP if needed.";
-    }
-  }, 1000);
-}
-
-function saveAuth(token, email) {
-  sessionStorage.setItem(AUTH_CONFIG.AUTH_TOKEN_KEY, token);
-  sessionStorage.setItem(AUTH_CONFIG.AUTH_EMAIL_KEY, email);
-}
-
-function continueToRegistration() {
-  window.location.href = AUTH_CONFIG.REGISTRATION_URL;
-}
-
-function handleVerified(result) {
-  if (result.alreadyRegistered) {
-    showAlreadyRegistered(result.registrationId);
+function showAuthenticated(session, user, registration) {
+  if (registration?.exists) {
+    showAlreadyRegistered(registration.registrationId);
     return;
   }
 
-  if (!result.success || !result.authToken) {
-    showMessage(result.message || "Verification failed. Please try again.");
-    return;
-  }
-
-  saveAuth(result.authToken, result.email);
-  showMessage(`✓ ${result.message || "Verification successful."}`, "success");
+  sessionStorage.setItem(AUTH_CONFIG.SESSION_HINT_KEY, "1");
+  sessionStorage.setItem("codex-auth-email", user.email || "");
   document.getElementById("methods")?.classList.add("hidden");
   document.getElementById("continueBtn")?.classList.add("show");
+  showMessage(`✓ Verified as ${user.email}. You can continue to registration.`, "success");
 }
 
-async function sendOtp() {
+async function handleAuthenticatedSession(session) {
+  if (!session) return false;
+
+  try {
+    const user = await getVerifiedUser();
+    if (!user?.email) throw new Error("Your authenticated account did not provide an email address.");
+    const registration = await checkExistingRegistration(session);
+    showAuthenticated(session, user, registration);
+    return true;
+  } catch (error) {
+    console.error("Authentication session check failed:", error);
+    showMessage(error.message || "Unable to verify your registration session.");
+    return false;
+  }
+}
+
+async function sendMagicLink() {
   clearMessage();
+  if (!supabaseClient) {
+    showMessage("Supabase authentication is not configured correctly.");
+    return;
+  }
+
   const email = document.getElementById("email")?.value.trim().toLowerCase();
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     showMessage("Please enter a valid email address.");
     return;
   }
 
-  const button = document.getElementById("sendOtp");
-  if (button) {
-    button.disabled = true;
-    button.textContent = "SENDING OTP...";
-  }
+  const button = document.getElementById("sendMagicLink");
+  setBusy(button, "SENDING LINK...", true);
 
   try {
-    const result = await postAuth("sendOtp", { email });
-    if (result.alreadyRegistered) {
-      showAlreadyRegistered(result.registrationId);
-      return;
-    }
-    if (result.cooldown) {
-      showMessage(result.message || "Please wait before requesting another OTP.");
-      startCooldown(result.retryAfter || 60);
-      return;
-    }
-    if (!result.success) {
-      showMessage(result.message || "Unable to send OTP.");
-      if (button) {
-        button.disabled = false;
-        button.textContent = "SEND OTP";
+    const redirectTo = `${window.location.origin}${window.location.pathname}`;
+    const { error } = await supabaseClient.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: redirectTo,
+        shouldCreateUser: true
       }
-      return;
-    }
+    });
 
-    document.getElementById("otpSection")?.classList.remove("hidden");
-    document.getElementById("otp")?.focus();
-    showMessage("✓ OTP sent. Check your email.", "success");
-    startCooldown(result.retryAfter || 60);
-    const hint = document.getElementById("otpHint");
-    if (hint) hint.textContent = "The OTP expires in 10 minutes.";
+    if (error) throw error;
+    showMessage("✓ Login link sent. Check your email and open the link to continue.", "success");
+    const hint = document.getElementById("emailHint");
+    if (hint) hint.textContent = "The secure link expires according to your Supabase Email OTP Expiration setting.";
   } catch (error) {
-    showMessage(error.message || "Unable to send OTP.");
-    if (button) {
-      button.disabled = false;
-      button.textContent = "SEND OTP";
-    }
-  }
-}
-
-async function verifyOtp() {
-  clearMessage();
-  const email = document.getElementById("email")?.value.trim().toLowerCase();
-  const otp = document.getElementById("otp")?.value.trim();
-
-  if (!email || !/^\d{6}$/.test(otp || "")) {
-    showMessage("Enter the 6-digit OTP sent to your email.");
-    return;
-  }
-
-  const button = document.getElementById("verifyOtp");
-  if (button) {
-    button.disabled = true;
-    button.textContent = "VERIFYING...";
-  }
-
-  try {
-    const result = await postAuth("verifyOtp", { email, otp });
-    handleVerified(result);
-  } catch (error) {
-    showMessage(error.message || "Unable to verify OTP.");
+    console.error("Magic link error:", error);
+    showMessage(error.message || "Unable to send the login link.");
   } finally {
-    if (button) {
-      button.disabled = false;
-      button.textContent = "VERIFY";
-    }
+    setBusy(button, "SEND LOGIN LINK", false);
   }
 }
 
-function initGoogle(clientId) {
-  const googleSection = document.getElementById("googleSection");
+async function signInWithGoogle() {
+  clearMessage();
+  if (!supabaseClient) {
+    showMessage("Supabase authentication is not configured correctly.");
+    return;
+  }
+
   const button = document.getElementById("googleButton");
-
-  if (!clientId || !window.google?.accounts?.id) {
-    if (googleSection) googleSection.classList.add("hidden");
-    return;
-  }
-
-  window.google.accounts.id.initialize({
-    client_id: clientId,
-    callback: async (response) => {
-      clearMessage();
-      try {
-        showMessage("Verifying your Google account...", "success");
-        const result = await postAuth("googleAuth", { credential: response.credential });
-        handleVerified(result);
-      } catch (error) {
-        showMessage(error.message || "Google sign-in failed.");
-      }
-    }
-  });
-
-  window.google.accounts.id.renderButton(button, {
-    type: "standard",
-    theme: document.body.classList.contains("light") ? "outline" : "filled_black",
-    size: "large",
-    text: "continue_with",
-    shape: "rectangular",
-    logo_alignment: "left",
-    width: 360
-  });
-}
-
-async function loadGoogleConfig() {
-  if (AUTH_CONFIG.GOOGLE_CLIENT_ID) {
-    initGoogle(AUTH_CONFIG.GOOGLE_CLIENT_ID);
-    return;
-  }
+  setBusy(button, "OPENING GOOGLE...", true);
 
   try {
-    const result = await jsonp("authConfig", {});
-    if (result.googleEnabled && result.googleClientId) {
-      const waitForGoogle = () => {
-        if (window.google?.accounts?.id) initGoogle(result.googleClientId);
-        else setTimeout(waitForGoogle, 100);
-      };
-      waitForGoogle();
-    } else {
-      document.getElementById("googleSection")?.classList.add("hidden");
-    }
-  } catch (_) {
-    document.getElementById("googleSection")?.classList.add("hidden");
+    const redirectTo = `${window.location.origin}${window.location.pathname}`;
+    const { error } = await supabaseClient.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo }
+    });
+    if (error) throw error;
+  } catch (error) {
+    console.error("Google sign-in error:", error);
+    showMessage(error.message || "Google sign-in failed.");
+    setBusy(button, "CONTINUE WITH GOOGLE", false);
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const existingToken = sessionStorage.getItem(AUTH_CONFIG.AUTH_TOKEN_KEY);
-  if (existingToken) {
-    document.getElementById("continueBtn")?.classList.add("show");
-    showMessage("You already have a verified registration session.", "success");
-  }
+async function continueToRegistration() {
+  clearMessage();
+  try {
+    const session = await getSession();
+    if (!session) {
+      showMessage("Please verify your account before continuing.");
+      return;
+    }
 
-  document.getElementById("sendOtp")?.addEventListener("click", sendOtp);
-  document.getElementById("verifyOtp")?.addEventListener("click", verifyOtp);
+    const user = await getVerifiedUser();
+    const registration = await checkExistingRegistration(session);
+    if (registration.exists) {
+      showAlreadyRegistered(registration.registrationId);
+      return;
+    }
+
+    sessionStorage.setItem(AUTH_CONFIG.SESSION_HINT_KEY, "1");
+    sessionStorage.setItem("codex-auth-email", user.email || "");
+    window.location.href = AUTH_CONFIG.REGISTRATION_URL;
+  } catch (error) {
+    showMessage(error.message || "Unable to continue. Please sign in again.");
+  }
+}
+
+function initAuthEvents() {
+  document.getElementById("sendMagicLink")?.addEventListener("click", sendMagicLink);
+  document.getElementById("googleButton")?.addEventListener("click", signInWithGoogle);
   document.getElementById("continueBtn")?.addEventListener("click", continueToRegistration);
 
-  document.getElementById("otp")?.addEventListener("input", (event) => {
-    event.target.value = event.target.value.replace(/\D/g, "").slice(0, 6);
+  document.getElementById("email")?.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      sendMagicLink();
+    }
+  });
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  if (!supabaseClient) {
+    showMessage("Supabase authentication is not configured. Please contact the event team.");
+    return;
+  }
+
+  initAuthEvents();
+
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_IN" && session) {
+      setTimeout(() => handleAuthenticatedSession(session), 0);
+    }
+    if (event === "SIGNED_OUT") {
+      sessionStorage.removeItem(AUTH_CONFIG.SESSION_HINT_KEY);
+      sessionStorage.removeItem("codex-auth-email");
+    }
   });
 
-  loadGoogleConfig();
+  try {
+    const session = await getSession();
+    if (session) await handleAuthenticatedSession(session);
+  } catch (error) {
+    console.error("Initial auth check failed:", error);
+    showMessage(error.message || "Unable to initialize authentication.");
+  }
 });
