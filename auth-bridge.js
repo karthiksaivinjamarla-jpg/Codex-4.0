@@ -1,8 +1,7 @@
 (function () {
-  const TOKEN_KEY = "codex-auth-token";
-  const EMAIL_KEY = "codex-auth-email";
+  const SUPABASE_URL = "https://lrwrqerurimwzalhjffa.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QRbFkE9mkgIljLF-1zMgGw_f4Ic5OBW";
   const AUTH_PAGE = "./auth.html";
-  const REGISTER_PAGE = "register.html";
 
   function isRegistrationPage() {
     return /(^|\/)register\.html$/i.test(window.location.pathname);
@@ -13,60 +12,121 @@
     window.location.replace(`${AUTH_PAGE}?return=${returnUrl}`);
   }
 
-  function guardRegistrationPage() {
-    if (!isRegistrationPage()) return;
-    const token = sessionStorage.getItem(TOKEN_KEY);
-    const email = sessionStorage.getItem(EMAIL_KEY);
-    if (!token || !email) redirectToAuth();
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const existing = document.querySelector(`script[src="${src}"]`);
+      if (existing) {
+        if (window.supabase) resolve();
+        else existing.addEventListener("load", resolve, { once: true });
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  async function getClient() {
+    if (!window.supabase) {
+      await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2");
+    }
+    return window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+    });
+  }
+
+  async function guardRegistrationPage() {
+    if (!isRegistrationPage()) return true;
+
+    try {
+      const client = await getClient();
+      const { data, error } = await client.auth.getSession();
+      if (error || !data.session) {
+        redirectToAuth();
+        return false;
+      }
+
+      const { data: userData, error: userError } = await client.auth.getUser();
+      if (userError || !userData.user?.email) {
+        redirectToAuth();
+        return false;
+      }
+
+      sessionStorage.setItem("codex-auth-ready", "1");
+      sessionStorage.setItem("codex-auth-email", userData.user.email);
+      return true;
+    } catch (error) {
+      console.error("Registration auth guard failed:", error);
+      redirectToAuth();
+      return false;
+    }
   }
 
   function injectAuthIntoRegistrationRequest() {
     if (!isRegistrationPage()) return;
 
-    const originalFetch = window.fetch;
+    const originalFetch = window.fetch.bind(window);
     window.fetch = async function (input, init) {
       const url = typeof input === "string" ? input : input?.url || "";
-      const token = sessionStorage.getItem(TOKEN_KEY);
+      const tokenPromise = window.__codexSupabaseSessionPromise;
 
-      if (!token || !url.includes("script.google.com/macros")) {
-        return originalFetch.apply(this, arguments);
-      }
-
-      if (!init || typeof init.body !== "string") {
-        return originalFetch.apply(this, arguments);
+      if (!url.includes("script.google.com/macros") || !tokenPromise || !init || typeof init.body !== "string") {
+        return originalFetch(input, init);
       }
 
       try {
-        const body = JSON.parse(init.body);
-        if (!body.authToken) body.authToken = token;
-        init.body = JSON.stringify(body);
-      } catch (_) {}
+        const session = await tokenPromise;
+        const token = session?.access_token;
+        if (token) {
+          const body = JSON.parse(init.body);
+          body.authToken = token;
+          init.body = JSON.stringify(body);
+        }
+      } catch (error) {
+        console.error("Unable to attach Supabase session to registration:", error);
+      }
 
-      return originalFetch.call(this, input, init);
+      return originalFetch(input, init);
     };
   }
 
   function protectLinksToRegistration() {
-    document.addEventListener("click", (event) => {
+    document.addEventListener("click", async (event) => {
       const link = event.target.closest?.("a[href]");
       if (!link) return;
       const href = link.getAttribute("href") || "";
       if (!/(^|\/)register\.html(?:[?#]|$)/i.test(href)) return;
 
       event.preventDefault();
-      const token = sessionStorage.getItem(TOKEN_KEY);
-      const email = sessionStorage.getItem(EMAIL_KEY);
-      if (token && email) window.location.href = href;
-      else window.location.href = AUTH_PAGE;
+      try {
+        const client = await getClient();
+        const { data } = await client.auth.getSession();
+        if (data.session) window.location.href = href;
+        else window.location.href = AUTH_PAGE;
+      } catch (_) {
+        window.location.href = AUTH_PAGE;
+      }
     });
   }
 
-  function start() {
-    guardRegistrationPage();
+  async function start() {
+    const client = await getClient();
+    window.__codexSupabaseSessionPromise = client.auth.getSession().then(({ data }) => data.session || null);
+
+    if (isRegistrationPage()) {
+      const allowed = await guardRegistrationPage();
+      if (!allowed) return;
+    }
+
     injectAuthIntoRegistrationRequest();
     protectLinksToRegistration();
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
-  else start();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => start().catch(error => console.error("Auth bridge failed:", error)));
+  } else {
+    start().catch(error => console.error("Auth bridge failed:", error));
+  }
 })();
