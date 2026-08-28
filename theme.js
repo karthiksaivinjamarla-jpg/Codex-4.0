@@ -70,6 +70,10 @@
   }
 
   function setupRegistrationAccess() {
+    // auth.html already loads auth.js, which owns the Supabase client.
+    // Avoid creating a second GoTrueClient on the authentication page.
+    if (/\/auth\.html$/i.test(window.location.pathname)) return;
+
     const authScript = document.createElement('script');
     authScript.src = './auth-bridge.js';
     authScript.defer = true;
