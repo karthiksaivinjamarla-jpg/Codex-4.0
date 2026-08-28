@@ -94,10 +94,28 @@ function checkRegistrationJsonp(q) {
   const callback = q.callback;
   if (!isValidCallback(callback)) return textResponse("Invalid callback.");
   try {
-    const user = getSupabaseUser(q.accessToken);
-    const existing = findRegistrationByEmail(user.email);
+    let email;
+    // If an accessToken is provided, verify via Supabase (most secure)
+    if (q.accessToken) {
+      const user = getSupabaseUser(q.accessToken);
+      email = user.email;
+    } else if (q.email) {
+      // Fallback: raw email lookup (less secure, but used for post-auth UX only)
+      email = normalizeEmail(String(q.email));
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        throw new Error("Invalid email address.");
+      }
+    } else {
+      throw new Error("Authentication session or email is required.");
+    }
+
+    const existing = findRegistrationByEmail(email);
     return ContentService.createTextOutput(callback + "(" + JSON.stringify({
-      success: true, exists: !!existing, registrationId: existing ? existing.registrationId : "", email: user.email
+      success: true,
+      exists: !!existing,
+      registrationId: existing ? existing.registrationId : "",
+      email: email,
+      data: existing || null
     }) + ");").setMimeType(ContentService.MimeType.JAVASCRIPT);
   } catch (error) {
     return ContentService.createTextOutput(callback + "(" + JSON.stringify({
@@ -191,12 +209,53 @@ function findRegistrationByEmail(email) {
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(String);
   const emailColumns = ["Member 1 - Email", "Member 2 - Email", "Member 3 - Email"].map(name => headers.indexOf(name) + 1).filter(index => index > 0);
   const registrationIdColumn = headers.indexOf("Registration ID") + 1;
+  const teamNameColumn = headers.indexOf("Team Name") + 1;
+  const teamSizeColumn = headers.indexOf("Team Size") + 1;
+  const collegeNameColumn = headers.indexOf("College Name") + 1;
+  const utrColumn = headers.indexOf("UPI Transaction ID / UTR") + 1;
+  const statusColumn = headers.indexOf("Status") + 1;
+
   if (!registrationIdColumn) return null;
 
   const rows = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
   for (let row = 0; row < rows.length; row++) {
     for (const column of emailColumns) {
-      if (normalizeEmail(rows[row][column - 1]) === normalized) return { registrationId: String(rows[row][registrationIdColumn - 1] || "") };
+      if (normalizeEmail(rows[row][column - 1]) === normalized) {
+        const getVal = (name) => {
+          const idx = headers.indexOf(name);
+          return idx >= 0 ? String(rows[row][idx] || "") : "";
+        };
+
+        return {
+          registrationId: String(rows[row][registrationIdColumn - 1] || ""),
+          teamName: teamNameColumn ? String(rows[row][teamNameColumn - 1] || "") : "",
+          teamSize: teamSizeColumn ? String(rows[row][teamSizeColumn - 1] || "") : "",
+          collegeName: collegeNameColumn ? String(rows[row][collegeNameColumn - 1] || "") : "",
+          utr: utrColumn ? String(rows[row][utrColumn - 1] || "") : "",
+          status: statusColumn ? String(rows[row][statusColumn - 1] || "Pending") : "Pending",
+          m1_name: getVal("Member 1 - Full Name"),
+          m1_roll: getVal("Member 1 - Roll Number"),
+          m1_email: getVal("Member 1 - Email"),
+          m1_phone: getVal("Member 1 - Mobile"),
+          m1_year: getVal("Member 1 - Year"),
+          m1_branch: getVal("Member 1 - Branch"),
+          m1_section: getVal("Member 1 - Section"),
+          m2_name: getVal("Member 2 - Full Name"),
+          m2_roll: getVal("Member 2 - Roll Number"),
+          m2_email: getVal("Member 2 - Email"),
+          m2_phone: getVal("Member 2 - Mobile"),
+          m2_year: getVal("Member 2 - Year"),
+          m2_branch: getVal("Member 2 - Branch"),
+          m2_section: getVal("Member 2 - Section"),
+          m3_name: getVal("Member 3 - Full Name"),
+          m3_roll: getVal("Member 3 - Roll Number"),
+          m3_email: getVal("Member 3 - Email"),
+          m3_phone: getVal("Member 3 - Mobile"),
+          m3_year: getVal("Member 3 - Year"),
+          m3_branch: getVal("Member 3 - Branch"),
+          m3_section: getVal("Member 3 - Section")
+        };
+      }
     }
   }
   return null;
@@ -206,7 +265,13 @@ function findRegistrationByEmail(email) {
 function getRegistrationIdJsonp(q) {
   const callback = q.callback;
   if (!isValidCallback(callback)) return textResponse("Invalid callback.");
-  const result = findRegistrationByToken(String(q.token || ""));
+  let result = findRegistrationByToken(String(q.token || ""));
+  if (!result.success && q.email) {
+    const existing = findRegistrationByEmail(String(q.email));
+    if (existing) {
+      result = { success: true, registrationId: existing.registrationId, data: existing };
+    }
+  }
   return ContentService.createTextOutput(callback + "(" + JSON.stringify(result) + ");").setMimeType(ContentService.MimeType.JAVASCRIPT);
 }
 

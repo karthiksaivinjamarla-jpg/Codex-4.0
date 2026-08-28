@@ -23,6 +23,25 @@ document.addEventListener("DOMContentLoaded", () => {
     if (qr) qr.src = CONFIG.QR_IMAGE_URL;
     if (fee) fee.textContent = `₹${CONFIG.PAYMENT_FEE} per team`;
 
+    // If returning to view existing registration pass
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("view") === "pass") {
+        const storedReg = sessionStorage.getItem("codex-existing-reg");
+        if (storedReg) {
+            try {
+                const regData = JSON.parse(storedReg);
+                showExistingRegistration(regData);
+                return; // Skip form setup for view-only mode
+            } catch (_) {}
+        }
+        // No stored data — check backend live
+        const email = sessionStorage.getItem("codex-auth-email");
+        if (email) {
+            fetchAndShowExistingRegistration(email);
+            return;
+        }
+    }
+
     setupTeamSize();
     setupNavigation();
     setupPaymentHelpers();
@@ -595,45 +614,121 @@ function convertFileToBase64(file) {
 /* =========================================================
    SUCCESS / CONFIRMATION PASS
 ========================================================= */
-function showSuccess(data) {
-    document.getElementById("registrationForm")?.classList.add("hidden");
+function populatePassMembers(data) {
+    const memberList = document.getElementById("passMemberList");
+    if (!memberList) return;
+    memberList.innerHTML = "";
+    const count = parseInt(data.teamSize, 10) === 3 ? 3 : 2;
+    for (let i = 1; i <= count; i++) {
+        const name = data[`m${i}_name`] || `Member ${i}`;
+        const roll = data[`m${i}_roll`] || "-";
+        const branch = data[`m${i}_branch`] || "-";
+        const year = data[`m${i}_year`] || "-";
+        const section = data[`m${i}_section`] || "-";
+        const email = data[`m${i}_email`] || "";
+        const li = document.createElement("li");
+        li.innerHTML = `
+            <div class="member-badge">${i === 1 ? "👑 LEADER" : "MEMBER " + i}</div>
+            <div class="member-info">
+                <strong>${escapeHtml(name)}</strong>
+                <small>Roll: ${escapeHtml(roll)} · ${escapeHtml(branch)} (Sec ${escapeHtml(section)}) · ${escapeHtml(year)}${email ? ` · ${escapeHtml(email)}` : ""}</small>
+            </div>
+        `;
+        memberList.appendChild(li);
+    }
+}
+
+function renderPassScreen(data, options = {}) {
+    const { isNew = false, statusText = "Under Review" } = options;
+
+    const form = document.getElementById("registrationForm");
+    const main = document.querySelector("main");
+    if (form) form.classList.add("hidden");
+    if (main) main.classList.add("hidden");
+
     const successScreen = document.getElementById("successScreen");
     if (!successScreen) return;
-
     successScreen.classList.remove("hidden");
     window.scrollTo({ top: 0, behavior: "smooth" });
 
-    // Populate pass details
+    // Update headline
+    const h2 = successScreen.querySelector("h2");
+    const msg = document.getElementById("successMessageText");
+    if (isNew) {
+        if (h2) h2.textContent = "Registration Submitted!";
+        if (msg) msg.textContent = "Thank you for registering for CODEX 4.0. Your submission has been received. A confirmation email will be sent to all team members.";
+    } else {
+        if (h2) h2.textContent = "Your Registration";
+        if (msg) msg.textContent = "Here is your CODEX 4.0 confirmation slip. Keep this safe for on-spot check-in.";
+    }
+
     document.getElementById("passTeamName").textContent = data.teamName || "-";
     document.getElementById("passCollege").textContent = data.collegeName || "-";
     document.getElementById("passTeamSize").textContent = `${data.teamSize || 2} Members`;
     document.getElementById("passUtr").textContent = data.utr || "-";
+
+    const statusEl = document.getElementById("passStatusText");
+    if (statusEl) statusEl.textContent = data.status || statusText;
+
+    populatePassMembers(data);
+}
+
+function showSuccess(data) {
+    renderPassScreen(data, { isNew: true, statusText: "Under Review" });
     document.getElementById("passRegId").textContent = "GENERATING ID...";
+}
 
-    const memberList = document.getElementById("passMemberList");
-    if (memberList) {
-        memberList.innerHTML = "";
-        const count = data.teamSize === "3" ? 3 : 2;
-
-        for (let i = 1; i <= count; i++) {
-            const li = document.createElement("li");
-            const isLeader = i === 1;
-            const name = data[`m${i}_name`] || `Member ${i}`;
-            const roll = data[`m${i}_roll`] || "-";
-            const branch = data[`m${i}_branch`] || "-";
-            const year = data[`m${i}_year`] || "-";
-            const section = data[`m${i}_section`] || "-";
-
-            li.innerHTML = `
-                <div class="member-badge">${isLeader ? "👑 LEADER" : "MEMBER " + i}</div>
-                <div class="member-info">
-                    <strong>${escapeHtml(name)}</strong>
-                    <small>Roll: ${escapeHtml(roll)} · ${escapeHtml(branch)} (Sec ${escapeHtml(section)}) · ${escapeHtml(year)}</small>
-                </div>
-            `;
-            memberList.appendChild(li);
-        }
+function showExistingRegistration(data) {
+    if (!data || !data.registrationId) {
+        window.location.replace("./auth.html");
+        return;
     }
+    renderPassScreen(data, { isNew: false, statusText: data.status || "Under Review" });
+    const regIdEl = document.getElementById("passRegId");
+    if (regIdEl) {
+        regIdEl.textContent = data.registrationId;
+        regIdEl.classList.add("highlight-pulse");
+    }
+    // Add "Back to Home" emphasis since we're in view-only mode
+    const printBtn = document.getElementById("printSlipBtn");
+    if (printBtn) printBtn.style.display = "inline-flex";
+}
+
+function fetchAndShowExistingRegistration(email) {
+    if (!email) { window.location.replace("./auth.html"); return; }
+
+    const successScreen = document.getElementById("successScreen");
+    if (successScreen) {
+        successScreen.classList.remove("hidden");
+        const h2 = successScreen.querySelector("h2");
+        if (h2) h2.textContent = "Loading your registration...";
+    }
+
+    const callbackName = "existingRegCallback_" + Math.random().toString(36).slice(2, 9);
+    const timeout = setTimeout(() => {
+        delete window[callbackName];
+        window.location.replace("./auth.html");
+    }, 8000);
+
+    window[callbackName] = function(res) {
+        clearTimeout(timeout);
+        delete window[callbackName];
+        if (res && res.success && res.exists && res.data) {
+            sessionStorage.setItem("codex-existing-reg", JSON.stringify(res.data));
+            showExistingRegistration(res.data);
+        } else {
+            window.location.replace("./auth.html");
+        }
+    };
+
+    const script = document.createElement("script");
+    script.src = `${CONFIG.API_URL}?action=checkRegistration&email=${encodeURIComponent(email)}&callback=${callbackName}&_t=${Date.now()}`;
+    script.onerror = function() {
+        clearTimeout(timeout);
+        delete window[callbackName];
+        window.location.replace("./auth.html");
+    };
+    document.body.appendChild(script);
 }
 
 /* =========================================================

@@ -453,3 +453,33 @@
         background: #fafafa !important;
     }
 }
+
+/* =====================================================
+   HIGHLIGHT PULSE ANIMATION (Registration ID reveal)
+   ===================================================== */
+@keyframes highlightPulse {
+    0%   { color: var(--green, #34d399); text-shadow: 0 0 18px rgba(52,211,153,.8); }
+    50%  { color: var(--accent, #39ff74); text-shadow: 0 0 32px rgba(52,211,153,.5); }
+    100% { color: var(--accent, #39ff74); text-shadow: none; }
+}
+.highlight-pulse {
+    animation: highlightPulse 1.4s ease forwards;
+}
+
+/* =====================================================
+   DUPLICATE REGISTRATION ALERT (auth.html)
+   ===================================================== */
+.already .id {
+    font: 800 28px 'Fira Code', monospace;
+    color: var(--accent2, #00e5ff);
+    margin: 10px 0;
+    letter-spacing: 1px;
+}
+
+/* =====================================================
+   VIEW-PASS MODE (success screen shown standalone)
+   ===================================================== */
+#successScreen:not(.hidden) {
+    display: block;
+    padding-top: 48px;
+}

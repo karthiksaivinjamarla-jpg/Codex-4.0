@@ -1,6 +1,7 @@
 (function () {
-  const SUPABASE_URL = "https://lrwrqerurimwzalhjffa.supabase.co";
-  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QRbFkE9mkgIljLF-1zMgGw_f4Ic5OBW";
+  const config = window.CODEX_SUPABASE_CONFIG || {};
+  const SUPABASE_URL = config.url || "https://lrwrqerurimwzalhjffa.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = config.publishableKey || "sb_publishable_QRbFkE9mkgIljLF-1zMgGw_f4Ic5OBW";
   const AUTH_PAGE = "./auth.html";
 
   function isRegistrationPage() {
@@ -56,6 +57,13 @@
 
       sessionStorage.setItem("codex-auth-ready", "1");
       sessionStorage.setItem("codex-auth-email", userData.user.email);
+
+      // Pre-fill leader email
+      const m1Email = document.querySelector('input[name="m1_email"]');
+      if (m1Email && !m1Email.value) {
+        m1Email.value = userData.user.email;
+      }
+
       return true;
     } catch (error) {
       console.error("Registration auth guard failed:", error);
