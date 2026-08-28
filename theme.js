@@ -80,6 +80,17 @@
     document.head.appendChild(authScript);
   }
 
+  function setupLocalTestHelper() {
+    if (location.protocol !== 'http:' || !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
+    if (!document.body.classList.contains('register-page')) return;
+    if (new URLSearchParams(location.search).get('test') !== '1') return;
+
+    const testScript = document.createElement('script');
+    testScript.src = './test-autofill.js';
+    testScript.defer = true;
+    document.head.appendChild(testScript);
+  }
+
   let saved = DEFAULT;
   try { saved = localStorage.getItem(KEY) || DEFAULT; } catch (_) {}
   applyTheme(saved);
@@ -87,6 +98,7 @@
   setupAccessibility();
   setupSmoothInteractions();
   setupRegistrationAccess();
+  setupLocalTestHelper();
 
   document.querySelectorAll('[data-theme]').forEach((button) => {
     button.addEventListener('click', () => applyTheme(button.dataset.theme));
