@@ -2,6 +2,7 @@ const SUPABASE_URL = window.CODEX_SUPABASE_CONFIG?.url || "";
 const SUPABASE_PUBLISHABLE_KEY = window.CODEX_SUPABASE_CONFIG?.publishableKey || "";
 const AUTH_CONFIG = {
   REGISTRATION_URL: "./register.html",
+  AUTH_PAGE_URL: "./auth.html",
   SESSION_HINT_KEY: "codex-auth-ready"
 };
 
@@ -47,6 +48,29 @@ async function getVerifiedUser() {
   return data.user || null;
 }
 
+async function signOut() {
+  clearMessage();
+  if (!supabaseClient) {
+    showMessage("Supabase authentication is not configured correctly.");
+    return;
+  }
+
+  const button = document.getElementById("signOutBtn");
+  setBusy(button, "SIGNING OUT...", true);
+
+  try {
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) throw error;
+    sessionStorage.removeItem(AUTH_CONFIG.SESSION_HINT_KEY);
+    sessionStorage.removeItem("codex-auth-email");
+    window.location.replace(AUTH_CONFIG.AUTH_PAGE_URL);
+  } catch (error) {
+    console.error("Sign-out error:", error);
+    showMessage(error.message || "Unable to sign out. Please try again.");
+    setBusy(button, "SIGN OUT", false);
+  }
+}
+
 function showAlreadyRegistered(id) {
   document.getElementById("methods")?.classList.add("hidden");
   document.getElementById("continueBtn")?.classList.remove("show");
@@ -61,6 +85,7 @@ function showAuthenticated(session, user) {
   sessionStorage.setItem("codex-auth-email", user.email || "");
   document.getElementById("methods")?.classList.add("hidden");
   document.getElementById("continueBtn")?.classList.add("show");
+  document.getElementById("signOutBtn")?.classList.add("show");
   showMessage(`✓ Verified as ${user.email}. You can continue to registration.`, "success");
 }
 
@@ -145,6 +170,7 @@ function initAuthEvents() {
   document.getElementById("sendMagicLink")?.addEventListener("click", sendMagicLink);
   document.getElementById("googleButton")?.addEventListener("click", signInWithGoogle);
   document.getElementById("continueBtn")?.addEventListener("click", continueToRegistration);
+  document.getElementById("signOutBtn")?.addEventListener("click", signOut);
   document.getElementById("email")?.addEventListener("keydown", event => {
     if (event.key === "Enter") { event.preventDefault(); sendMagicLink(); }
   });
