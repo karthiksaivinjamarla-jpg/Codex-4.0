@@ -71,7 +71,6 @@
 
   function setupRegistrationAccess() {
     if (/\/auth\.html$/i.test(window.location.pathname)) return;
-
     const authScript = document.createElement('script');
     authScript.src = './auth-bridge.js';
     authScript.defer = true;
@@ -81,7 +80,6 @@
   function setupLocalTestHelper() {
     if (location.protocol !== 'http:' || !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
     if (new URLSearchParams(location.search).get('test') !== '1') return;
-
     const testScript = document.createElement('script');
     testScript.src = './test-autofill.js';
     testScript.defer = true;
@@ -89,12 +87,10 @@
   }
 
   function setupBrandLogos() {
-    if (!document.querySelector('.site-header')) return;
-    if (document.querySelector('.codex-header-logo')) return;
-
-    const header = document.querySelector('.header-inner');
-    const brand = document.querySelector('.brand');
+    const header = document.querySelector('.site-header .header-inner');
+    const brand = header?.querySelector('.brand');
     if (!header || !brand) return;
+    if (header.querySelector('.codex-header-logo')) return;
 
     const makeLogo = (src, alt, className) => {
       const img = document.createElement('img');
@@ -103,26 +99,43 @@
       img.className = `codex-header-logo ${className}`;
       img.loading = 'eager';
       img.decoding = 'async';
+      img.onerror = () => { img.style.display = 'none'; };
       return img;
     };
 
-    const collegeLogo = makeLogo('./assets/college-logo.png', 'G. Pulla Reddy Engineering College logo', 'college-logo');
-    const clubLogo = makeLogo('./assets/coders-club-logo.png', "Coders' Club logo", 'club-logo');
+    const collegeLogo = makeLogo(
+      './assets/college-logo.png',
+      'G. Pulla Reddy Engineering College logo',
+      'college-logo'
+    );
+    const clubLogo = makeLogo(
+      './assets/coders-club-logo.png',
+      "Coders' Club logo",
+      'club-logo'
+    );
 
     const logoStyle = document.createElement('style');
     logoStyle.textContent = `
-      .codex-header-logo{width:42px;height:42px;object-fit:contain;flex:0 0 42px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.25))}
+      .codex-header-logo{width:42px;height:42px;object-fit:contain;flex:0 0 42px;display:block;filter:drop-shadow(0 4px 10px rgba(0,0,0,.25))}
       .codex-header-logo.college-logo{margin-right:2px}
-      .codex-header-logo.club-logo{margin-left:auto}
-      @media(max-width:900px){.codex-header-logo{width:36px;height:36px;flex-basis:36px}.codex-header-logo.club-logo{margin-left:0}.header-inner{gap:10px}.brand{min-width:0}}
-      @media(max-width:600px){.codex-header-logo{width:32px;height:32px;flex-basis:32px}.brand-title{font-size:16px}}
+      .codex-header-logo.club-logo{margin-right:8px}
+      .header-inner{gap:12px}
+      @media(max-width:900px){
+        .codex-header-logo{width:36px;height:36px;flex-basis:36px}
+        .codex-header-logo.club-logo{margin-right:2px}
+        .header-inner{gap:8px}
+        .brand{min-width:0}
+      }
+      @media(max-width:600px){
+        .codex-header-logo{width:32px;height:32px;flex-basis:32px}
+        .brand-title{font-size:16px}
+      }
     `;
     document.head.appendChild(logoStyle);
 
+    // Keep both institutional logos together with the CODEX brand.
     header.insertBefore(collegeLogo, brand);
-    const registerButton = header.querySelector('.register-btn');
-    if (registerButton) header.insertBefore(clubLogo, registerButton);
-    else header.appendChild(clubLogo);
+    header.insertBefore(clubLogo, brand);
   }
 
   let saved = DEFAULT;
