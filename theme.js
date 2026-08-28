@@ -70,8 +70,6 @@
   }
 
   function setupRegistrationAccess() {
-    // auth.html already loads auth.js, which owns the Supabase client.
-    // Avoid creating a second GoTrueClient on the authentication page.
     if (/\/auth\.html$/i.test(window.location.pathname)) return;
 
     const authScript = document.createElement('script');
@@ -82,7 +80,6 @@
 
   function setupLocalTestHelper() {
     if (location.protocol !== 'http:' || !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
-    if (!document.body.classList.contains('register-page')) return;
     if (new URLSearchParams(location.search).get('test') !== '1') return;
 
     const testScript = document.createElement('script');
