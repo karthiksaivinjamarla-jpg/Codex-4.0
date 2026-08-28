@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#0D0D0D">
+<title>Admin Dashboard | CODEX 4.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div class="theme-switch"><button type="button" data-theme="dark">DARK</button><button type="button" data-theme="light">LIGHT</button></div>
+<header class="admin-header"><a href="index.html" class="admin-brand"><span>&lt;/&gt;</span><div><strong>CODEX <em>4.0</em></strong><small>ADMIN CONTROL</small></div></a><div class="admin-actions"><span id="adminEmail">Checking access...</span><button id="refreshBtn" type="button">↻ REFRESH</button><button id="signOutBtn" type="button">SIGN OUT</button></div></header>
+<main class="admin-shell">
+<section id="loadingState" class="state-card"><div class="loader"></div><h1>Verifying admin access</h1><p>Please wait while your Supabase session and admin permissions are checked.</p></section>
+<section id="accessDenied" class="state-card hidden"><div class="state-icon">!</div><h1>Admin access required</h1><p id="accessDeniedText">This account is not authorized to access the CODEX 4.0 administration dashboard.</p><a href="auth.html" class="admin-btn">GO TO LOGIN</a></section>
+<section id="dashboard" class="hidden">
+<div class="page-heading"><div><span class="kicker">REGISTRATION CONTROL</span><h1>Admin Dashboard</h1><p>Review registrations stored directly in Supabase.</p></div><div class="live-badge"><span></span> SUPABASE LIVE</div></div>
+<div id="message" class="admin-message hidden"></div>
+<div class="stats-grid">
+<div class="stat-card"><small>TOTAL</small><strong id="totalCount">0</strong></div>
+<div class="stat-card"><small>PENDING</small><strong id="pendingCount">0</strong></div>
+<div class="stat-card"><small>APPROVED</small><strong id="approvedCount">0</strong></div>
+<div class="stat-card"><small>REJECTED</small><strong id="rejectedCount">0</strong></div>
+</div>
+<div class="toolbar"><div class="search-box"><span>⌕</span><input id="searchInput" type="search" placeholder="Search team, registration ID, email, UTR..."></div><select id="statusFilter"><option value="all">All statuses</option><option value="Pending">Pending</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option></select><select id="teamSizeFilter"><option value="all">All team sizes</option><option value="2">2 Members</option><option value="3">3 Members</option></select></div>
+<div class="table-wrap"><table><thead><tr><th>Registration</th><th>Team</th><th>Leader</th><th>Members</th><th>Payment</th><th>Status</th><th></th></tr></thead><tbody id="registrationRows"></tbody></table><div id="emptyState" class="empty-state hidden"><strong>No registrations found</strong><span>Try changing the search or filters.</span></div></div>
+</section>
+</main>
+<div id="detailModal" class="modal hidden" aria-hidden="true"><div class="modal-backdrop" data-close-modal></div><section class="modal-card"><button class="modal-close" type="button" data-close-modal>×</button><div id="detailContent"></div></section></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="theme.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
