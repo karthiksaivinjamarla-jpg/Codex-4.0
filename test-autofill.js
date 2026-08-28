@@ -1,6 +1,5 @@
 (function () {
   if (location.protocol !== 'http:' || !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
-  if (!document.body.classList.contains('register-page')) return;
   if (new URLSearchParams(location.search).get('test') !== '1') return;
 
   const values = {
@@ -51,7 +50,7 @@
     }
     Object.entries(values).forEach(([name, value]) => setValue(name, value));
     createTestReceipt();
-    document.querySelectorAll('#registrationForm .form-step').forEach(panel => panel.classList.remove('hidden'));
+
     const button = document.getElementById('testFillButton');
     if (button) {
       button.textContent = '✓ TEST DATA FILLED';
