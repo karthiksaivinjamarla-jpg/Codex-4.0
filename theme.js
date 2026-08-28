@@ -69,12 +69,24 @@
     });
   }
 
+  function setupRegistrationAccess() {
+    // auth.html already loads auth.js, which owns the Supabase client.
+    // Avoid creating a second GoTrueClient on the authentication page.
+    if (/\/auth\.html$/i.test(window.location.pathname)) return;
+
+    const authScript = document.createElement('script');
+    authScript.src = './auth-bridge.js';
+    authScript.defer = true;
+    document.head.appendChild(authScript);
+  }
+
   let saved = DEFAULT;
   try { saved = localStorage.getItem(KEY) || DEFAULT; } catch (_) {}
   applyTheme(saved);
   setupPromotionMetadata();
   setupAccessibility();
   setupSmoothInteractions();
+  setupRegistrationAccess();
 
   document.querySelectorAll('[data-theme]').forEach((button) => {
     button.addEventListener('click', () => applyTheme(button.dataset.theme));
