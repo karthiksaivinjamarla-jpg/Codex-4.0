@@ -88,6 +88,43 @@
     document.head.appendChild(testScript);
   }
 
+  function setupBrandLogos() {
+    if (!document.querySelector('.site-header')) return;
+    if (document.querySelector('.codex-header-logo')) return;
+
+    const header = document.querySelector('.header-inner');
+    const brand = document.querySelector('.brand');
+    if (!header || !brand) return;
+
+    const makeLogo = (src, alt, className) => {
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = alt;
+      img.className = `codex-header-logo ${className}`;
+      img.loading = 'eager';
+      img.decoding = 'async';
+      return img;
+    };
+
+    const collegeLogo = makeLogo('./assets/college-logo.png', 'G. Pulla Reddy Engineering College logo', 'college-logo');
+    const clubLogo = makeLogo('./assets/coders-club-logo.png', "Coders' Club logo", 'club-logo');
+
+    const logoStyle = document.createElement('style');
+    logoStyle.textContent = `
+      .codex-header-logo{width:42px;height:42px;object-fit:contain;flex:0 0 42px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.25))}
+      .codex-header-logo.college-logo{margin-right:2px}
+      .codex-header-logo.club-logo{margin-left:auto}
+      @media(max-width:900px){.codex-header-logo{width:36px;height:36px;flex-basis:36px}.codex-header-logo.club-logo{margin-left:0}.header-inner{gap:10px}.brand{min-width:0}}
+      @media(max-width:600px){.codex-header-logo{width:32px;height:32px;flex-basis:32px}.brand-title{font-size:16px}}
+    `;
+    document.head.appendChild(logoStyle);
+
+    header.insertBefore(collegeLogo, brand);
+    const registerButton = header.querySelector('.register-btn');
+    if (registerButton) header.insertBefore(clubLogo, registerButton);
+    else header.appendChild(clubLogo);
+  }
+
   let saved = DEFAULT;
   try { saved = localStorage.getItem(KEY) || DEFAULT; } catch (_) {}
   applyTheme(saved);
@@ -96,6 +133,7 @@
   setupSmoothInteractions();
   setupRegistrationAccess();
   setupLocalTestHelper();
+  setupBrandLogos();
 
   document.querySelectorAll('[data-theme]').forEach((button) => {
     button.addEventListener('click', () => applyTheme(button.dataset.theme));
