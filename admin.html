@@ -16,7 +16,7 @@
 <header class="admin-header"><a href="index.html" class="admin-brand"><span>&lt;/&gt;</span><div><strong>CODEX <em>4.0</em></strong><small>ADMIN CONTROL</small></div></a><div class="admin-actions"><span id="adminEmail">Checking access...</span><button id="refreshBtn" type="button">↻ REFRESH</button><button id="signOutBtn" type="button">SIGN OUT</button></div></header>
 <main class="admin-shell">
 <section id="loadingState" class="state-card"><div class="loader"></div><h1>Verifying admin access</h1><p>Please wait while your Supabase session and admin permissions are checked.</p></section>
-<section id="accessDenied" class="state-card hidden"><div class="state-icon">!</div><h1>Admin access required</h1><p id="accessDeniedText">This account is not authorized to access the CODEX 4.0 administration dashboard.</p><a href="auth.html" class="admin-btn">GO TO LOGIN</a></section>
+<section id="accessDenied" class="state-card hidden"><div class="state-icon">!</div><h1 id="accessTitle">Admin access required</h1><p id="accessDeniedText">This account is not authorized to access the CODEX 4.0 administration dashboard.</p><button id="adminLoginBtn" type="button" class="admin-btn">CONTINUE WITH GOOGLE</button><a id="backToLoginBtn" href="auth.html" class="admin-btn hidden">GO TO LOGIN</a></section>
 <section id="dashboard" class="hidden">
 <div class="page-heading"><div><span class="kicker">REGISTRATION CONTROL</span><h1>Admin Dashboard</h1><p>Review registrations stored directly in Supabase.</p></div><div class="live-badge"><span></span> SUPABASE LIVE</div></div>
 <div id="message" class="admin-message hidden"></div>
