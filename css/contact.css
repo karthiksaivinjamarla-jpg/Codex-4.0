@@ -1,0 +1,91 @@
+/* =========================================================
+   CODEX 4.0 - CONTACT PAGE STYLES
+========================================================= */
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+.contact-grid .card h3 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.contact-name {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--text);
+}
+
+.contact-phone {
+  font: 700 14px 'Fira Code', monospace;
+  color: var(--accent);
+  margin-top: 8px;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.contact-phone:hover {
+  text-decoration: underline;
+}
+
+.club-mini {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.club-mini h4 {
+  font: 700 11px 'Fira Code', monospace;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.socials {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.socials a {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel2);
+  color: var(--accent);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.socials a svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  display: block;
+}
+
+.socials a:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  background: var(--soft);
+}
+
+body.light .socials a {
+  background: var(--panel);
+  color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+}

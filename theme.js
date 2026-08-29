@@ -2,6 +2,10 @@
   const KEY = 'codex-theme';
   const DEFAULT = 'dark';
 
+  const isSubdirectory = window.location.pathname.includes('/pages/') ||
+                         window.location.pathname.includes('\\pages\\');
+  const rootPrefix = isSubdirectory ? '../' : './';
+
   function applyTheme(theme) {
     const value = theme === 'light' ? 'light' : 'dark';
     document.body.classList.toggle('light', value === 'light');
@@ -31,16 +35,16 @@
   }
 
   function setupPromotionMetadata() {
-    addMeta('description', 'CODEX 4.0 — an inter-college coding event by Coders\' Club GPREC. Build. Think. Compete.');
+    addMeta('description', "CODEX 4.0 — an inter-college coding event by Coders' Club GPREC. Build. Think. Compete.");
     addMeta('robots', 'index,follow');
     addMeta('', 'CODEX 4.0 | Inter-College Coding Event', 'og:title');
-    addMeta('', 'Inter-college coding competition by Coders\' Club GPREC. Team up, solve problems and compete.', 'og:description');
+    addMeta('', "Inter-college coding competition by Coders' Club GPREC. Team up, solve problems and compete.", 'og:description');
     addMeta('', 'website', 'og:type');
     addMeta('', 'https://karthiksaivinjamarla-jpg.github.io/Codex-4.0/', 'og:url');
     addMeta('', 'CODEX 4.0', 'og:site_name');
     addMeta('', 'summary_large_image', 'twitter:card');
     addMeta('', 'CODEX 4.0 | Inter-College Coding Event', 'twitter:title');
-    addMeta('', 'Inter-college coding competition by Coders\' Club GPREC.', 'twitter:description');
+    addMeta('', "Inter-college coding competition by Coders' Club GPREC.", 'twitter:description');
   }
 
   function setupAccessibility() {
@@ -71,19 +75,13 @@
 
   function setupRegistrationAccess() {
     if (/\/auth\.html$/i.test(window.location.pathname)) return;
+    const existing = document.querySelector('script[src*="auth-bridge.js"]');
+    if (existing) return;
+
     const authScript = document.createElement('script');
-    authScript.src = './auth-bridge.js';
+    authScript.src = `${rootPrefix}auth-bridge.js`;
     authScript.defer = true;
     document.head.appendChild(authScript);
-  }
-
-  function setupLocalTestHelper() {
-    if (location.protocol !== 'http:' || !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
-    if (new URLSearchParams(location.search).get('test') !== '1') return;
-    const testScript = document.createElement('script');
-    testScript.src = './test-autofill.js';
-    testScript.defer = true;
-    document.head.appendChild(testScript);
   }
 
   function setupBrandLogos() {
@@ -94,7 +92,7 @@
 
     const makeLogo = (src, alt, className) => {
       const img = document.createElement('img');
-      img.src = src;
+      img.src = `${rootPrefix}${src}`;
       img.alt = alt;
       img.className = `codex-header-logo ${className}`;
       img.loading = 'eager';
@@ -104,39 +102,44 @@
     };
 
     const collegeLogo = makeLogo(
-      './assets/college-logo.png',
+      'assets/college-logo.png',
       'G. Pulla Reddy Engineering College logo',
       'college-logo'
     );
     const clubLogo = makeLogo(
-      './assets/coders-club-logo.png',
+      'assets/coders-club-logo.png',
       "Coders' Club logo",
       'club-logo'
     );
 
-    const logoStyle = document.createElement('style');
-    logoStyle.textContent = `
-      .codex-header-logo{width:42px;height:42px;object-fit:contain;flex:0 0 42px;display:block;filter:drop-shadow(0 4px 10px rgba(0,0,0,.25))}
-      .codex-header-logo.college-logo{margin-right:2px}
-      .codex-header-logo.club-logo{margin-right:8px}
-      .header-inner{gap:12px}
-      @media(max-width:900px){
-        .codex-header-logo{width:36px;height:36px;flex-basis:36px}
-        .codex-header-logo.club-logo{margin-right:2px}
-        .header-inner{gap:8px}
-        .brand{min-width:0}
-      }
-      @media(max-width:600px){
-        .codex-header-logo{width:32px;height:32px;flex-basis:32px}
-        .brand-title{font-size:16px}
-      }
-    `;
-    document.head.appendChild(logoStyle);
+    if (!document.getElementById('codex-logo-styles')) {
+      const logoStyle = document.createElement('style');
+      logoStyle.id = 'codex-logo-styles';
+      logoStyle.textContent = `
+        .codex-header-logo{width:42px;height:42px;object-fit:contain;flex:0 0 42px;display:block;filter:drop-shadow(0 4px 10px rgba(0,0,0,.25))}
+        .codex-header-logo.college-logo{margin-right:2px}
+        .codex-header-logo.club-logo{margin-right:8px}
+        .header-inner{gap:12px}
+        @media(max-width:900px){
+          .codex-header-logo{width:36px;height:36px;flex-basis:36px}
+          .codex-header-logo.club-logo{margin-right:2px}
+          .header-inner{gap:8px}
+          .brand{min-width:0}
+        }
+        @media(max-width:600px){
+          .codex-header-logo{width:32px;height:32px;flex-basis:32px}
+          .brand-title{font-size:16px}
+        }
+      `;
+      document.head.appendChild(logoStyle);
+    }
 
-    // Keep both institutional logos together with the CODEX brand.
     header.insertBefore(collegeLogo, brand);
     header.insertBefore(clubLogo, brand);
   }
+
+  // Export hook for dynamic shell
+  window.codexSetupBrandLogos = setupBrandLogos;
 
   let saved = DEFAULT;
   try { saved = localStorage.getItem(KEY) || DEFAULT; } catch (_) {}
@@ -145,7 +148,6 @@
   setupAccessibility();
   setupSmoothInteractions();
   setupRegistrationAccess();
-  setupLocalTestHelper();
   setupBrandLogos();
 
   document.querySelectorAll('[data-theme]').forEach((button) => {

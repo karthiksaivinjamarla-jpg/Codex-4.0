@@ -1,0 +1,66 @@
+/* =========================================================
+   CODEX 4.0 - FAQ PAGE STYLES
+========================================================= */
+
+.codex-faq-list {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  gap: 14px;
+}
+
+.codex-faq-list details {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0 24px;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.codex-faq-list details:hover {
+  border-color: var(--accent);
+}
+
+.codex-faq-list details[open] {
+  border-color: var(--accent);
+  background: var(--soft);
+  box-shadow: 0 8px 30px var(--shadow);
+}
+
+.codex-faq-list summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 22px 32px 22px 0;
+  font-size: 17px;
+  font-weight: 800;
+  position: relative;
+  user-select: none;
+}
+
+.codex-faq-list summary::-webkit-details-marker {
+  display: none;
+}
+
+.codex-faq-list summary:after {
+  content: '+';
+  position: absolute;
+  right: 0;
+  top: 18px;
+  color: var(--accent);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.codex-faq-list details[open] summary:after {
+  content: '−';
+}
+
+.codex-faq-list details p {
+  margin: 0;
+  padding: 0 0 24px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.7;
+}

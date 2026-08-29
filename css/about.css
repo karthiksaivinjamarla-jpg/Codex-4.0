@@ -1,0 +1,64 @@
+/* =========================================================
+   CODEX 4.0 - ABOUT PAGE STYLES
+========================================================= */
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 18px;
+  margin-top: 10px;
+}
+
+.about-grid .card h3 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.about-grid .card p {
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.about-stat-item {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+  text-align: center;
+}
+
+.about-stat-item strong {
+  display: block;
+  font: 800 24px 'Fira Code', monospace;
+  color: var(--accent);
+}
+
+.about-stat-item span {
+  display: block;
+  font: 700 10px 'Fira Code', monospace;
+  color: var(--muted);
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+@media (max-width: 900px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .about-stats {
+    grid-template-columns: 1fr;
+  }
+}

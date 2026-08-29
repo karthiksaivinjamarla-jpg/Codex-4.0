@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0D0D0D">
+  <title>FAQ | CODEX 4.0</title>
+  <meta name="description" content="Frequently asked questions about CODEX 4.0 eligibility, team size, payment, and competition format.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/faq.css">
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="theme-switch">
+    <button type="button" data-theme="dark">DARK</button>
+    <button type="button" data-theme="light">LIGHT</button>
+  </div>
+
+  <div id="navbar"></div>
+
+  <main>
+    <section class="section" id="faq">
+      <div class="section-title">
+        <span class="kicker">FREQUENTLY ASKED QUESTIONS</span>
+        <h2>Got questions? We've got answers.</h2>
+        <p>Find answers to commonly asked questions about team formation, eligibility, payment verification, and event logistics.</p>
+      </div>
+
+      <div class="codex-faq-list">
+        <details open>
+          <summary>Who is eligible to participate in CODEX 4.0?</summary>
+          <p>Students currently studying in 2nd, 3rd, or 4th year from any recognized engineering college are eligible to form a team. Each team can have at most one 4th-year student.</p>
+        </details>
+        <details>
+          <summary>What is the team size and registration fee?</summary>
+          <p>Teams can consist of either 2 or 3 members. The registration fee is fixed at ₹300 per team regardless of 2 or 3 members.</p>
+        </details>
+        <details>
+          <summary>How does the payment and verification work?</summary>
+          <p>Pay ₹300 using any UPI app (GPay / PhonePe / Paytm / BHIM) via the QR code on the registration page, enter your 12-digit UTR number, and upload the payment receipt. You will immediately receive a digital confirmation pass and ticket stored securely in our database.</p>
+        </details>
+        <details>
+          <summary>Can members of a team be from different branches or colleges?</summary>
+          <p>Yes, cross-branch and cross-college teams are welcome as long as the eligibility criteria (maximum one 4th-year student) are met.</p>
+        </details>
+        <details>
+          <summary>What should participants carry on the event day?</summary>
+          <p>Every team member must carry their official College ID card and a copy of the Registration ID confirmation pass.</p>
+        </details>
+        <details>
+          <summary>Can a student register in more than one team?</summary>
+          <p>No. Each student (email, roll number, and mobile number) can only be registered with one team. The system automatically enforces uniqueness.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="final">
+      <div class="final-box">
+        <strong>&gt; READY TO JOIN CODEX 4.0? _</strong>
+        <a class="register-btn" href="../register.html">REGISTER YOUR TEAM →</a>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../supabase-config.js"></script>
+  <script src="../theme.js"></script>
+  <script src="../auth-bridge.js"></script>
+  <script src="../auth-ui.js"></script>
+  <script src="../js/core/page-shell.js"></script>
+</body>
+</html>
