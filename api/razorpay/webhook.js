@@ -2,6 +2,7 @@
 // Vercel Serverless Function — handles Razorpay webhook events.
 //
 // Security:
+//  - Disables Vercel's automatic bodyParser so raw request stream is preserved.
 //  - Verifies X-Razorpay-Signature header using HMAC-SHA256 + RAZORPAY_WEBHOOK_SECRET.
 //  - Processing is idempotent — duplicate webhook deliveries do not create duplicate rows.
 //  - Only handles payment.captured and payment.failed events.
@@ -14,7 +15,15 @@
 const crypto = require("crypto");
 const { createClient } = require("@supabase/supabase-js");
 
-module.exports = async function handler(req, res) {
+// Tell Vercel Serverless runtime to NOT parse the body automatically.
+// This ensures the exact raw byte stream is available for cryptographic HMAC verification.
+const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -29,13 +38,21 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ received: true });
   }
 
-  // Razorpay sends the raw body for signature verification.
-  // We need the raw body as a string.
-  const rawBody = await getRawBody(req);
+  // ---------------------------------------------------------------
+  // STEP 1: Read the unparsed raw request body for HMAC calculation.
+  // ---------------------------------------------------------------
+  let rawBody;
+  try {
+    rawBody = await getRawBody(req);
+  } catch (readErr) {
+    console.error("webhook: Failed to read raw request body:", readErr.message);
+    return res.status(400).json({ error: "Unable to read request payload." });
+  }
+
   const receivedSignature = req.headers["x-razorpay-signature"] || "";
 
   // ---------------------------------------------------------------
-  // Verify webhook signature.
+  // STEP 2: Verify webhook signature against the raw unparsed payload.
   // ---------------------------------------------------------------
   const expectedSignature = crypto
     .createHmac("sha256", webhookSecret)
@@ -47,6 +64,9 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: "Invalid webhook signature." });
   }
 
+  // ---------------------------------------------------------------
+  // STEP 3: Parse JSON only AFTER signature verification succeeds.
+  // ---------------------------------------------------------------
   let event;
   try {
     event = JSON.parse(rawBody);
@@ -68,6 +88,7 @@ module.exports = async function handler(req, res) {
 
   // ---------------------------------------------------------------
   // Handle payment.captured — mark payment as confirmed.
+  // Idempotent: skips if payment_status is already "paid".
   // ---------------------------------------------------------------
   if (eventName === "payment.captured") {
     const { error } = await supabase
@@ -78,7 +99,7 @@ module.exports = async function handler(req, res) {
         payment_verified_at: new Date().toISOString()
       })
       .eq("razorpay_order_id", payload.order_id)
-      .neq("payment_status", "paid"); // Idempotent: skip if already paid.
+      .neq("payment_status", "paid");
 
     if (error) {
       console.error("webhook: payment.captured update error:", error.message);
@@ -89,28 +110,37 @@ module.exports = async function handler(req, res) {
 
   // ---------------------------------------------------------------
   // Handle payment.failed — mark payment as failed.
+  // Safe: only updates if payment_status is still "pending" (cannot overwrite "paid").
   // ---------------------------------------------------------------
   if (eventName === "payment.failed") {
     await supabase
       .from("registrations")
       .update({ payment_status: "failed" })
       .eq("razorpay_order_id", payload.order_id)
-      .eq("payment_status", "pending"); // Only update if still pending.
+      .eq("payment_status", "pending");
   }
 
   return res.status(200).json({ received: true });
-};
+}
 
-// Read the raw request body as a string.
-// Vercel passes the body as a buffer or string depending on content type.
+// Read raw request stream into a UTF-8 string.
 async function getRawBody(req) {
   if (typeof req.body === "string") return req.body;
   if (Buffer.isBuffer(req.body)) return req.body.toString("utf8");
 
   return new Promise((resolve, reject) => {
-    let data = "";
-    req.on("data", chunk => { data += chunk.toString(); });
-    req.on("end", () => resolve(data));
-    req.on("error", reject);
+    const chunks = [];
+    req.on("data", (chunk) => {
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    });
+    req.on("end", () => {
+      resolve(Buffer.concat(chunks).toString("utf8"));
+    });
+    req.on("error", (err) => {
+      reject(err);
+    });
   });
 }
+
+module.exports = handler;
+module.exports.config = config;

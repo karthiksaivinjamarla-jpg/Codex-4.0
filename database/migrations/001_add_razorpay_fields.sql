@@ -20,6 +20,12 @@ CREATE UNIQUE INDEX IF NOT EXISTS registrations_razorpay_order_id_unique
   ON public.registrations (razorpay_order_id)
   WHERE razorpay_order_id IS NOT NULL;
 
+-- Unique constraint on razorpay_payment_id prevents reusing a payment ID
+-- across multiple registrations at the database level.
+CREATE UNIQUE INDEX IF NOT EXISTS registrations_razorpay_payment_id_unique
+  ON public.registrations (razorpay_payment_id)
+  WHERE razorpay_payment_id IS NOT NULL;
+
 -- Optional: mark existing manually-approved rows as paid so they don't appear
 -- as pending in the admin dashboard. Run this if you want to migrate old data.
 -- UPDATE public.registrations

@@ -83,7 +83,7 @@ module.exports = async function handler(req, res) {
   // Server-side duplicate check before insert.
   const { data: existing, error: existingError } = await supabase
     .from("registrations")
-    .select("registration_id, payment_status")
+    .select("registration_id, payment_status, razorpay_order_id, status, created_at")
     .eq("user_id", r.user_id)
     .maybeSingle();
 
@@ -93,8 +93,20 @@ module.exports = async function handler(req, res) {
   }
 
   if (existing?.registration_id) {
-    // If already paid, prevent duplicate.
+    // If already paid:
     if (existing.payment_status === "paid") {
+      // Idempotent retry: if this is the exact same order that was already verified,
+      // return 200 success with the existing registration ID.
+      if (existing.razorpay_order_id === razorpay_order_id) {
+        return res.status(200).json({
+          success: true,
+          registrationId: existing.registration_id,
+          status: existing.status || "Pending",
+          createdAt: existing.created_at
+        });
+      }
+
+      // Different order attempted on an already-paid account -> block duplicate.
       return res.status(409).json({
         error: "This account already has a completed CODEX 4.0 registration.",
         registrationId: existing.registration_id
