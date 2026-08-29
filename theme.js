@@ -79,7 +79,7 @@
     if (existing) return;
 
     const authScript = document.createElement('script');
-    authScript.src = `${rootPrefix}auth-bridge.js`;
+    authScript.src = `${rootPrefix}js/auth/auth-bridge.js`;
     authScript.defer = true;
     document.head.appendChild(authScript);
   }
