@@ -1,0 +1,9 @@
+{
+  "name": "codex-4.0",
+  "version": "1.0.0",
+  "description": "CODEX 4.0 Inter-College Coding Event",
+  "dependencies": {
+    "razorpay": "^2.9.2",
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}
