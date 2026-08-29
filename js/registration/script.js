@@ -1,10 +1,7 @@
 const CONFIG = {
-    QR_IMAGE_URL: "./codex-payment-qr.png",
     EVENT_NAME: "CODEX 4.0",
     ORGANIZER: "Coders' Club",
-    PAYMENT_FEE: 300,
-    UPI_ID: "9392687157@ybl",
-    MAX_FILE_SIZE: 10 * 1024 * 1024
+    PAYMENT_FEE: 300
 };
 
 let currentStep = 1;
@@ -16,16 +13,9 @@ let lastSubmittedData = null;
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", async () => {
-    const qr = document.getElementById("paymentQR");
-    const fee = document.getElementById("displayFee");
-
-    if (qr) qr.src = CONFIG.QR_IMAGE_URL;
-    if (fee) fee.textContent = `₹${CONFIG.PAYMENT_FEE} per team`;
-
     setupTeamSize();
     setupNavigation();
-    setupPaymentHelpers();
-    setupFileUpload();
+    setupPayNowButton();
     setupRealtimeValidation();
     setupConfirmationPassActions();
     compactTeamSizeSelector();
@@ -33,7 +23,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     showStep(1);
 
     /*
-     * Existing registration handling is now done through Supabase.
      * If this page was opened with ?view=pass, load the registration
      * belonging to the currently authenticated user.
      */
@@ -339,60 +328,14 @@ function updateNavigation() {
 
 
 /* =========================================================
-   PAYMENT HELPERS & UPI
+   PAY NOW BUTTON — delegates to js/payments/razorpay.js
 ========================================================= */
 
-function setupPaymentHelpers() {
-    const copyBtn =
-        document.getElementById("copyUpiBtn");
-
-    const upiLink =
-        document.getElementById("upiPayLink");
-
-    if (copyBtn) {
-        copyBtn.addEventListener(
-            "click",
-            async () => {
-                try {
-                    await navigator.clipboard.writeText(
-                        CONFIG.UPI_ID
-                    );
-
-                    const originalText =
-                        copyBtn.textContent;
-
-                    copyBtn.textContent =
-                        "✓ Copied UPI ID!";
-
-                    copyBtn.classList.add(
-                        "copied"
-                    );
-
-                    setTimeout(() => {
-                        copyBtn.textContent =
-                            originalText;
-
-                        copyBtn.classList.remove(
-                            "copied"
-                        );
-                    }, 2000);
-                } catch (error) {
-                    prompt(
-                        "Copy this UPI ID:",
-                        CONFIG.UPI_ID
-                    );
-                }
-            }
-        );
-    }
-
-    if (upiLink) {
-        upiLink.href =
-            `upi://pay?pa=${CONFIG.UPI_ID}` +
-            `&pn=${encodeURIComponent(CONFIG.EVENT_NAME)}` +
-            `&am=${CONFIG.PAYMENT_FEE}` +
-            `&cu=INR`;
-    }
+function setupPayNowButton() {
+    const payBtn = document.getElementById("payNowBtn");
+    if (!payBtn) return;
+    // The razorpay.js module wires this up itself via its own DOMContentLoaded.
+    // This function is kept as a hook for any additional setup if needed.
 }
 
 
@@ -400,245 +343,6 @@ function setupPaymentHelpers() {
    FILE UPLOAD & PREVIEW
 ========================================================= */
 
-function setupFileUpload() {
-    const receiptInput =
-        document.getElementById("receipt");
-
-    const fileInfo =
-        document.getElementById("fileInfo");
-
-    const dropzoneLabel =
-        document.getElementById("dropzoneLabel");
-
-    const dropzonePrompt =
-        document.getElementById("dropzonePrompt");
-
-    const previewContainer =
-        document.getElementById("previewContainer");
-
-    const previewMedia =
-        document.getElementById("previewMedia");
-
-    const previewFileName =
-        document.getElementById("previewFileName");
-
-    const previewFileSize =
-        document.getElementById("previewFileSize");
-
-    const removeFileBtn =
-        document.getElementById("removeFileBtn");
-
-    if (!receiptInput) {
-        return;
-    }
-
-    function handleFile(file) {
-        if (!file) {
-            resetPreview();
-            return;
-        }
-
-        const allowed = [
-            "image/jpeg",
-            "image/png",
-            "application/pdf"
-        ];
-
-        if (!allowed.includes(file.type)) {
-            receiptInput.value = "";
-
-            resetPreview();
-
-            showStatus(
-                "Please upload a JPG, PNG or PDF payment receipt.",
-                true
-            );
-
-            return;
-        }
-
-        if (file.size > CONFIG.MAX_FILE_SIZE) {
-            receiptInput.value = "";
-
-            resetPreview();
-
-            showStatus(
-                "Payment receipt must be 10MB or smaller.",
-                true
-            );
-
-            return;
-        }
-
-        clearStatus();
-
-        const sizeFormatted =
-            (file.size / (1024 * 1024))
-                .toFixed(2) + " MB";
-
-        if (fileInfo) {
-            fileInfo.textContent =
-                `Selected: ${file.name} (${sizeFormatted})`;
-        }
-
-        if (previewFileName) {
-            previewFileName.textContent =
-                file.name;
-        }
-
-        if (previewFileSize) {
-            previewFileSize.textContent =
-                sizeFormatted;
-        }
-
-        if (previewMedia) {
-            previewMedia.innerHTML = "";
-
-            if (file.type.startsWith("image/")) {
-                const img =
-                    document.createElement("img");
-
-                img.src =
-                    URL.createObjectURL(file);
-
-                img.alt =
-                    "Receipt preview";
-
-                img.className =
-                    "receipt-thumbnail";
-
-                previewMedia.appendChild(img);
-            } else {
-                const pdfBadge =
-                    document.createElement("div");
-
-                pdfBadge.className =
-                    "pdf-badge";
-
-                pdfBadge.innerHTML =
-                    "<span>PDF</span><b>Document</b>";
-
-                previewMedia.appendChild(
-                    pdfBadge
-                );
-            }
-        }
-
-        if (dropzonePrompt) {
-            dropzonePrompt.classList.add(
-                "hidden"
-            );
-        }
-
-        if (previewContainer) {
-            previewContainer.classList.remove(
-                "hidden"
-            );
-        }
-    }
-
-
-    function resetPreview() {
-        receiptInput.value = "";
-
-        if (fileInfo) {
-            fileInfo.textContent =
-                "No file selected";
-        }
-
-        if (dropzonePrompt) {
-            dropzonePrompt.classList.remove(
-                "hidden"
-            );
-        }
-
-        if (previewContainer) {
-            previewContainer.classList.add(
-                "hidden"
-            );
-        }
-
-        if (previewMedia) {
-            previewMedia.innerHTML = "";
-        }
-    }
-
-
-    receiptInput.addEventListener(
-        "change",
-        () => {
-            handleFile(
-                receiptInput.files[0]
-            );
-        }
-    );
-
-
-    if (removeFileBtn) {
-        removeFileBtn.addEventListener(
-            "click",
-            event => {
-                event.preventDefault();
-                event.stopPropagation();
-
-                resetPreview();
-            }
-        );
-    }
-
-
-    if (dropzoneLabel) {
-        ["dragenter", "dragover"]
-            .forEach(eventName => {
-                dropzoneLabel.addEventListener(
-                    eventName,
-                    event => {
-                        event.preventDefault();
-                        event.stopPropagation();
-
-                        dropzoneLabel.classList.add(
-                            "dragover"
-                        );
-                    }
-                );
-            });
-
-
-        ["dragleave", "drop"]
-            .forEach(eventName => {
-                dropzoneLabel.addEventListener(
-                    eventName,
-                    event => {
-                        event.preventDefault();
-                        event.stopPropagation();
-
-                        dropzoneLabel.classList.remove(
-                            "dragover"
-                        );
-                    }
-                );
-            });
-
-
-        dropzoneLabel.addEventListener(
-            "drop",
-            event => {
-                const files =
-                    event.dataTransfer.files;
-
-                if (
-                    files &&
-                    files.length > 0
-                ) {
-                    receiptInput.files =
-                        files;
-
-                    handleFile(files[0]);
-                }
-            }
-        );
-    }
-}
 
 
 /* =========================================================
@@ -981,92 +685,19 @@ function validateCompleteForm(form) {
     }
 
 
-    const utr =
-        document.querySelector(
-            '[name="utr"]'
-        )?.value.trim() || "";
-
-
-    if (
-        !/^[A-Za-z0-9]{8,30}$/.test(utr)
-    ) {
-        showStatus(
-            "Please enter a valid UPI Transaction ID / UTR.",
-            true
-        );
-
-        return false;
-    }
-
-
-    const receipt =
-        document.getElementById(
-            "receipt"
-        )?.files[0];
-
-
-    if (!receipt) {
-        showStatus(
-            "Please upload your payment receipt.",
-            true
-        );
-
-        return false;
-    }
-
-
-    if (
-        ![
-            "image/jpeg",
-            "image/png",
-            "application/pdf"
-        ].includes(receipt.type)
-    ) {
-        showStatus(
-            "Payment receipt must be JPG, PNG or PDF.",
-            true
-        );
-
-        return false;
-    }
-
-
-    if (
-        receipt.size >
-        CONFIG.MAX_FILE_SIZE
-    ) {
-        showStatus(
-            "Payment receipt must be 10MB or smaller.",
-            true
-        );
-
-        return false;
-    }
-
-
     return true;
 }
 
 
 /* =========================================================
-   LEGACY SUBMISSION BLOCK
+   SUBMISSION NOTE
 ========================================================= */
 
 /*
- * IMPORTANT:
- *
- * Registration submission is intentionally NOT implemented here.
- *
- * supabase-registration.js owns the submit event and sends the
- * registration directly to Supabase.
- *
- * Keeping a second submit listener here would risk:
- *
- * 1. Duplicate registrations
- * 2. Google Apps Script requests
- * 3. Conflicting success screens
- *
- * Therefore this file only provides validation/UI helpers.
+ * Registration submission is handled by js/payments/razorpay.js.
+ * The form does not submit traditionally — clicking "PAY ₹300"
+ * opens Razorpay Checkout, and after server-side signature
+ * verification the registration INSERT is done server-side.
  */
 
 
@@ -1254,7 +885,9 @@ function renderPassScreen(
         data.team_size ??
         2;
 
-    const utr =
+    // Use Razorpay payment ID if available, fall back to legacy transaction_id.
+    const paymentId =
+        data.razorpay_payment_id ??
         data.utr ??
         data.transaction_id ??
         "-";
@@ -1312,8 +945,7 @@ function renderPassScreen(
     }
 
     if (utrEl) {
-        utrEl.textContent =
-            utr;
+        utrEl.textContent = paymentId;
     }
 
     if (regIdEl) {
@@ -1322,9 +954,11 @@ function renderPassScreen(
     }
 
     if (statusEl) {
+        const paymentStatus = data.payment_status || data.status;
         statusEl.textContent =
-            data.status ||
-            statusText;
+            paymentStatus === "paid"
+                ? "PAID ✓"
+                : (data.status || statusText);
     }
 
 
