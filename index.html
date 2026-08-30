@@ -7,33 +7,21 @@
   <title>CODEX 4.0 | Inter-College Coding Event</title>
   <meta name="description" content="CODEX 4.0 — an inter-college coding event by Coders' Club GPREC. Build. Think. Compete.">
   <meta name="robots" content="index,follow">
-  <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://karthiksaivinjamarla-jpg.github.io/Codex-4.0/">
   <meta property="og:title" content="CODEX 4.0 | Inter-College Coding Event">
-  <meta property="og:description" content="Inter-college coding competition by Coders' Club GPREC. Team up, solve problems, and compete for trophies & prizes.">
+  <meta property="og:description" content="Inter-college coding competition by Coders' Club GPREC. Team up, solve problems, and compete.">
   <meta property="og:image" content="./codex-payment-qr.png">
   <meta property="og:site_name" content="CODEX 4.0">
-  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="CODEX 4.0 | Inter-College Coding Event">
-  <meta name="twitter:description" content="Build. Think. Compete. Join CODEX 4.0 by Coders' Club GPREC. 2 rounds, prizes, and competitive programming.">
+  <meta name="twitter:description" content="Build. Think. Compete. Join CODEX 4.0 by Coders' Club GPREC.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
   <link rel="stylesheet" href="css/global.css">
   <link rel="stylesheet" href="css/home.css">
-  <link rel="stylesheet" href="css/about.css">
-  <link rel="stylesheet" href="css/highlights.css">
-  <link rel="stylesheet" href="css/prizes.css">
-  <link rel="stylesheet" href="css/timeline.css">
-  <link rel="stylesheet" href="css/details.css">
-  <link rel="stylesheet" href="css/rounds.css">
-  <link rel="stylesheet" href="css/faq.css">
-  <link rel="stylesheet" href="css/contact.css">
-<link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="theme.css">
 </head>
 <body>
   <div class="bg-grid"></div>
@@ -45,14 +33,14 @@
 
   <header class="site-header">
     <div class="header-inner">
-      <a class="brand" href="index.html">
-        <span class="brand-mark">&lt;/&gt;</span>
+      <a class="brand" href="index.html" aria-label="CODEX 4.0 home">
+        <span class="brand-mark"><img class="brand-logo" src="assets/coders-club-logo.jpg" alt="Coders' Club GPREC logo" width="42" height="42"></span>
         <span>
           <span class="brand-title">CODEX <span>4.0</span></span>
           <span class="brand-sub">INTER-COLLEGE CODING EVENT</span>
         </span>
       </a>
-      <nav class="nav">
+      <nav class="nav" aria-label="Primary navigation">
         <a href="index.html" class="active">Home</a>
         <a href="pages/about.html">About</a>
         <a href="pages/highlights.html">Highlights</a>
@@ -62,13 +50,12 @@
         <a href="pages/rounds.html">Rounds</a>
         <a href="pages/faq.html">FAQ</a>
         <a href="pages/contact.html">Contact</a>
+        <a href="register.html" class="register-btn">Register</a>
       </nav>
-      <a class="register-btn" href="register.html">REGISTER NOW →</a>
     </div>
   </header>
 
   <main id="home">
-    <!-- Hero Section -->
     <section class="hero">
       <div>
         <span class="eyebrow">SYSTEM INITIALIZED_</span>
@@ -92,273 +79,68 @@
       </div>
     </section>
 
-    <!-- Stats Bar -->
-    <section class="stats">
+    <section class="stats" aria-label="Event summary">
       <div class="stat">
         <div class="stat-icon">👥</div>
-        <div>
-          <strong>2 – 3</strong>
-          <small>MEMBERS / TEAM</small>
-        </div>
+        <div><strong>2 – 3</strong><small>MEMBERS / TEAM</small></div>
       </div>
       <div class="stat">
         <div class="stat-icon">₹</div>
-        <div>
-          <strong>₹300</strong>
-          <small>REGISTRATION FEE</small>
-        </div>
+        <div><strong>₹300</strong><small>REGISTRATION FEE</small></div>
       </div>
       <div class="stat">
         <div class="stat-icon">&lt;/&gt;</div>
-        <div>
-          <strong>02</strong>
-          <small>ROUNDS</small>
-        </div>
+        <div><strong>02</strong><small>ROUNDS</small></div>
       </div>
       <div class="stat">
         <div class="stat-icon">⌘</div>
-        <div>
-          <strong>INTER-COLLEGE</strong>
-          <small>PARTICIPATION</small>
-        </div>
+        <div><strong>INTER-COLLEGE</strong><small>PARTICIPATION</small></div>
       </div>
     </section>
 
-    <!-- About Section -->
-    <section class="section" id="about">
+    <section class="section" aria-label="Explore CODEX 4.0">
       <div class="section-title">
-        <span class="kicker">ABOUT CODEX 4.0</span>
-        <h2>Where logic meets competition.</h2>
-        <p>CODEX 4.0 is an inter-college coding competition by Coders' Club, GPREC, designed to challenge problem-solving, collaboration and competitive programming skills.</p>
+        <span class="kicker">EXPLORE CODEX 4.0</span>
+        <h2>Everything you need, in its own place.</h2>
+        <p>The detailed event information has been moved to dedicated pages so the homepage stays focused and easy to navigate.</p>
       </div>
       <div class="about-grid">
-        <div class="card">
-          <h3>Build. Think. Compete.</h3>
-          <p>Teams work through two rounds of coding challenges, turning ideas and algorithms into efficient solutions under time pressure.</p>
-        </div>
-        <div class="card">
-          <h3>Built by Coders' Club</h3>
-          <p>A student-driven technical community focused on coding, learning, collaboration, innovation and creating opportunities for students to compete beyond the campus.</p>
-        </div>
+        <a class="card" href="pages/about.html">
+          <h3>About</h3>
+          <p>Learn about CODEX 4.0 and the Coders' Club community.</p>
+        </a>
+        <a class="card" href="pages/highlights.html">
+          <h3>Highlights</h3>
+          <p>See what makes the event worth entering.</p>
+        </a>
+        <a class="card" href="pages/prizes.html">
+          <h3>Prizes</h3>
+          <p>Explore rewards, recognition and certificates.</p>
+        </a>
+        <a class="card" href="pages/timeline.html">
+          <h3>Timeline</h3>
+          <p>Follow the competition journey and key dates.</p>
+        </a>
+        <a class="card" href="pages/details.html">
+          <h3>Details</h3>
+          <p>Check event information, venue and guidelines.</p>
+        </a>
+        <a class="card" href="pages/rounds.html">
+          <h3>Rounds</h3>
+          <p>Understand what each competition round involves.</p>
+        </a>
+        <a class="card" href="pages/faq.html">
+          <h3>FAQ</h3>
+          <p>Find answers to common participant questions.</p>
+        </a>
+        <a class="card" href="pages/contact.html">
+          <h3>Contact</h3>
+          <p>Find the coordinators and official contact channels.</p>
+        </a>
       </div>
     </section>
 
-    <!-- Highlights Section -->
-    <section class="section" id="highlights">
-      <div class="section-title">
-        <span class="kicker">EVENT HIGHLIGHTS</span>
-        <h2>Four reasons to enter.</h2>
-      </div>
-      <div class="section-panel">
-        <div class="highlights">
-          <div class="highlight">
-            <div class="hicon">♜</div>
-            <strong>Competitive Coding</strong>
-            <p>Solve challenging problems and climb the leaderboard.</p>
-          </div>
-          <div class="highlight">
-            <div class="hicon">👥</div>
-            <strong>Team Challenge</strong>
-            <p>Collaborate with your team and achieve excellence.</p>
-          </div>
-          <div class="highlight">
-            <div class="hicon">💡</div>
-            <strong>Problem Solving</strong>
-            <p>Enhance your logic and algorithmic thinking under timed constraints.</p>
-          </div>
-          <div class="highlight">
-            <div class="hicon">🌐</div>
-            <strong>Inter-College</strong>
-            <p>Compete with the sharpest minds from across colleges.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Prizes & Rewards Section -->
-    <section class="section" id="prizes">
-      <div class="section-title">
-        <span class="kicker">🏆 PRIZES & REWARDS</span>
-        <h2>Rewards for excellence.</h2>
-        <p>Celebrate your algorithmic mastery with prestigious awards and recognitions.</p>
-      </div>
-      <div class="prizes-grid">
-        <div class="prize-card">
-          <span class="prize-badge">WINNERS</span>
-          <div class="prize-icon">🥇</div>
-          <h3>Grand Cash Pool & Trophy</h3>
-          <p>Top teams win cash prizes, exclusive trophies, and champion certificates of excellence.</p>
-        </div>
-        <div class="prize-card">
-          <span class="prize-badge">RUNNERS-UP</span>
-          <div class="prize-icon">🥈</div>
-          <h3>Merit Recognition</h3>
-          <p>Exciting awards, runner-up trophies, and verified certificates of technical distinction.</p>
-        </div>
-        <div class="prize-card">
-          <span class="prize-badge">ALL TEAMS</span>
-          <div class="prize-icon">📜</div>
-          <h3>Participation Certificate</h3>
-          <p>Official verified participation certificate from Coders' Club GPREC for all registered attendees.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Timeline Section -->
-    <section class="section" id="timeline">
-      <div class="section-title">
-        <span class="kicker">CODEX TIMELINE</span>
-        <h2>The competition journey.</h2>
-      </div>
-      <div class="section-panel">
-        <div class="timeline">
-          <div class="time">
-            <div class="time-num">01</div>
-            <h3>Registration</h3>
-            <p>Team registration open online</p>
-          </div>
-          <div class="time">
-            <div class="time-num">02</div>
-            <h3>Round 1</h3>
-            <p>20 August 2026 · Vibe 2 Vibe</p>
-          </div>
-          <div class="time">
-            <div class="time-num">03</div>
-            <h3>Round 2</h3>
-            <p>2 September 2026 · CodeSprint</p>
-          </div>
-          <div class="time">
-            <div class="time-num">04</div>
-            <h3>Results</h3>
-            <p>Prize distribution & ceremony</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Event Details & Guidelines -->
-    <section class="section" id="details">
-      <div class="section-title">
-        <span class="kicker">EVENT INFORMATION</span>
-        <h2>Everything you need to know.</h2>
-      </div>
-      <div class="info-grid">
-        <div class="info-box">
-          <h3>📅 EVENT DETAILS</h3>
-          <div class="info-row"><b>Round 1</b><span>20 August 2026 — Vibe 2 Vibe</span></div>
-          <div class="info-row"><b>Round 2</b><span>2 September 2026 — CodeSprint</span></div>
-          <div class="info-row"><b>Competition</b><span>2 rounds</span></div>
-          <div class="info-row"><b>Fee</b><span>₹300 per team</span></div>
-        </div>
-        <div class="info-box">
-          <h3>📍 VENUE & REPORTING</h3>
-          <div class="info-row"><b>Venue</b><span>GPREC Campus (Kurnool)</span></div>
-          <div class="info-row"><b>Reporting</b><span>Be present at the venue by 9:00 AM sharp</span></div>
-          <div class="info-row"><b>Duration</b><span>Full-day coding marathon</span></div>
-          <div class="info-row"><b>Note</b><span>Final room allocations will be emailed to team leaders.</span></div>
-        </div>
-        <div class="info-box">
-          <h3>⚠️ GUIDELINES</h3>
-          <div class="guidelines">
-            <div class="guideline">Team size: strictly 2–3 members.</div>
-            <div class="guideline">Teams can have at most one final-year candidate.</div>
-            <div class="guideline">Remember the email ID used in the registration form.</div>
-            <div class="guideline">Carry your College ID card without fail.</div>
-            <div class="guideline">Incomplete/incorrect entries may lead to disqualification.</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Round Breakdown -->
-    <section class="section" id="rounds">
-      <div class="section-title">
-        <span class="kicker">ROUND BREAKDOWN</span>
-        <h2>Know what each round involves.</h2>
-      </div>
-      <div class="about-grid">
-        <div class="card">
-          <h3>Round 1 — Vibe 2 Vibe</h3>
-          <p>Vibe-coding based challenge focused on building, creativity, logic and fast-paced algorithmic implementation.</p>
-          <p style="margin-top:10px;"><strong>Date:</strong> 20 August 2026</p>
-        </div>
-        <div class="card">
-          <h3>Round 2 — CodeSprint</h3>
-          <p>Final competitive coding round featuring algorithmic problem statements to test optimization and speed.</p>
-          <p style="margin-top:10px;"><strong>Date:</strong> 2 September 2026</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section class="section" id="faq">
-      <div class="section-title">
-        <span class="kicker">FREQUENTLY ASKED QUESTIONS</span>
-        <h2>Got questions? We've got answers.</h2>
-      </div>
-      <div class="codex-faq-list">
-        <details>
-          <summary>Who is eligible to participate in CODEX 4.0?</summary>
-          <p>Students from 2nd, 3rd, and 4th year from any recognized engineering college are eligible to form a team. Each team can have at most one 4th-year student.</p>
-        </details>
-        <details>
-          <summary>What is the team size and registration fee?</summary>
-          <p>Teams can consist of 2 or 3 members. The registration fee is fixed at ₹300 per team.</p>
-        </details>
-        <details>
-          <summary>How does the payment and verification work?</summary>
-          <p>Pay ₹300 using any UPI app (GPay / PhonePe / Paytm / BHIM) via the QR code on the registration page, enter your 12-digit UTR number, and upload the payment receipt. You will immediately receive a digital confirmation slip and an email ticket.</p>
-        </details>
-        <details>
-          <summary>What should participants carry on the event day?</summary>
-          <p>Every team member must carry their official College ID card and a copy of the Registration ID confirmation slip.</p>
-        </details>
-        <details>
-          <summary>Can members of a team be from different branches or colleges?</summary>
-          <p>Yes, cross-branch and cross-college teams are welcome as long as the eligibility criteria (maximum one 4th-year student) are met.</p>
-        </details>
-      </div>
-    </section>
-
-    <!-- Coders' Club & Contact Section -->
-    <section class="section" id="contact">
-      <div class="section-title">
-        <span class="kicker">CODERS' CLUB & CONTACT</span>
-        <h2>Connect with the organizers.</h2>
-      </div>
-      <div class="about-grid">
-        <div class="card">
-          <h3>Lead Coordinator</h3>
-          <p class="contact-name">KARTHIK SAI V</p>
-          <p class="contact-phone">📞 +91 9032174306 (ECE)</p>
-          <p style="margin-top:12px; font-size:14px; color:var(--muted);">For technical, payment or event queries, feel free to reach out directly via call or WhatsApp.</p>
-        </div>
-        <div class="card">
-          <h3>Coders' Club GPREC</h3>
-          <p>A student-driven technical community focused on coding, learning, collaboration, and competitive excellence.</p>
-          <div class="club-mini">
-            <h4>Official Social Handles</h4>
-            <div class="socials">
-              <!-- LinkedIn -->
-              <a href="https://www.linkedin.com/company/coders-club-gprec/" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
-              </a>
-              <!-- Instagram -->
-              <a href="https://www.instagram.com/coders_club_gprec" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Instagram">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-              </a>
-              <!-- X (Twitter) -->
-              <a href="https://x.com/CodersClubGprec" target="_blank" rel="noopener noreferrer" title="X (Twitter)" aria-label="X">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Final Call to Action -->
-    <section class="final">
+    <section class="section">
       <div class="final-box">
         <strong>&gt; BUILD THE FUTURE. BE THE CHAMPION. _</strong>
         <a class="register-btn" href="register.html">REGISTER YOUR TEAM →</a>
