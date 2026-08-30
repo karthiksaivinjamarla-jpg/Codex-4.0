@@ -89,7 +89,9 @@ module.exports = async function handler(req, res) {
 
   if (existingError && existingError.code !== "PGRST116") {
     console.error("verify-payment: Duplicate check error:", existingError.message);
-    return res.status(500).json({ error: "Registration check failed. Please contact support." });
+    return res.status(500).json({
+      error: `Registration check failed: ${existingError.message}. (Did you run the Supabase database migration?)`
+    });
   }
 
   if (existing?.registration_id) {
@@ -130,7 +132,7 @@ module.exports = async function handler(req, res) {
 
     if (updateError) {
       console.error("verify-payment: Update error:", updateError.message);
-      return res.status(500).json({ error: "Failed to update registration. Contact support." });
+      return res.status(500).json({ error: `Failed to update registration: ${updateError.message}` });
     }
 
     return res.status(200).json({
@@ -191,7 +193,7 @@ module.exports = async function handler(req, res) {
       });
     }
     console.error("verify-payment: Insert error:", insertError.message);
-    return res.status(500).json({ error: "Registration could not be saved. Please contact support." });
+    return res.status(500).json({ error: `Registration could not be saved: ${insertError.message}` });
   }
 
   return res.status(200).json({
