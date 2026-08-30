@@ -1,0 +1,79 @@
+/* =========================================================
+   CODEX 4.0 - EVENT DETAILS & GUIDELINES PAGE STYLES
+========================================================= */
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1.05fr 0.9fr;
+  gap: 18px;
+}
+
+.info-box {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 26px;
+}
+
+.info-box h3 {
+  font: 700 13px 'Fira Code', monospace;
+  color: var(--accent);
+  letter-spacing: 1px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 12px;
+  margin: 12px 0;
+  font-size: 14px;
+  line-height: 1.6;
+  border-bottom: 1px dashed var(--line);
+  padding-bottom: 10px;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.info-row b {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.info-row span {
+  color: var(--muted);
+}
+
+.guidelines {
+  display: grid;
+  gap: 12px;
+}
+
+.guideline {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+  position: relative;
+  padding-left: 24px;
+}
+
+.guideline:before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--accent);
+  font-weight: 900;
+}
+
+@media (max-width: 900px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,78 @@
+/* =========================================================
+   CODEX 4.0 - ROUND BREAKDOWN PAGE STYLES
+========================================================= */
+
+.rounds-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.round-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 34px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.round-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: 0 16px 40px var(--shadow);
+}
+
+.round-badge {
+  display: inline-block;
+  font: 800 11px 'Fira Code', monospace;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  margin-bottom: 20px;
+}
+
+.round-card h3 {
+  font-size: 26px;
+  font-weight: 900;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.round-card p {
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.round-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.round-meta-item small {
+  display: block;
+  font: 700 10px 'Fira Code', monospace;
+  color: var(--muted);
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.round-meta-item strong {
+  font-size: 15px;
+  color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .rounds-grid {
+    grid-template-columns: 1fr;
+  }
+}

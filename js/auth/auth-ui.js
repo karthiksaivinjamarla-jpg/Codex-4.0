@@ -4,6 +4,10 @@
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
   });
 
+  const isSubdirectory = window.location.pathname.includes('/pages/') ||
+                         window.location.pathname.includes('\\pages\\');
+  const rootPrefix = isSubdirectory ? '../' : './';
+
   function clearAuthHints() {
     sessionStorage.removeItem("codex-auth-ready");
     sessionStorage.removeItem("codex-auth-email");
@@ -24,7 +28,7 @@
         if (client) await client.auth.signOut();
       } finally {
         clearAuthHints();
-        window.location.href = window.location.pathname.endsWith("auth.html") ? "./auth.html" : "./index.html";
+        window.location.href = window.location.pathname.endsWith("auth.html") ? "./auth.html" : `${rootPrefix}index.html`;
       }
     });
 
@@ -35,9 +39,13 @@
 
   async function init() {
     if (!client) return;
-    const { data } = await client.auth.getSession();
-    if (data.session) addSignOutButton();
+    try {
+      const { data } = await client.auth.getSession();
+      if (data?.session) addSignOutButton();
+    } catch (_) {}
   }
+
+  window.codexInitAuthUI = init;
 
   document.addEventListener("DOMContentLoaded", () => init().catch(error => console.error("Auth UI failed:", error)));
 })();

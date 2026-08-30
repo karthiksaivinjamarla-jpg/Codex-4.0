@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="theme.css">
-<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="css/global.css">
+<link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
 <div class="theme-switch"><button type="button" data-theme="dark">DARK</button><button type="button" data-theme="light">LIGHT</button></div>
@@ -25,6 +25,7 @@
 <div class="stat-card"><small>PENDING</small><strong id="pendingCount">0</strong></div>
 <div class="stat-card"><small>APPROVED</small><strong id="approvedCount">0</strong></div>
 <div class="stat-card"><small>REJECTED</small><strong id="rejectedCount">0</strong></div>
+<div class="stat-card stat-card--paid"><small>PAID ✓</small><strong id="paidCount">0</strong></div>
 </div>
 <div class="toolbar"><div class="search-box"><span>⌕</span><input id="searchInput" type="search" placeholder="Search team, registration ID, email, UTR..."></div><select id="statusFilter"><option value="all">All statuses</option><option value="Pending">Pending</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option></select><select id="teamSizeFilter"><option value="all">All team sizes</option><option value="2">2 Members</option><option value="3">3 Members</option></select></div>
 <div class="table-wrap"><table><thead><tr><th>Registration</th><th>Team</th><th>Leader</th><th>Members</th><th>Payment</th><th>Status</th><th></th></tr></thead><tbody id="registrationRows"></tbody></table><div id="emptyState" class="empty-state hidden"><strong>No registrations found</strong><span>Try changing the search or filters.</span></div></div>
@@ -32,8 +33,8 @@
 </main>
 <div id="detailModal" class="modal hidden" aria-hidden="true"><div class="modal-backdrop" data-close-modal></div><section class="modal-card"><button class="modal-close" type="button" data-close-modal>×</button><div id="detailContent"></div></section></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
+<script src="config/supabase-config.js"></script>
 <script src="theme.js"></script>
-<script src="admin.js"></script>
+<script src="js/admin/admin.js"></script>
 </body>
 </html>

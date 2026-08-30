@@ -1,0 +1,63 @@
+/* =========================================================
+   CODEX 4.0 - HIGHLIGHTS PAGE STYLES
+========================================================= */
+
+.highlights {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.highlight {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 24px 18px;
+  min-height: 170px;
+  text-align: center;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.highlight:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: 0 10px 30px var(--shadow);
+}
+
+.hicon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 14px;
+  border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  font-size: 22px;
+  background: var(--soft);
+}
+
+.highlight strong {
+  font-size: 17px;
+  font-weight: 800;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.highlight p {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .highlights {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .highlights {
+    grid-template-columns: 1fr;
+  }
+}

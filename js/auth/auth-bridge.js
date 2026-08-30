@@ -2,7 +2,10 @@
   const config = window.CODEX_SUPABASE_CONFIG || {};
   const SUPABASE_URL = config.url || "https://lrwrqerurimwzalhjffa.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = config.publishableKey || "sb_publishable_QRbFkE9mkgIljLF-1zMgGw_f4Ic5OBW";
-  const AUTH_PAGE = "./auth.html";
+  const isSubdirectory = window.location.pathname.includes('/pages/') ||
+                         window.location.pathname.includes('\\pages\\');
+  const rootPrefix = isSubdirectory ? '../' : './';
+  const AUTH_PAGE = `${rootPrefix}auth.html`;
 
   function isRegistrationPage() {
     return /(^|\/)register\.html$/i.test(window.location.pathname);

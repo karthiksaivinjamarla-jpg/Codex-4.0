@@ -55,6 +55,8 @@
     $("pendingCount").textContent = registrations.filter(r => r.status === "Pending").length;
     $("approvedCount").textContent = registrations.filter(r => r.status === "Approved").length;
     $("rejectedCount").textContent = registrations.filter(r => r.status === "Rejected").length;
+    const paidEl = $("paidCount");
+    if (paidEl) paidEl.textContent = registrations.filter(r => r.payment_status === "paid").length;
   }
 
   function filtered() {
@@ -73,6 +75,9 @@
         r.leader_email,
         r.college_name,
         r.transaction_id,
+        r.razorpay_payment_id,
+        r.razorpay_order_id,
+        r.payment_status,
         r.member1_name,
         r.member1_roll,
         r.member2_name,
@@ -114,7 +119,8 @@
         <td><span class="member-count">${memberCount(r)}</span></td>
         <td>
           <strong>₹${esc(r.payment_amount ?? 0)}</strong>
-          <small>${esc(r.transaction_id || "-")}</small>
+          <small class="payment-id-cell">${esc(r.razorpay_payment_id || r.transaction_id || "-")}</small>
+          <span class="payment-status-badge ${esc(r.payment_status || "pending")}">${esc(r.payment_status || "pending")}</span>
         </td>
         <td>
           <span class="status ${statusClass(r.status)}">${esc(r.status || "Pending")}</span>
@@ -220,20 +226,25 @@
       <div class="detail-grid">
         <div><label>COLLEGE</label><strong>${esc(r.college_name || "-")}</strong></div>
         <div><label>LEADER EMAIL</label><strong>${esc(r.leader_email || "-")}</strong></div>
-        <div><label>PAYMENT</label><strong>₹${esc(r.payment_amount ?? 0)}</strong></div>
-        <div><label>UTR / TRANSACTION ID</label><strong>${esc(r.transaction_id || "-")}</strong></div>
+        <div><label>PAYMENT AMOUNT</label><strong>₹${esc(r.payment_amount ?? 0)}</strong></div>
+        <div><label>PAYMENT STATUS</label><strong class="payment-status-badge ${esc(r.payment_status || "pending")}">${esc(r.payment_status || "pending").toUpperCase()}</strong></div>
+        <div><label>RAZORPAY ORDER ID</label><strong class="mono-text">${esc(r.razorpay_order_id || "-")}</strong></div>
+        <div><label>RAZORPAY PAYMENT ID</label><strong class="mono-text">${esc(r.razorpay_payment_id || "-")}</strong></div>
+        <div><label>PAYMENT VERIFIED AT</label><strong>${esc(formatDate(r.payment_verified_at) || "-")}</strong></div>
+        ${r.transaction_id ? `<div><label>LEGACY UTR</label><strong>${esc(r.transaction_id)}</strong></div>` : ""}
       </div>
 
       <h3 class="detail-section-title">TEAM MEMBERS</h3>
       <div class="member-list">${members}</div>
 
+      ${r.receipt_url ? `
       <div class="receipt-box">
         <div>
-          <label>PAYMENT RECEIPT</label>
+          <label>PAYMENT RECEIPT (LEGACY)</label>
           <span id="receiptState">Preparing secure link...</span>
         </div>
         <a id="receiptLink" class="view-btn hidden" target="_blank" rel="noopener">OPEN RECEIPT ↗</a>
-      </div>
+      </div>` : ""}
 
       <div class="detail-actions">
         <button class="action pending" type="button" data-status-action="pending">MARK PENDING</button>
@@ -249,15 +260,18 @@
     c.querySelector(".approve").onclick = () => updateStatus(r.id, "Approved");
     c.querySelector(".reject").onclick = () => updateStatus(r.id, "Rejected");
 
-    const url = await receiptUrl(r.receipt_url);
-    if (url) {
-      $("receiptLink").href = url;
-      $("receiptLink").classList.remove("hidden");
-      $("receiptState").textContent = "Secure signed link ready.";
-    } else {
-      $("receiptState").textContent = r.receipt_url
-        ? "Receipt exists but could not be opened."
-        : "No receipt path stored.";
+    // Only fetch signed receipt URL for legacy registrations that have one.
+    if (r.receipt_url) {
+      const url = await receiptUrl(r.receipt_url);
+      const receiptLink = $("receiptLink");
+      const receiptState = $("receiptState");
+      if (url && receiptLink) {
+        receiptLink.href = url;
+        receiptLink.classList.remove("hidden");
+        if (receiptState) receiptState.textContent = "Secure signed link ready.";
+      } else if (receiptState) {
+        receiptState.textContent = "Receipt exists but could not be opened.";
+      }
     }
   }
 
