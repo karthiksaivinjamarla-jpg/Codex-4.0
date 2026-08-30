@@ -21,16 +21,13 @@
       if (!response.ok) throw new Error(`HTTP ${response.status} loading ${componentPath}`);
       let html = await response.text();
 
-      // Resolve path variables
       html = html.replace(/\{\{ROOT\}\}/g, rootPrefix)
                  .replace(/\{\{PAGES\}\}/g, pagesPrefix);
 
       target.innerHTML = html;
 
-      // Post-injection hooks
       if (componentName === 'navbar') {
         highlightActiveNavLink(target);
-        // Trigger logo and auth UI hooks if present
         if (typeof window.codexSetupBrandLogos === 'function') {
           window.codexSetupBrandLogos();
         }
@@ -40,7 +37,6 @@
       }
     } catch (error) {
       console.warn(`Dynamic component load failed for ${componentName}:`, error);
-      // Fallback in case fetch is blocked (e.g. file:// protocol)
       renderFallback(targetId, componentName);
     }
   }
@@ -69,8 +65,8 @@
       target.innerHTML = `
         <header class="site-header">
           <div class="header-inner">
-            <a class="brand" href="${rootPrefix}index.html">
-              <span class="brand-mark">&lt;/&gt;</span>
+            <a class="brand" href="${rootPrefix}index.html" aria-label="CODEX 4.0 home">
+              <span class="brand-mark"><img class="brand-logo" src="${rootPrefix}assets/coders-club-logo.png" alt="Coders' Club GPREC logo" width="42" height="42"></span>
               <span><span class="brand-title">CODEX <span>4.0</span></span><span class="brand-sub">INTER-COLLEGE CODING EVENT</span></span>
             </a>
             <nav class="nav">
