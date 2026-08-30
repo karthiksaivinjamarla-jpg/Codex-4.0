@@ -28,9 +28,10 @@ async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const webhookSecret = (process.env.RAZORPAY_WEBHOOK_SECRET || "").trim().replace(/^["']|["']$/g, "");
+  const rawSupabaseUrl = (process.env.SUPABASE_URL || "https://lrwrqerurimwzalhjffa.supabase.co").trim().replace(/^["']|["']$/g, "");
+  const supabaseUrl = formatSupabaseUrl(rawSupabaseUrl);
+  const serviceRoleKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim().replace(/^["']|["']$/g, "");
 
   if (!webhookSecret || !supabaseUrl || !serviceRoleKey) {
     console.error("webhook: Missing environment variables.");
@@ -140,6 +141,17 @@ async function getRawBody(req) {
       reject(err);
     });
   });
+}
+
+// Clean and validate Supabase URL (strip trailing slashes, /rest/v1 paths, quotes)
+function formatSupabaseUrl(url) {
+  if (!url) return "https://lrwrqerurimwzalhjffa.supabase.co";
+  let clean = url.trim().replace(/^["']|["']$/g, "");
+  if (!clean.startsWith("http://") && !clean.startsWith("https://")) {
+    clean = `https://${clean}`;
+  }
+  clean = clean.replace(/\/rest\/v1\/?$/i, "").replace(/\/auth\/v1\/?$/i, "").replace(/\/+$/, "");
+  return clean;
 }
 
 module.exports = handler;
