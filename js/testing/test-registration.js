@@ -1,101 +1,84 @@
 /* CODEX 4.0 — TEST REGISTRATION HELPER
  * Test-data autofill only. Never bypasses authentication, validation, payment, or Supabase.
+ * Loaded only when explicitly requested with ?test=1 on localhost or Vercel.
  */
 (function () {
   'use strict';
 
-  const isTestHost =
+  const params = new URLSearchParams(window.location.search);
+  const allowedHost =
     window.location.hostname === 'localhost' ||
     window.location.hostname === '127.0.0.1' ||
     window.location.hostname.endsWith('.vercel.app');
 
-  if (!isTestHost) return;
+  if (!allowedHost || params.get('test') !== '1') return;
 
   const values = {
     teamName: 'CODEX TEST TEAM',
-    member1Name: 'Test User One',
-    member1Phone: '9000000001',
-    member1Email: 'testuser1@example.com',
-    member2Name: 'Test User Two',
-    member2Phone: '9000000002',
-    member2Email: 'testuser2@example.com',
-    member3Name: 'Test User Three',
-    member3Phone: '9000000003',
-    member3Email: 'testuser3@example.com'
+    collegeName: 'G. Pulla Reddy Engineering College',
+    m1: { name: 'Test User One', roll: 'TEST001', email: 'testuser1@example.com', phone: '9000000001', year: '3rd Year', branch: 'Electronics & Communication Engineering (ECE)', section: 'A' },
+    m2: { name: 'Test User Two', roll: 'TEST002', email: 'testuser2@example.com', phone: '9000000002', year: '3rd Year', branch: 'Computer Science & Engineering (CSE)', section: 'A' },
+    m3: { name: 'Test User Three', roll: 'TEST003', email: 'testuser3@example.com', phone: '9000000003', year: '2nd Year', branch: 'Information Technology (IT)', section: 'A' }
   };
 
-  function findField(candidates) {
-    return candidates.map((selector) => document.querySelector(selector)).find(Boolean);
-  }
-
-  function setField(field, value) {
+  function setField(name, value) {
+    const field = document.querySelector(`[name="${name}"]`);
     if (!field) return false;
-    const setter = Object.getOwnPropertyDescriptor(
-      HTMLInputElement.prototype,
-      'value'
-    )?.set;
-    if (setter && field instanceof HTMLInputElement) setter.call(field, value);
+    const prototype = field instanceof HTMLSelectElement ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
+    const setter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set;
+    if (setter) setter.call(field, value);
     else field.value = value;
+    field.dataset.testFilled = 'true';
     field.dispatchEvent(new Event('input', { bubbles: true }));
     field.dispatchEvent(new Event('change', { bubbles: true }));
     return true;
   }
 
+  function fillMember(prefix, member) {
+    Object.entries(member).forEach(([key, value]) => setField(`${prefix}_${key}`, value));
+  }
+
   function fill() {
-    const fields = [
-      [['#teamName', '[name="teamName"]'], values.teamName],
-      [['#member1Name', '[name="member1Name"]'], values.member1Name],
-      [['#member1Phone', '[name="member1Phone"]'], values.member1Phone],
-      [['#member1Email', '[name="member1Email"]'], values.member1Email],
-      [['#member2Name', '[name="member2Name"]'], values.member2Name],
-      [['#member2Phone', '[name="member2Phone"]'], values.member2Phone],
-      [['#member2Email', '[name="member2Email"]'], values.member2Email],
-      [['#member3Name', '[name="member3Name"]'], values.member3Name],
-      [['#member3Phone', '[name="member3Phone"]'], values.member3Phone],
-      [['#member3Email', '[name="member3Email"]'], values.member3Email]
-    ];
+    setField('teamName', values.teamName);
+    setField('collegeName', values.collegeName);
+    fillMember('m1', values.m1);
+    fillMember('m2', values.m2);
 
-    fields.forEach(([selectors, value]) => setField(findField(selectors), value));
-
-    const authEmail = document.querySelector('#leadEmail, [name="leadEmail"], [name="email"]');
-    if (authEmail && authEmail.dataset.authLocked === 'true') {
-      // Preserve the authenticated email when the application has locked it.
-      return;
+    const size3 = document.querySelector('input[name="teamSize"][value="3"]');
+    if (size3) {
+      size3.checked = true;
+      size3.dispatchEvent(new Event('change', { bubbles: true }));
+      fillMember('m3', values.m3);
     }
 
     const status = document.querySelector('#testRegistrationStatus');
-    if (status) status.textContent = 'Test data filled. Normal validation and payment are still required.';
+    if (status) status.textContent = 'Test data filled. Continue normally and complete Razorpay Test Mode payment.';
   }
 
   function clear() {
-    const selectors = [
-      '#teamName, [name="teamName"]',
-      '#member1Name, [name="member1Name"]', '#member1Phone, [name="member1Phone"]', '#member1Email, [name="member1Email"]',
-      '#member2Name, [name="member2Name"]', '#member2Phone, [name="member2Phone"]', '#member2Email, [name="member2Email"]',
-      '#member3Name, [name="member3Name"]', '#member3Phone, [name="member3Phone"]', '#member3Email, [name="member3Email"]'
-    ];
-    selectors.forEach((selector) => {
-      const field = document.querySelector(selector);
-      if (field && field.dataset.testFilled === 'true') setField(field, '');
+    document.querySelectorAll('[data-test-filled="true"]').forEach((field) => {
+      setField(field.name, '');
+      delete field.dataset.testFilled;
     });
+    const status = document.querySelector('#testRegistrationStatus');
+    if (status) status.textContent = 'Test-filled fields cleared.';
   }
 
   function init() {
-    const form = document.querySelector('form');
+    const form = document.querySelector('#registrationForm');
     if (!form || document.querySelector('#testRegistrationTools')) return;
 
     const box = document.createElement('div');
     box.id = 'testRegistrationTools';
+    box.style.cssText = 'border:1px solid var(--line);border-radius:12px;padding:14px;margin:0 0 16px;background:var(--soft);';
     box.innerHTML = `
-      <div style="border:1px solid #d6d6d6;border-radius:12px;padding:14px;margin:16px 0;background:#fafafa">
-        <strong>TEST MODE — DATA AUTOFILL ONLY</strong>
-        <p style="margin:6px 0 10px;font-size:13px">This helper only fills sample data. Normal authentication, validation and Razorpay payment are still required.</p>
-        <button type="button" id="fillTestRegistration">Fill Test Data</button>
-        <button type="button" id="clearTestRegistration" style="margin-left:8px">Clear Test Data</button>
-        <div id="testRegistrationStatus" aria-live="polite" style="margin-top:8px;font-size:13px"></div>
-      </div>`;
-    form.prepend(box);
+      <strong style="font-size:11px;letter-spacing:.5px">TEST MODE — DATA AUTOFILL ONLY</strong>
+      <p style="margin:6px 0 10px;font-size:10px;color:var(--muted)">Sample data only. Google authentication, validation and Razorpay payment are still required.</p>
+      <button type="button" id="fillTestRegistration" class="secondary-btn">Fill Test Data</button>
+      <button type="button" id="clearTestRegistration" class="secondary-btn" style="margin-left:8px">Clear Test Data</button>
+      <div id="testRegistrationStatus" aria-live="polite" style="margin-top:8px;font-size:10px;color:var(--muted)"></div>`;
 
+    form.querySelector('.stepper')?.before(box);
     box.querySelector('#fillTestRegistration').addEventListener('click', fill);
     box.querySelector('#clearTestRegistration').addEventListener('click', clear);
   }
