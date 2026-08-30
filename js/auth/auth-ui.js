@@ -8,6 +8,23 @@
                          window.location.pathname.includes('\\pages\\');
   const rootPrefix = isSubdirectory ? '../' : './';
 
+  function setupBrandLogo() {
+    const brandMarks = document.querySelectorAll('.brand-mark');
+    brandMarks.forEach((mark) => {
+      let logo = mark.querySelector('.brand-logo');
+      if (!logo) {
+        logo = document.createElement('img');
+        logo.className = 'brand-logo';
+        logo.alt = "Coders' Club GPREC logo";
+        logo.src = `${rootPrefix}assets/coders-club-logo.png`;
+        mark.textContent = '';
+        mark.appendChild(logo);
+      }
+    });
+  }
+
+  window.codexSetupBrandLogos = setupBrandLogo;
+
   function clearAuthHints() {
     sessionStorage.removeItem("codex-auth-ready");
     sessionStorage.removeItem("codex-auth-email");
@@ -38,6 +55,7 @@
   }
 
   async function init() {
+    setupBrandLogo();
     if (!client) return;
     try {
       const { data } = await client.auth.getSession();
