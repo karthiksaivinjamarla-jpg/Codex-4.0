@@ -17,7 +17,7 @@
       button.setAttribute('aria-pressed', button.dataset.theme === value ? 'true' : 'false');
     });
 
-    const meta = document.querySelector('meta[name="theme-color"]');
+    const meta = document.head.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', value === 'light' ? '#F2F2F2' : '#0D0D0D');
   }
 
@@ -101,16 +101,8 @@
       return img;
     };
 
-    const collegeLogo = makeLogo(
-      'assets/college-logo.png',
-      'G. Pulla Reddy Engineering College logo',
-      'college-logo'
-    );
-    const clubLogo = makeLogo(
-      'assets/coders-club-logo.png',
-      "Coders' Club logo",
-      'club-logo'
-    );
+    const collegeLogo = makeLogo('assets/college-logo.png', 'G. Pulla Reddy Engineering College logo', 'college-logo');
+    const clubLogo = makeLogo('assets/coders-club-logo.png', "Coders' Club logo", 'club-logo');
 
     if (!document.getElementById('codex-logo-styles')) {
       const logoStyle = document.createElement('style');
@@ -120,16 +112,8 @@
         .codex-header-logo.college-logo{margin-right:2px}
         .codex-header-logo.club-logo{margin-right:8px}
         .header-inner{gap:12px}
-        @media(max-width:900px){
-          .codex-header-logo{width:36px;height:36px;flex-basis:36px}
-          .codex-header-logo.club-logo{margin-right:2px}
-          .header-inner{gap:8px}
-          .brand{min-width:0}
-        }
-        @media(max-width:600px){
-          .codex-header-logo{width:32px;height:32px;flex-basis:32px}
-          .brand-title{font-size:16px}
-        }
+        @media(max-width:900px){.codex-header-logo{width:36px;height:36px;flex-basis:36px}.codex-header-logo.club-logo{margin-right:2px}.header-inner{gap:8px}.brand{min-width:0}}
+        @media(max-width:600px){.codex-header-logo{width:32px;height:32px;flex-basis:32px}.brand-title{font-size:16px}}
       `;
       document.head.appendChild(logoStyle);
     }
@@ -138,7 +122,21 @@
     header.insertBefore(clubLogo, brand);
   }
 
-  // Export hook for dynamic shell
+  function setupTestRegistrationHelper() {
+    const params = new URLSearchParams(window.location.search);
+    const allowedHost = window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname.endsWith('.vercel.app');
+    if (!allowedHost || params.get('test') !== '1' || !document.querySelector('#registrationForm')) return;
+    if (document.querySelector('script[data-test-registration-helper]')) return;
+
+    const script = document.createElement('script');
+    script.src = `${rootPrefix}js/testing/test-registration.js`;
+    script.dataset.testRegistrationHelper = 'true';
+    script.defer = true;
+    document.body.appendChild(script);
+  }
+
   window.codexSetupBrandLogos = setupBrandLogos;
 
   let saved = DEFAULT;
@@ -149,6 +147,7 @@
   setupSmoothInteractions();
   setupRegistrationAccess();
   setupBrandLogos();
+  setupTestRegistrationHelper();
 
   document.querySelectorAll('[data-theme]').forEach((button) => {
     button.addEventListener('click', () => applyTheme(button.dataset.theme));
