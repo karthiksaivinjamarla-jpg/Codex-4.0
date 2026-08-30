@@ -17,17 +17,27 @@
     const brandMarks = document.querySelectorAll('.brand-mark');
     brandMarks.forEach(mark => {
       const existing = mark.querySelector('.brand-logo');
-      if (existing) return;
+      if (existing) {
+        existing.src = `${rootPrefix}assets/coders-club-logo.jpg`;
+        return;
+      }
 
       mark.textContent = '';
       const img = document.createElement('img');
       img.className = 'brand-logo';
-      img.src = `${rootPrefix}assets/coders-club-logo.png`;
+      img.src = `${rootPrefix}assets/coders-club-logo.jpg`;
       img.alt = "Coders' Club GPREC logo";
       img.width = 42;
       img.height = 42;
       img.loading = 'eager';
       img.decoding = 'async';
+      img.style.width = '52px';
+      img.style.height = '52px';
+      img.style.objectFit = 'contain';
+      img.style.transform = 'scale(1.18)';
+      mark.style.width = '42px';
+      mark.style.height = '42px';
+      mark.style.overflow = 'hidden';
       mark.appendChild(img);
     });
   }
