@@ -17,6 +17,10 @@
         logo.className = 'brand-logo';
         logo.alt = "Coders' Club GPREC logo";
         logo.src = `${rootPrefix}assets/coders-club-logo.png`;
+        logo.style.width = '42px';
+        logo.style.height = '42px';
+        logo.style.display = 'block';
+        logo.style.objectFit = 'contain';
         mark.textContent = '';
         mark.appendChild(logo);
       }
