@@ -158,11 +158,31 @@ main {
   height: 42px;
   flex: 0 0 42px;
   display: block;
+  position: relative;
+  overflow: hidden;
   font-size: 0;
+  color: transparent;
   background-image: url('../assets/coders-club-logo.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
+}
+
+.brand-mark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('../assets/coders-club-logo.png') center / contain no-repeat;
+  pointer-events: none;
+}
+
+.brand-mark .brand-logo {
+  width: 42px;
+  height: 42px;
+  display: block;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
 }
 
 .brand-title {
