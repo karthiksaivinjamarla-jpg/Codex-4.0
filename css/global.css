@@ -154,8 +154,15 @@ main {
 }
 
 .brand-mark {
-  font: 700 32px 'Fira Code', monospace;
-  color: var(--accent);
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: block;
+  font-size: 0;
+  background-image: url('../assets/coders-club-logo.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 .brand-title {
