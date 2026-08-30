@@ -1,0 +1,1 @@
+Logo fix is implemented in js/auth/auth-ui.js and components/navbar.html. This file should not be deployed as application logic.
