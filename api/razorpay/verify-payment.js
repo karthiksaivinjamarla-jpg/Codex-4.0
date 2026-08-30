@@ -81,17 +81,19 @@ module.exports = async function handler(req, res) {
   const teamSize = Number(r.team_size) || 2;
 
   // Server-side duplicate check before insert.
-  const { data: existing, error: existingError } = await supabase
+  let existing = null;
+  const { data: existingData, error: existingError } = await supabase
     .from("registrations")
     .select("registration_id, payment_status, razorpay_order_id, status, created_at")
     .eq("user_id", r.user_id)
     .maybeSingle();
 
-  if (existingError && existingError.code !== "PGRST116") {
-    console.error("verify-payment: Duplicate check error:", existingError.message);
-    return res.status(500).json({
-      error: `Registration check failed: ${existingError.message}. (Did you run the Supabase database migration?)`
-    });
+  if (existingError) {
+    if (existingError.code !== "PGRST116") {
+      console.warn("verify-payment: Duplicate pre-check notice:", existingError.message);
+    }
+  } else {
+    existing = existingData;
   }
 
   if (existing?.registration_id) {
