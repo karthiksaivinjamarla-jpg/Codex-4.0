@@ -13,32 +13,45 @@
     sessionStorage.removeItem("codex-auth-email");
   }
 
+  function styleBrandLogo(mark, img) {
+    mark.style.width = '42px';
+    mark.style.height = '42px';
+    mark.style.overflow = 'hidden';
+    mark.style.backgroundImage = 'none';
+    mark.style.backgroundColor = '#ffffff';
+    mark.style.borderRadius = '6px';
+    mark.style.display = 'flex';
+    mark.style.alignItems = 'center';
+    mark.style.justifyContent = 'center';
+
+    img.style.width = '52px';
+    img.style.height = '52px';
+    img.style.objectFit = 'contain';
+    img.style.transform = 'scale(1.18)';
+    img.style.display = 'block';
+    img.style.position = 'relative';
+    img.style.zIndex = '2';
+  }
+
   function setupBrandLogo() {
     const brandMarks = document.querySelectorAll('.brand-mark');
     brandMarks.forEach(mark => {
-      const existing = mark.querySelector('.brand-logo');
-      if (existing) {
-        existing.src = `${rootPrefix}assets/coders-club-logo.jpg`;
-        return;
+      let img = mark.querySelector('.brand-logo');
+
+      if (!img) {
+        mark.textContent = '';
+        img = document.createElement('img');
+        img.className = 'brand-logo';
+        img.alt = "Coders' Club GPREC logo";
+        img.loading = 'eager';
+        img.decoding = 'async';
+        mark.appendChild(img);
       }
 
-      mark.textContent = '';
-      const img = document.createElement('img');
-      img.className = 'brand-logo';
       img.src = `${rootPrefix}assets/coders-club-logo.jpg`;
-      img.alt = "Coders' Club GPREC logo";
       img.width = 42;
       img.height = 42;
-      img.loading = 'eager';
-      img.decoding = 'async';
-      img.style.width = '52px';
-      img.style.height = '52px';
-      img.style.objectFit = 'contain';
-      img.style.transform = 'scale(1.18)';
-      mark.style.width = '42px';
-      mark.style.height = '42px';
-      mark.style.overflow = 'hidden';
-      mark.appendChild(img);
+      styleBrandLogo(mark, img);
     });
   }
 
