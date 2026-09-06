@@ -120,9 +120,10 @@
       logoStyle.id = 'codex-logo-styles';
       logoStyle.textContent = `
         .codex-header-logo{width:40px;height:40px;object-fit:contain;flex:0 0 40px;display:block;filter:drop-shadow(0 4px 10px rgba(0,0,0,.25))}
-        .codex-header-logo.college-logo{margin-right:2px}
-        .header-inner{gap:12px}
-        @media(max-width:900px){.codex-header-logo{width:34px;height:34px;flex-basis:34px}.header-inner{gap:8px}.brand{min-width:0}}
+        .codex-header-logo.college-logo{margin:0}
+        .site-header .header-inner{align-items:center}
+        .site-header .brand{align-items:center;min-height:42px}
+        @media(max-width:900px){.codex-header-logo{width:34px;height:34px;flex-basis:34px}.site-header .brand{min-width:0}}
       `;
       document.head.appendChild(logoStyle);
     }
@@ -167,13 +168,10 @@
 
       panel.querySelectorAll('a').forEach((link) => link.addEventListener('click', closePanel));
 
-      if (!panel.dataset.outsideHandler) {
-        document.addEventListener('click', (event) => {
-          if (!panel.classList.contains('open')) return;
-          if (!header.contains(event.target) && !panel.contains(event.target)) closePanel();
-        });
-        panel.dataset.outsideHandler = 'true';
-      }
+      document.addEventListener('click', (event) => {
+        if (!panel.classList.contains('open')) return;
+        if (!header.contains(event.target) && !panel.contains(event.target)) closePanel();
+      });
 
       header.appendChild(toggle);
       document.body.appendChild(panel);
@@ -264,7 +262,7 @@
       sectionOptions.forEach((value) => {
         const option = document.createElement('option');
         option.value = value;
-        option.textContent = `Section ${value}`;
+        option.textContent = value;
         select.appendChild(option);
       });
       if (input.value) select.value = input.value;
