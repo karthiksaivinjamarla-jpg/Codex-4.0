@@ -25,9 +25,10 @@
 <body>
   <div class="bg-grid"></div>
   <div class="theme-switch">
-    <button id="darkTheme" data-theme="dark">DARK</button>
-    <button id="lightTheme" data-theme="light">LIGHT</button>
+    <button type="button" data-theme="dark">DARK</button>
+    <button type="button" data-theme="light">LIGHT</button>
   </div>
+
   <header class="site-header">
     <div class="header-inner">
       <a class="brand" href="index.html" aria-label="CODEX 4.0 home">
@@ -48,6 +49,7 @@
       </nav>
     </div>
   </header>
+
   <main id="home">
     <section class="hero">
       <div>
@@ -58,7 +60,7 @@
         <div class="prompt">&gt; READY TO ENTER THE ARENA? _</div>
         <div class="hero-actions">
           <a class="register-btn" href="register.html">REGISTER YOUR TEAM →</a>
-          <a class="secondary-btn" href="pages/about.html">EXPLORE EVENT ↓</a>
+          <a class="secondary-btn" href="#about-preview">EXPLORE EVENT ↓</a>
         </div>
       </div>
       <div class="hero-art">
@@ -66,12 +68,33 @@
         <div class="laptop"><div class="screen"></div><div class="keyboard"></div><div class="base"></div><div class="platform"></div></div>
       </div>
     </section>
+
     <section class="stats" aria-label="Event summary">
       <div class="stat"><div class="stat-icon">👥</div><div><strong>2 – 3</strong><small>MEMBERS / TEAM</small></div></div>
       <div class="stat"><div class="stat-icon">₹</div><div><strong>₹300</strong><small>REGISTRATION FEE</small></div></div>
       <div class="stat"><div class="stat-icon">&lt;/&gt;</div><div><strong>02</strong><small>ROUNDS</small></div></div>
       <div class="stat"><div class="stat-icon">⌘</div><div><strong>INTER-COLLEGE</strong><small>PARTICIPATION</small></div></div>
     </section>
+
+    <section class="section home-about" id="about-preview">
+      <div class="section-title">
+        <span class="kicker">ABOUT CODEX 4.0</span>
+        <h2>Where logic meets competition.</h2>
+        <p>CODEX 4.0 is an inter-college coding competition by Coders' Club, GPREC, built around problem-solving, collaboration, and competitive programming.</p>
+      </div>
+      <div class="home-about-grid">
+        <article class="home-about-card">
+          <h3>Build. Think. Compete.</h3>
+          <p>Teams of 2–3 members take on two coding rounds designed to test logical thinking, algorithmic problem solving, and implementation speed.</p>
+          <a class="home-about-link" href="pages/about.html">Read full About page →</a>
+        </article>
+        <article class="home-about-card">
+          <h3>Built by Coders' Club</h3>
+          <p>A student-driven technical community at G. Pulla Reddy Engineering College focused on coding, learning, collaboration, and innovation.</p>
+        </article>
+      </div>
+    </section>
+
     <section class="section">
       <div class="final-box">
         <strong>&gt; BUILD THE FUTURE. BE THE CHAMPION. _</strong>
@@ -79,6 +102,7 @@
       </div>
     </section>
   </main>
+
   <footer class="footer">Coders' Club · CODEX 4.0 · Inter-College Coding Event · GPREC</footer>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config/supabase-config.js"></script>
