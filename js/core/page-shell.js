@@ -1,7 +1,7 @@
 /**
  * CODEX 4.0 - Page Shell Loader
  * Dynamically loads shared header (navbar) and footer components into target containers,
- * resolving relative paths dynamically depending on whether the page is in root or a subdirectory.
+ * resolving relative paths dynamically depending on whether the page is in the root or a subdirectory.
  */
 
 (function () {
@@ -9,6 +9,25 @@
                          window.location.pathname.includes('\\pages\\');
   const rootPrefix = isSubdirectory ? '../' : './';
   const pagesPrefix = isSubdirectory ? './' : 'pages/';
+
+  function alignSharedHeaderControls() {
+    const header = document.querySelector('.site-header .header-inner');
+    const nav = header?.querySelector('.nav, .top-nav');
+    const themeSwitch = document.querySelector('.theme-switch');
+
+    // Theme control belongs in the header on every desktop page, immediately
+    // after the navigation (whose final action is Register). Mobile CSS moves
+    // it back to the compact fixed position.
+    if (header && nav && themeSwitch && themeSwitch.parentElement !== header) {
+      nav.insertAdjacentElement('afterend', themeSwitch);
+    }
+
+    // The navbar is loaded after theme.js on subpages, so initialize the
+    // mobile menu only after the shared header actually exists.
+    if (typeof window.codexSetupMobileNavigation === 'function') {
+      window.codexSetupMobileNavigation();
+    }
+  }
 
   async function loadComponent(targetId, componentName) {
     const target = document.getElementById(targetId);
@@ -34,10 +53,12 @@
         if (typeof window.codexInitAuthUI === 'function') {
           window.codexInitAuthUI();
         }
+        alignSharedHeaderControls();
       }
     } catch (error) {
       console.warn(`Dynamic component load failed for ${componentName}:`, error);
       renderFallback(targetId, componentName);
+      if (componentName === 'navbar') alignSharedHeaderControls();
     }
   }
 
