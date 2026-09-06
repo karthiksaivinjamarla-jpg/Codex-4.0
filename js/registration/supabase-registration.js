@@ -1,5 +1,13 @@
 // js/registration/supabase-registration.js
 // Provides the shared Supabase client for the registration page.
+//
+// Responsibilities:
+//  - Initialize and expose window.CODEX_SUPABASE_REGISTRATION.client
+//  - Used by script.js (loadExistingRegistration) and razorpay.js (session check)
+//
+// The registration INSERT is handled server-side in /api/razorpay/verify-payment.js
+// after cryptographic payment signature verification.
+//
 // Also loads the shared CODEX theme/footer and normalizes the registration logo.
 
 (() => {
@@ -19,11 +27,13 @@
     document.head.appendChild(footerCss);
   }
 
-  if (!document.querySelector('script[src="./theme.js"], script[src="theme.js"]')) {
-    const themeScript = document.createElement('script');
-    themeScript.src = './theme.js';
-    themeScript.defer = true;
-    document.body.appendChild(themeScript);
+  function loadThemeScript() {
+    if (!document.querySelector('script[src="./theme.js"], script[src="theme.js"]')) {
+      const themeScript = document.createElement('script');
+      themeScript.src = './theme.js';
+      themeScript.defer = true;
+      document.body.appendChild(themeScript);
+    }
   }
 
   function normalizeRegistrationLogo() {
@@ -93,9 +103,13 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', normalizeRegistrationLogo, { once: true });
+    document.addEventListener('DOMContentLoaded', () => {
+      normalizeRegistrationLogo();
+      loadThemeScript();
+    }, { once: true });
   } else {
     normalizeRegistrationLogo();
+    loadThemeScript();
   }
 
   const config = window.CODEX_SUPABASE_CONFIG || {};
