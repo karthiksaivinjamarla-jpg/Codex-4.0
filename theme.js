@@ -98,9 +98,6 @@
     const brand = header?.querySelector('.brand');
     if (!header || !brand) return;
 
-    /* The brand already contains the Coders' Club JPG. Only add the college logo.
-       The previous implementation added another club logo beside the brand, which
-       caused duplicate logos and cramped mobile headers. */
     header.querySelectorAll('.codex-header-logo').forEach((logo) => logo.remove());
     if (header.querySelector('.college-logo')) return;
 
@@ -201,12 +198,10 @@
   setupMobileNavigation();
   setupTestRegistrationHelper();
 
-  const observer = new MutationObserver(() => {
-    setupBrandLogos();
-    setupMobileNavigation();
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
-
+  // Do not observe the entire document. The previous MutationObserver could
+  // repeatedly react to dynamic navbar/auth DOM changes and keep the main thread
+  // busy, making the local page appear frozen/unresponsive. Dynamic components
+  // explicitly call the setup functions after they are injected.
   document.querySelectorAll('[data-theme]').forEach((button) => {
     button.addEventListener('click', () => applyTheme(button.dataset.theme));
   });
