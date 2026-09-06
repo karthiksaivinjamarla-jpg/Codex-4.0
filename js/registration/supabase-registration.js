@@ -5,13 +5,21 @@
 
 (() => {
   // register.html is a standalone page and does not load the shared shell.
-  // Load the shared stylesheet and theme explicitly from the site root.
+  // Load shared styling and theme explicitly from the site root.
   if (!document.querySelector('link[data-codex-shared-theme]')) {
     const css = document.createElement('link');
     css.rel = 'stylesheet';
     css.href = './theme.css';
     css.dataset.codexSharedTheme = 'true';
     document.head.appendChild(css);
+  }
+
+  if (!document.querySelector('link[data-codex-register-footer]')) {
+    const footerCss = document.createElement('link');
+    footerCss.rel = 'stylesheet';
+    footerCss.href = './css/register-footer.css';
+    footerCss.dataset.codexRegisterFooter = 'true';
+    document.head.appendChild(footerCss);
   }
 
   if (!document.querySelector('script[src="./theme.js"], script[src="theme.js"]')) {
