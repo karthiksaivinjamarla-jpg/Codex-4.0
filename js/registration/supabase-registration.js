@@ -3,8 +3,6 @@
 // Also loads the shared CODEX theme/footer and normalizes the registration logo.
 
 (() => {
-  // register.html is a standalone page and does not load the shared shell.
-  // Load shared styling and theme explicitly from the site root.
   if (!document.querySelector('link[data-codex-shared-theme]')) {
     const css = document.createElement('link');
     css.rel = 'stylesheet';
@@ -48,38 +46,50 @@
 
     img.src = './assets/coders-club-logo.jpg';
     img.alt = "Coders' Club GPREC logo";
-    img.width = 42;
-    img.height = 42;
     img.loading = 'eager';
     img.decoding = 'async';
 
-    Object.assign(mark.style, {
-      width: '42px',
-      height: '42px',
-      minWidth: '42px',
-      flex: '0 0 42px',
-      overflow: 'hidden',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'transparent',
-      border: '0',
-      borderRadius: '0',
-      position: 'relative'
-    });
+    const applyLogoSize = () => {
+      const mobile = window.matchMedia('(max-width: 600px)').matches;
+      const size = mobile ? 34 : 42;
+      const gap = mobile ? 8 : 10;
 
-    Object.assign(img.style, {
-      width: '42px',
-      height: '42px',
-      minWidth: '42px',
-      maxWidth: '42px',
-      objectFit: 'contain',
-      display: 'block',
-      position: 'relative',
-      transform: 'none',
-      margin: '0',
-      padding: '0'
-    });
+      Object.assign(mark.style, {
+        width: `${size}px`,
+        height: `${size}px`,
+        minWidth: `${size}px`,
+        flex: `0 0 ${size}px`,
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'transparent',
+        border: '0',
+        borderRadius: '0',
+        position: 'relative'
+      });
+
+      Object.assign(img.style, {
+        width: `${size}px`,
+        height: `${size}px`,
+        minWidth: `${size}px`,
+        maxWidth: `${size}px`,
+        objectFit: 'contain',
+        display: 'block',
+        position: 'relative',
+        transform: 'none',
+        margin: '0',
+        padding: '0'
+      });
+
+      brand.style.gap = `${gap}px`;
+      brand.style.alignItems = 'center';
+      brand.style.minWidth = mobile ? '0' : '205px';
+      brand.style.overflow = 'hidden';
+    };
+
+    applyLogoSize();
+    window.addEventListener('resize', applyLogoSize, { passive: true });
   }
 
   if (document.readyState === 'loading') {
@@ -98,6 +108,5 @@
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
   });
 
-  // Expose client for use by script.js and js/payments/razorpay.js
   window.CODEX_SUPABASE_REGISTRATION = { client };
 })();
