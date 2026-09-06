@@ -47,6 +47,15 @@
     addMeta('', "Inter-college coding competition by Coders' Club GPREC.", 'twitter:description');
   }
 
+  function setupMobileStyles() {
+    if (document.getElementById('codex-mobile-styles')) return;
+    const link = document.createElement('link');
+    link.id = 'codex-mobile-styles';
+    link.rel = 'stylesheet';
+    link.href = `${rootPrefix}css/mobile.css`;
+    document.head.appendChild(link);
+  }
+
   function setupAccessibility() {
     document.querySelectorAll('[data-theme]').forEach((button) => {
       button.setAttribute('type', 'button');
@@ -88,38 +97,78 @@
     const header = document.querySelector('.site-header .header-inner');
     const brand = header?.querySelector('.brand');
     if (!header || !brand) return;
-    if (header.querySelector('.codex-header-logo')) return;
 
-    const makeLogo = (src, alt, className) => {
-      const img = document.createElement('img');
-      img.src = `${rootPrefix}${src}`;
-      img.alt = alt;
-      img.className = `codex-header-logo ${className}`;
-      img.loading = 'eager';
-      img.decoding = 'async';
-      img.onerror = () => { img.style.display = 'none'; };
-      return img;
-    };
+    /* The brand already contains the Coders' Club JPG. Only add the college logo.
+       The previous implementation added another club logo beside the brand, which
+       caused duplicate logos and cramped mobile headers. */
+    header.querySelectorAll('.codex-header-logo').forEach((logo) => logo.remove());
+    if (header.querySelector('.college-logo')) return;
 
-    const collegeLogo = makeLogo('assets/college-logo.png', 'G. Pulla Reddy Engineering College logo', 'college-logo');
-    const clubLogo = makeLogo('assets/coders-club-logo.png', "Coders' Club logo", 'club-logo');
+    const collegeLogo = document.createElement('img');
+    collegeLogo.src = `${rootPrefix}assets/college-logo.png`;
+    collegeLogo.alt = 'G. Pulla Reddy Engineering College logo';
+    collegeLogo.className = 'codex-header-logo college-logo';
+    collegeLogo.loading = 'eager';
+    collegeLogo.decoding = 'async';
+    collegeLogo.onerror = () => { collegeLogo.style.display = 'none'; };
 
     if (!document.getElementById('codex-logo-styles')) {
       const logoStyle = document.createElement('style');
       logoStyle.id = 'codex-logo-styles';
       logoStyle.textContent = `
-        .codex-header-logo{width:42px;height:42px;object-fit:contain;flex:0 0 42px;display:block;filter:drop-shadow(0 4px 10px rgba(0,0,0,.25))}
+        .codex-header-logo{width:40px;height:40px;object-fit:contain;flex:0 0 40px;display:block;filter:drop-shadow(0 4px 10px rgba(0,0,0,.25))}
         .codex-header-logo.college-logo{margin-right:2px}
-        .codex-header-logo.club-logo{margin-right:8px}
         .header-inner{gap:12px}
-        @media(max-width:900px){.codex-header-logo{width:36px;height:36px;flex-basis:36px}.codex-header-logo.club-logo{margin-right:2px}.header-inner{gap:8px}.brand{min-width:0}}
-        @media(max-width:600px){.codex-header-logo{width:32px;height:32px;flex-basis:32px}.brand-title{font-size:16px}}
+        @media(max-width:900px){.codex-header-logo{width:34px;height:34px;flex-basis:34px}.header-inner{gap:8px}.brand{min-width:0}}
       `;
       document.head.appendChild(logoStyle);
     }
 
     header.insertBefore(collegeLogo, brand);
-    header.insertBefore(clubLogo, brand);
+  }
+
+  function setupMobileNavigation() {
+    const headers = document.querySelectorAll('.site-header .header-inner');
+    headers.forEach((header) => {
+      const nav = header.querySelector('.nav');
+      if (!nav || header.querySelector('.mobile-menu-toggle')) return;
+
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'mobile-menu-toggle';
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Open navigation menu');
+      toggle.innerHTML = '<span>☰</span>';
+
+      const panel = document.createElement('nav');
+      panel.className = 'mobile-nav-panel';
+      panel.setAttribute('aria-label', 'Mobile navigation');
+      panel.innerHTML = nav.innerHTML;
+
+      const closePanel = () => {
+        panel.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Open navigation menu');
+        toggle.innerHTML = '<span>☰</span>';
+      };
+
+      toggle.addEventListener('click', () => {
+        const open = !panel.classList.contains('open');
+        panel.classList.toggle('open', open);
+        toggle.setAttribute('aria-expanded', String(open));
+        toggle.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+        toggle.innerHTML = open ? '<span>×</span>' : '<span>☰</span>';
+      });
+
+      panel.querySelectorAll('a').forEach((link) => link.addEventListener('click', closePanel));
+      document.addEventListener('click', (event) => {
+        if (!panel.classList.contains('open')) return;
+        if (!header.contains(event.target) && !panel.contains(event.target)) closePanel();
+      });
+
+      header.appendChild(toggle);
+      document.body.appendChild(panel);
+    });
   }
 
   function setupTestRegistrationHelper() {
@@ -138,16 +187,25 @@
   }
 
   window.codexSetupBrandLogos = setupBrandLogos;
+  window.codexSetupMobileNavigation = setupMobileNavigation;
 
   let saved = DEFAULT;
   try { saved = localStorage.getItem(KEY) || DEFAULT; } catch (_) {}
   applyTheme(saved);
+  setupMobileStyles();
   setupPromotionMetadata();
   setupAccessibility();
   setupSmoothInteractions();
   setupRegistrationAccess();
   setupBrandLogos();
+  setupMobileNavigation();
   setupTestRegistrationHelper();
+
+  const observer = new MutationObserver(() => {
+    setupBrandLogos();
+    setupMobileNavigation();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
 
   document.querySelectorAll('[data-theme]').forEach((button) => {
     button.addEventListener('click', () => applyTheme(button.dataset.theme));
