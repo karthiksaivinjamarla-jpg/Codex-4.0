@@ -16,21 +16,22 @@
   function styleBrandLogo(mark, img) {
     mark.style.width = '42px';
     mark.style.height = '42px';
+    mark.style.flex = '0 0 42px';
     mark.style.overflow = 'hidden';
     mark.style.backgroundImage = 'none';
-    mark.style.backgroundColor = '#ffffff';
-    mark.style.borderRadius = '6px';
+    mark.style.backgroundColor = 'transparent';
+    mark.style.borderRadius = '0';
     mark.style.display = 'flex';
     mark.style.alignItems = 'center';
     mark.style.justifyContent = 'center';
 
-    img.style.width = '52px';
-    img.style.height = '52px';
+    img.style.width = '42px';
+    img.style.height = '42px';
     img.style.objectFit = 'contain';
-    img.style.transform = 'scale(1.18)';
+    img.style.transform = 'none';
     img.style.display = 'block';
     img.style.position = 'relative';
-    img.style.zIndex = '2';
+    img.style.zIndex = '1';
   }
 
   function setupBrandLogo() {
@@ -39,7 +40,6 @@
       let img = mark.querySelector('.brand-logo');
 
       if (!img) {
-        mark.textContent = '';
         img = document.createElement('img');
         img.className = 'brand-logo';
         img.alt = "Coders' Club GPREC logo";
@@ -83,6 +83,9 @@
 
   async function init() {
     setupBrandLogo();
+    if (typeof window.codexSetupMobileNavigation === 'function') {
+      window.codexSetupMobileNavigation();
+    }
     if (!client) return;
     try {
       const { data } = await client.auth.getSession();
