@@ -17,6 +17,12 @@
       button.setAttribute('aria-pressed', button.dataset.theme === value ? 'true' : 'false');
     });
 
+    document.querySelectorAll('.theme-toggle-single').forEach((button) => {
+      button.textContent = value === 'light' ? '☀' : '☾';
+      button.setAttribute('aria-label', value === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
+      button.title = value === 'light' ? 'Switch to dark mode' : 'Switch to light mode';
+    });
+
     const meta = document.head.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', value === 'light' ? '#F2F2F2' : '#0D0D0D');
   }
@@ -159,9 +165,7 @@
         toggle.innerHTML = open ? '<span aria-hidden="true">×</span>' : '<span aria-hidden="true">☰</span>';
       });
 
-      panel.querySelectorAll('a').forEach((link) => {
-        link.addEventListener('click', closePanel);
-      });
+      panel.querySelectorAll('a').forEach((link) => link.addEventListener('click', closePanel));
 
       if (!panel.dataset.outsideHandler) {
         document.addEventListener('click', (event) => {
@@ -180,7 +184,6 @@
     document.querySelectorAll('.theme-switch').forEach((switcher) => {
       if (switcher.dataset.singleToggleReady === 'true') return;
 
-      const existingButtons = Array.from(switcher.querySelectorAll('[data-theme]'));
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'theme-toggle-single';
@@ -194,18 +197,9 @@
       switcher.innerHTML = '';
       switcher.appendChild(button);
       switcher.dataset.singleToggleReady = 'true';
-
-      const current = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
-      button.textContent = current === 'light' ? '☀' : '☾';
-      button.setAttribute('aria-label', current === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
-      button.title = current === 'light' ? 'Switch to dark mode' : 'Switch to light mode';
     });
 
-    document.querySelectorAll('.theme-toggle-single').forEach((button) => {
-      button.textContent = document.documentElement.dataset.theme === 'light' ? '☀' : '☾';
-      button.setAttribute('aria-label', document.documentElement.dataset.theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
-      button.title = document.documentElement.dataset.theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode';
-    });
+    applyTheme(document.documentElement.dataset.theme || DEFAULT);
   }
 
   function setupRegistrationFields() {
@@ -230,9 +224,7 @@
       if (input.dataset.dropdownReady === 'true') return;
       const select = document.createElement('select');
       Array.from(input.attributes).forEach((attribute) => {
-        if (!['list', 'type', 'placeholder'].includes(attribute.name)) {
-          select.setAttribute(attribute.name, attribute.value);
-        }
+        if (!['list', 'type', 'placeholder'].includes(attribute.name)) select.setAttribute(attribute.name, attribute.value);
       });
       select.name = input.name;
       select.required = input.required;
@@ -258,9 +250,7 @@
       if (input.dataset.dropdownReady === 'true') return;
       const select = document.createElement('select');
       Array.from(input.attributes).forEach((attribute) => {
-        if (!['list', 'type', 'placeholder'].includes(attribute.name)) {
-          select.setAttribute(attribute.name, attribute.value);
-        }
+        if (!['list', 'type', 'placeholder'].includes(attribute.name)) select.setAttribute(attribute.name, attribute.value);
       });
       select.name = input.name;
       select.required = input.required;
@@ -316,16 +306,4 @@
   setupThemeToggle();
   setupRegistrationFields();
   setupTestRegistrationHelper();
-
-  document.querySelectorAll('.theme-toggle-single').forEach((button) => {
-    button.addEventListener('click', () => {
-      const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
-      applyTheme(next);
-      document.querySelectorAll('.theme-toggle-single').forEach((toggle) => {
-        toggle.textContent = next === 'light' ? '☀' : '☾';
-        toggle.setAttribute('aria-label', next === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
-        toggle.title = next === 'light' ? 'Switch to dark mode' : 'Switch to light mode';
-      });
-    });
-  });
 })();
