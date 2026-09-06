@@ -3,18 +3,23 @@ html,body{overflow-x:hidden;max-width:100%;-webkit-text-size-adjust:100%}
 img,svg,video{max-width:100%}
 button,a,input,select,textarea{touch-action:manipulation}
 
+/* Single sun/moon theme control */
+.theme-switch{display:flex!important;align-items:center;justify-content:center;width:44px;height:44px!important;padding:3px!important;border-radius:50%!important}
+.theme-switch .theme-toggle-single{width:36px!important;height:36px!important;min-width:36px!important;padding:0!important;display:grid!important;place-items:center!important;border:1px solid var(--line)!important;border-radius:50%!important;background:var(--panel2)!important;color:var(--text)!important;font:700 18px/1 'Inter',sans-serif!important;cursor:pointer!important;transition:transform .18s ease,background .18s ease,color .18s ease,border-color .18s ease!important}
+.theme-switch .theme-toggle-single:hover{transform:rotate(12deg) scale(1.04);border-color:var(--accent)!important;color:var(--accent)!important}
+
 @media(max-width:900px){
 .site-header{height:auto!important;min-height:76px!important;padding-top:48px!important}
 .header-inner{min-height:76px!important;height:auto!important;padding:10px 16px!important;gap:10px!important}
 .brand{min-width:0!important;flex:1 1 auto!important;gap:8px!important;overflow:hidden}
 .brand-mark,.brand-mark .brand-logo{width:38px!important;height:38px!important;flex:0 0 38px!important}
 .brand-title{font-size:17px!important;line-height:1.1!important}.brand-sub{display:none!important}
-.nav{display:none!important}
+.nav{display:none!important}.top-nav{display:none!important}
 .mobile-menu-toggle{display:inline-flex!important;flex:0 0 42px;width:42px;height:42px;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--text);font:700 18px 'Fira Code',monospace;cursor:pointer}
 .mobile-menu-toggle[aria-expanded=true]{color:var(--accent);border-color:var(--accent)}
 .mobile-nav-panel{position:fixed;left:12px;right:12px;top:126px;z-index:250;display:none;padding:10px;background:color-mix(in srgb,var(--panel) 96%,transparent);border:1px solid var(--line);border-radius:12px;box-shadow:0 22px 60px rgba(0,0,0,.45);backdrop-filter:blur(18px)}
-.mobile-nav-panel.open{display:grid;gap:4px}.mobile-nav-panel a{display:flex;align-items:center;min-height:44px;padding:10px 12px;border-radius:8px;color:var(--text);text-decoration:none;font:700 11px 'Fira Code',monospace;text-transform:uppercase}.mobile-nav-panel a:hover,.mobile-nav-panel a.active{color:var(--accent);background:var(--soft)}.mobile-nav-panel .register-btn{color:#fff!important;margin-top:4px}
-.theme-switch{top:8px!important;right:10px!important;left:auto!important;transform:none!important;height:34px!important}.theme-switch button{min-width:62px!important;height:28px!important;padding:0 8px!important;font-size:9px!important}
+.mobile-nav-panel.open{display:grid;gap:4px}.mobile-nav-panel a{display:flex;align-items:center;min-height:44px;padding:10px 12px;border-radius:8px;color:var(--text);text-decoration:none;font:700 11px 'Fira Code',monospace;text-transform:uppercase}.mobile-nav-panel a:hover,.mobile-nav-panel a.active{color:var(--accent);background:var(--soft)}.mobile-nav-panel .register-btn,.mobile-nav-panel .nav-cta{color:#fff!important;margin-top:4px}
+.theme-switch{top:8px!important;right:10px!important;left:auto!important;transform:none!important;width:40px!important;height:40px!important}.theme-switch .theme-toggle-single{width:34px!important;height:34px!important;min-width:34px!important;font-size:17px!important}
 .sign-out-btn{min-height:40px!important;padding:9px 10px!important;font-size:9px!important}
 }
 
@@ -28,4 +33,4 @@ button,a,input,select,textarea{touch-action:manipulation}
 #successScreen{padding:30px 10px 48px!important}#successScreen h2{font-size:27px!important}#registrationPass{width:100%!important;margin-top:20px!important;border-radius:12px!important}#registrationPass .pass-header{padding:14px!important}#registrationPass .pass-grid{grid-template-columns:1fr!important}#registrationPass .pass-grid>div{border-right:0!important;border-bottom:1px solid var(--line)!important}#registrationPass .pass-grid>div:last-child{border-bottom:0!important}#registrationPass .pass-id-block strong{font-size:21px!important}#registrationPass .pass-members{padding:14px!important}#registrationPass .pass-members li{flex-direction:column!important;gap:8px!important}#successScreen .pass-actions{display:grid!important;grid-template-columns:1fr!important}#successScreen .pass-actions a,#successScreen .pass-actions button{width:100%!important}
 .admin-header{min-height:70px!important;padding:42px 14px 10px!important;gap:8px!important}.admin-shell{padding:28px 12px 55px!important}.page-heading{align-items:flex-start!important;flex-direction:column!important;gap:10px!important}.page-heading h1{font-size:29px!important}.toolbar{flex-direction:column!important}.toolbar select{min-height:44px!important;width:100%!important}.search-box{min-height:44px!important}.stats-grid{grid-template-columns:1fr 1fr!important}.stat-card{padding:14px!important}.stat-card strong{font-size:24px!important}.modal{padding:10px!important}.modal-card{max-height:94vh!important;padding:20px 14px!important;border-radius:11px!important}.detail-grid,.member-list{grid-template-columns:1fr!important}.receipt-box,.detail-actions{flex-direction:column!important;align-items:stretch!important}
 }
-@media(max-width:380px){.theme-switch button{min-width:58px!important;font-size:8px!important}.hero{padding-left:12px!important;padding-right:12px!important}.hero-actions{grid-template-columns:1fr!important}.hero-art{height:215px!important;min-height:215px!important}.laptop{transform:scale(.72)!important}.stats{margin-left:12px!important;margin-right:12px!important}}
+@media(max-width:380px){.theme-switch .theme-toggle-single{width:32px!important;height:32px!important;min-width:32px!important;font-size:16px!important}.hero{padding-left:12px!important;padding-right:12px!important}.hero-actions{grid-template-columns:1fr!important}.hero-art{height:215px!important;min-height:215px!important}.laptop{transform:scale(.72)!important}.stats{margin-left:12px!important;margin-right:12px!important}}
