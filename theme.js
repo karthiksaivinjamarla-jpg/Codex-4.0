@@ -194,6 +194,53 @@
 
       switcher.innerHTML = '';
       switcher.appendChild(button);
+
+      // On desktop, keep the theme control immediately after the navigation
+      // (whose final action is Register). On mobile, CSS returns it to the
+      // compact fixed position in the top-right corner.
+      const headerInner = document.querySelector('.site-header .header-inner');
+      if (headerInner) {
+        const nav = headerInner.querySelector('.nav, .top-nav');
+        if (nav) {
+          nav.insertAdjacentElement('afterend', switcher);
+        } else {
+          headerInner.appendChild(switcher);
+        }
+      }
+
+      if (!document.getElementById('codex-theme-position-styles')) {
+        const style = document.createElement('style');
+        style.id = 'codex-theme-position-styles';
+        style.textContent = `
+          @media (min-width: 901px) {
+            .site-header .header-inner { justify-content: flex-start !important; }
+            .site-header .header-inner > .nav { margin-left: auto !important; }
+            .site-header .header-inner > .theme-switch {
+              position: static !important;
+              top: auto !important;
+              left: auto !important;
+              right: auto !important;
+              transform: none !important;
+              margin: 0 0 0 12px !important;
+              flex: 0 0 auto !important;
+              z-index: 210 !important;
+            }
+          }
+          @media (max-width: 900px) {
+            .site-header .header-inner > .theme-switch {
+              position: fixed !important;
+              top: 10px !important;
+              right: 14px !important;
+              left: auto !important;
+              transform: none !important;
+              margin: 0 !important;
+              z-index: 9999 !important;
+            }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
       switcher.dataset.singleToggleReady = 'true';
     });
 
