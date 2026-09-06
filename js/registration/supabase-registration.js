@@ -5,12 +5,7 @@
 //  - Initialize and expose window.CODEX_SUPABASE_REGISTRATION.client
 //  - Used by script.js (loadExistingRegistration) and razorpay.js (session check)
 //
-// What was REMOVED (moved to server-side):
-//  - uploadReceipt() — receipt upload to Supabase Storage
-//  - submitToSupabase() — direct database insert from browser
-//  - form 'submit' event listener — form submission now triggered by Razorpay checkout
-//
-// The registration INSERT is now handled server-side in /api/razorpay/verify-payment.js
+// The registration INSERT is handled server-side in /api/razorpay/verify-payment.js
 // after cryptographic payment signature verification.
 
 (() => {
@@ -24,6 +19,15 @@
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
   });
 
-  // Expose client for use by script.js and js/payments/razorpay.js
   window.CODEX_SUPABASE_REGISTRATION = { client };
+
+  // register.html does not directly load theme.js. Load the shared layer here
+  // so registration receives the same mobile navigation, theme control,
+  // field enhancements and portal footer as the other CODEX pages.
+  if (!document.querySelector('script[src="./theme.js"], script[src="theme.js"]')) {
+    const themeScript = document.createElement('script');
+    themeScript.src = './theme.js';
+    themeScript.defer = true;
+    document.body.appendChild(themeScript);
+  }
 })();
