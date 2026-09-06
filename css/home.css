@@ -36,11 +36,11 @@
 .feature-link:hover { text-decoration:underline; }
 
 /* Home About preview */
-.home-about-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(220px,.65fr); gap:18px; margin-top:22px; }
-.home-about-card { padding:22px; border:1px solid var(--line); border-radius:12px; background:var(--panel); }
+.home-about-grid { display:grid; grid-template-columns:1fr; gap:18px; margin-top:22px; }
+.home-about-card { width:100%; box-sizing:border-box; padding:22px; border:1px solid var(--line); border-radius:12px; background:var(--panel); }
 .home-about-card h3 { margin:0 0 10px; font-size:18px; }
 .home-about-card p { margin:0; color:var(--muted); font-size:13px; line-height:1.7; }
 .home-about-link { display:inline-flex; margin-top:16px; min-height:42px; align-items:center; padding:0 15px; border:1px solid var(--accent); border-radius:8px; color:var(--accent); text-decoration:none; font:700 10px 'Fira Code',monospace; text-transform:uppercase; }
 
-@media(max-width:900px){ .hero{grid-template-columns:1fr}.hero-art{order:-1;transform:scale(.82);transform-origin:center}.stats{grid-template-columns:1fr 1fr}.feature-showcase{grid-template-columns:1fr 1fr}.home-about-grid{grid-template-columns:1fr} }
-@media(max-width:600px){ .hero{padding:35px 20px}.hero h1{font-size:58px}.hero p{font-size:16px}.hero-art{transform:scale(.72)}.stats{grid-template-columns:1fr}.stat{border-right:0;border-bottom:1px solid var(--line)}.feature-showcase{grid-template-columns:1fr}.home-about-grid{grid-template-columns:1fr} }
+@media(max-width:900px){ .hero{grid-template-columns:1fr}.hero-art{order:-1;transform:scale(.82);transform-origin:center}.stats{grid-template-columns:1fr 1fr}.feature-showcase{grid-template-columns:1fr 1fr}.home-about-grid{display:flex!important;flex-direction:column!important;grid-template-columns:none!important;width:100%!important;gap:18px!important}.home-about-card{width:100%!important;max-width:none!important} }
+@media(max-width:600px){ .hero{padding:35px 20px}.hero h1{font-size:58px}.hero p{font-size:16px}.hero-art{transform:scale(.72)}.stats{grid-template-columns:1fr}.stat{border-right:0;border-bottom:1px solid var(--line)}.feature-showcase{grid-template-columns:1fr}.home-about-grid{display:flex!important;flex-direction:column!important;gap:16px!important}.home-about-card{width:100%!important;padding:20px!important}.home-about-card h3{font-size:20px!important}.home-about-card p{font-size:15px!important;line-height:1.7!important} }
