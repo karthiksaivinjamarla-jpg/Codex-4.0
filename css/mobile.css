@@ -25,7 +25,7 @@ button,a,input,select,textarea{touch-action:manipulation}
 .brand{min-width:0!important;flex:1 1 auto!important;gap:8px!important;overflow:hidden}
 .brand-mark,.brand-mark .brand-logo{width:38px!important;height:38px!important;flex:0 0 38px!important}
 .site-header .codex-header-logo{width:34px!important;height:34px!important;flex-basis:34px!important}
-.brand-title{font-size:17px!important;line-height:1.1!important}.brand-sub{display:none!important}
+.brand-title{font-size:17px!important;line-height:1.1!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.brand-sub{display:none!important}
 .nav{display:none!important}.top-nav{display:none!important}
 .mobile-menu-toggle{display:inline-flex!important;flex:0 0 42px;width:42px;height:42px;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--text);font:700 18px 'Fira Code',monospace;cursor:pointer}
 .mobile-menu-toggle[aria-expanded=true]{color:var(--accent);border-color:var(--accent)}
@@ -46,24 +46,261 @@ button,a,input,select,textarea{touch-action:manipulation}
 .admin-header{min-height:70px!important;padding:42px 14px 10px!important;gap:8px!important}.admin-shell{padding:28px 12px 55px!important}.page-heading{align-items:flex-start!important;flex-direction:column!important;gap:10px!important}.page-heading h1{font-size:29px!important}.toolbar{flex-direction:column!important}.toolbar select{min-height:44px!important;width:100%!important}.search-box{min-height:44px!important}.stats-grid{grid-template-columns:1fr 1fr!important}.stat-card{padding:14px!important}.stat-card strong{font-size:24px!important}.modal{padding:10px!important}.modal-card{max-height:94vh!important;padding:20px 14px!important;border-radius:11px!important}.detail-grid,.member-list{grid-template-columns:1fr!important}.receipt-box,.detail-actions{flex-direction:column!important;align-items:stretch!important}
 .home-about{padding-top:24px!important}.home-about .section-title{max-width:760px}.home-about-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(220px,.65fr);gap:18px;margin-top:22px}.home-about-card{padding:22px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}.home-about-card h3{margin:0 0 10px;font-size:18px}.home-about-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.7}.home-about-link{display:inline-flex;margin-top:16px;min-height:42px;align-items:center;padding:0 15px;border:1px solid var(--accent);border-radius:8px;color:var(--accent);text-decoration:none;font:700 10px 'Fira Code',monospace;text-transform:uppercase}
 
-/* Mobile registration header: keep branding independent from the action controls. */
-body:has(.registration-wrap) .site-header{min-height:128px!important;padding-top:48px!important}
-body:has(.registration-wrap) .site-header .header-inner{position:relative!important;display:block!important;min-height:80px!important;height:80px!important;padding:8px 14px!important;gap:0!important}
-body:has(.registration-wrap) .site-header .codex-header-logo{position:absolute!important;left:14px!important;top:9px!important;width:32px!important;height:32px!important;flex:0 0 32px!important}
-body:has(.registration-wrap) .site-header .brand{position:absolute!important;left:54px!important;right:14px!important;top:7px!important;display:flex!important;min-width:0!important;width:auto!important;height:42px!important;gap:8px!important;overflow:visible!important;z-index:2!important}
+}
+
+@media(max-width:900px){
+/* Mobile registration header: clean CSS grid layout ensuring no overlap across 320px-900px */
+body:has(.registration-wrap) .site-header,
+body:has(.register-page) .site-header {
+  min-height: auto !important;
+  height: auto !important;
+  padding-top: 0 !important;
+}
+
+body:has(.registration-wrap) .site-header .header-inner,
+body:has(.register-page) .site-header .header-inner {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto auto !important;
+  grid-template-rows: auto auto !important;
+  align-items: center !important;
+  column-gap: 8px !important;
+  row-gap: 6px !important;
+  min-height: 74px !important;
+  height: auto !important;
+  padding: 10px 14px !important;
+  position: relative !important;
+}
+
+body:has(.registration-wrap) .site-header .codex-header-logo,
+body:has(.register-page) .site-header .codex-header-logo {
+  grid-column: 1 !important;
+  grid-row: 1 / span 2 !important;
+  align-self: center !important;
+  width: 34px !important;
+  height: 34px !important;
+  flex: 0 0 34px !important;
+  margin: 0 !important;
+  position: static !important;
+  display: block !important;
+}
+
+body:has(.registration-wrap) .site-header .brand,
+body:has(.register-page) .site-header .brand {
+  grid-column: 2 !important;
+  grid-row: 1 / span 2 !important;
+  align-self: center !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-width: 0 !important;
+  width: auto !important;
+  position: static !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: auto !important;
+}
+
 body:has(.registration-wrap) .site-header .brand-mark,
-body:has(.registration-wrap) .site-header .brand-mark .brand-logo{width:34px!important;height:34px!important;flex:0 0 34px!important}
-body:has(.registration-wrap) .site-header .brand>span:last-child{display:block!important;min-width:0!important;flex:1 1 auto!important;overflow:visible!important}
-body:has(.registration-wrap) .site-header .brand-title{display:block!important;width:max-content!important;max-width:none!important;font-size:15px!important;line-height:1.05!important;letter-spacing:-.5px!important;white-space:nowrap!important;overflow:visible!important}
-body:has(.registration-wrap) .site-header .brand-title span{display:inline!important;white-space:nowrap!important}
-body:has(.registration-wrap) .site-header .brand-sub{display:none!important}
-body:has(.registration-wrap) .site-header .nav{position:absolute!important;right:58px!important;top:47px!important;display:block!important;margin:0!important;width:auto!important;height:38px!important;z-index:4!important}
-body:has(.registration-wrap) .site-header .nav>a:not(:first-child){display:none!important}
-body:has(.registration-wrap) .site-header .nav>a:first-child{display:inline-flex!important;position:static!important;min-height:38px!important;height:38px!important;padding:8px 10px!important;white-space:nowrap!important;justify-content:center!important;align-items:center!important;font:900 9px 'Fira Code',monospace!important;text-transform:uppercase!important;text-decoration:none!important;border-radius:7px!important;margin:0!important;background:var(--accent)!important;color:#041008!important}
-body:has(.registration-wrap) .site-header .sign-out-btn{position:absolute!important;right:58px!important;top:7px!important;min-height:38px!important;height:38px!important;padding:8px 10px!important;white-space:nowrap!important;font-size:9px!important;margin:0!important;z-index:5!important}
-body:has(.registration-wrap) .site-header .mobile-menu-toggle{position:absolute!important;right:14px!important;top:47px!important;width:40px!important;height:38px!important;flex:0 0 40px!important;z-index:6!important}
-body:has(.registration-wrap) .site-header .theme-switch{position:absolute!important;left:auto!important;right:14px!important;top:7px!important;transform:none!important;width:40px!important;height:38px!important;z-index:3!important}
-body:has(.registration-wrap) .site-header .theme-switch .theme-toggle-single{width:32px!important;height:32px!important;min-width:32px!important;font-size:16px!important}
+body:has(.registration-wrap) .site-header .brand-mark .brand-logo,
+body:has(.register-page) .site-header .brand-mark,
+body:has(.register-page) .site-header .brand-mark .brand-logo {
+  width: 34px !important;
+  height: 34px !important;
+  flex: 0 0 34px !important;
+}
+
+body:has(.registration-wrap) .site-header .brand > span:last-child,
+body:has(.register-page) .site-header .brand > span:last-child {
+  display: block !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  overflow: hidden !important;
+}
+
+body:has(.registration-wrap) .site-header .brand-title,
+body:has(.register-page) .site-header .brand-title {
+  display: block !important;
+  width: auto !important;
+  max-width: 100% !important;
+  font-size: 15px !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.5px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body:has(.registration-wrap) .site-header .brand-title span,
+body:has(.register-page) .site-header .brand-title span {
+  display: inline !important;
+  white-space: nowrap !important;
+}
+
+body:has(.registration-wrap) .site-header .brand-sub,
+body:has(.register-page) .site-header .brand-sub {
+  display: none !important;
+}
+
+body:has(.registration-wrap) .site-header .nav,
+body:has(.registration-wrap) .site-header .top-nav,
+body:has(.register-page) .site-header .nav,
+body:has(.register-page) .site-header .top-nav {
+  display: none !important;
+}
+
+body:has(.registration-wrap) .site-header .sign-out-btn,
+body:has(.register-page) .site-header .sign-out-btn {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  position: static !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  padding: 5px 9px !important;
+  white-space: nowrap !important;
+  font-size: 9px !important;
+  border-radius: 7px !important;
+  margin: 0 !important;
+  align-self: center !important;
+  z-index: 1 !important;
+}
+
+body:has(.registration-wrap) .site-header .theme-switch,
+body:has(.register-page) .site-header .theme-switch {
+  grid-column: 4 !important;
+  grid-row: 1 !important;
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  width: 36px !important;
+  height: 32px !important;
+  min-width: 36px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  align-self: center !important;
+  justify-self: end !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 1 !important;
+}
+
+body:has(.registration-wrap) .site-header .theme-switch .theme-toggle-single,
+body:has(.register-page) .site-header .theme-switch .theme-toggle-single {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  font-size: 15px !important;
+}
+
+body:has(.registration-wrap) .site-header .nav-cta,
+body:has(.register-page) .site-header .nav-cta {
+  grid-column: 3 !important;
+  grid-row: 2 !important;
+  position: static !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  padding: 5px 9px !important;
+  white-space: nowrap !important;
+  font: 900 9px 'Fira Code', monospace !important;
+  text-transform: uppercase !important;
+  text-decoration: none !important;
+  border-radius: 7px !important;
+  background: var(--accent) !important;
+  color: #fff !important;
+  border: 1px solid var(--accent) !important;
+  margin: 0 !important;
+  align-self: center !important;
+  z-index: 1 !important;
+}
+
+body:has(.registration-wrap):not(:has(.sign-out-btn)) .site-header .nav-cta,
+body:has(.register-page):not(:has(.sign-out-btn)) .site-header .nav-cta {
+  grid-row: 1 / span 2 !important;
+}
+
+body:has(.registration-wrap) .site-header .mobile-menu-toggle,
+body:has(.register-page) .site-header .mobile-menu-toggle {
+  grid-column: 4 !important;
+  grid-row: 2 !important;
+  position: static !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 32px !important;
+  min-width: 36px !important;
+  flex: 0 0 36px !important;
+  border-radius: 7px !important;
+  margin: 0 !important;
+  align-self: center !important;
+  justify-self: end !important;
+  font-size: 16px !important;
+  z-index: 1 !important;
+}
+
+body:has(.registration-wrap):not(:has(.sign-out-btn)) .site-header .mobile-menu-toggle,
+body:has(.register-page):not(:has(.sign-out-btn)) .site-header .mobile-menu-toggle {
+  grid-row: 2 !important;
+}
+
+@media(max-width:360px){
+  body:has(.registration-wrap) .site-header .header-inner,
+  body:has(.register-page) .site-header .header-inner {
+    padding: 8px 10px !important;
+    column-gap: 6px !important;
+    row-gap: 4px !important;
+  }
+  body:has(.registration-wrap) .site-header .codex-header-logo,
+  body:has(.register-page) .site-header .codex-header-logo {
+    width: 28px !important;
+    height: 28px !important;
+    flex-basis: 28px !important;
+  }
+  body:has(.registration-wrap) .site-header .brand-mark,
+  body:has(.registration-wrap) .site-header .brand-mark .brand-logo,
+  body:has(.register-page) .site-header .brand-mark,
+  body:has(.register-page) .site-header .brand-mark .brand-logo {
+    width: 28px !important;
+    height: 28px !important;
+    flex-basis: 28px !important;
+  }
+  body:has(.registration-wrap) .site-header .brand-title,
+  body:has(.register-page) .site-header .brand-title {
+    font-size: 13px !important;
+  }
+  body:has(.registration-wrap) .site-header .sign-out-btn,
+  body:has(.register-page) .site-header .sign-out-btn,
+  body:has(.registration-wrap) .site-header .nav-cta,
+  body:has(.register-page) .site-header .nav-cta {
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 4px 6px !important;
+    font-size: 8px !important;
+  }
+  body:has(.registration-wrap) .site-header .theme-switch,
+  body:has(.register-page) .site-header .theme-switch,
+  body:has(.registration-wrap) .site-header .mobile-menu-toggle,
+  body:has(.register-page) .site-header .mobile-menu-toggle {
+    width: 30px !important;
+    height: 28px !important;
+    min-width: 30px !important;
+    flex-basis: 30px !important;
+  }
+  body:has(.registration-wrap) .site-header .theme-switch .theme-toggle-single,
+  body:has(.register-page) .site-header .theme-switch .theme-toggle-single {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    font-size: 13px !important;
+  }
+}
 }
 @media(max-width:380px){.theme-switch .theme-toggle-single{width:32px!important;height:32px!important;min-width:32px!important;font-size:16px!important}.hero{padding-left:12px!important;padding-right:12px!important}.hero-actions{grid-template-columns:1fr!important}.hero-art{height:215px!important;min-height:215px!important}.laptop{transform:scale(.72)!important}.stats{margin-left:12px!important;margin-right:12px!important}.home-about-grid{grid-template-columns:1fr!important}}
 
