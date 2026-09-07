@@ -66,11 +66,33 @@
   }
 
   function setupBrandLogos() {
-    const header = document.querySelector('.site-header .header-inner'); const brand = header?.querySelector('.brand'); if (!header || !brand) return;
-    header.querySelectorAll('.codex-header-logo').forEach((logo) => logo.remove()); if (header.querySelector('.college-logo')) return;
-    const collegeLogo = document.createElement('img'); collegeLogo.src = `${rootPrefix}assets/college-logo.png`; collegeLogo.alt = 'G. Pulla Reddy Engineering College logo'; collegeLogo.className = 'codex-header-logo college-logo'; collegeLogo.loading = 'eager'; collegeLogo.decoding = 'async'; collegeLogo.onerror = () => { collegeLogo.style.display = 'none'; };
-    if (!document.getElementById('codex-logo-styles')) { const logoStyle = document.createElement('style'); logoStyle.id = 'codex-logo-styles'; logoStyle.textContent = `.codex-header-logo{width:40px;height:40px;object-fit:contain;flex:0 0 40px;display:block;filter:drop-shadow(0 4px 10px rgba(0,0,0,.25))}.codex-header-logo.college-logo{margin:0}.site-header .header-inner{align-items:center}.site-header .brand{align-items:center;min-height:42px}@media(max-width:900px){.codex-header-logo{width:34px;height:34px;flex-basis:34px}.site-header .brand{min-width:0}}`; document.head.appendChild(logoStyle); }
-    header.insertBefore(collegeLogo, brand);
+    document.querySelectorAll('.site-header .header-inner').forEach((header) => {
+      const brand = header.querySelector('.brand'); if (!brand) return;
+      let group = header.querySelector('.header-brand-group');
+      if (!group) {
+        group = document.createElement('div');
+        group.className = 'header-brand-group';
+        header.insertBefore(group, brand);
+        group.appendChild(brand);
+      }
+      group.querySelectorAll('.codex-header-logo:not(.college-logo)').forEach((el) => el.remove());
+      if (!group.querySelector('.codex-header-logo')) {
+        const collegeLogo = document.createElement('img');
+        collegeLogo.src = `${rootPrefix}assets/college-logo.png`;
+        collegeLogo.alt = 'G. Pulla Reddy Engineering College logo';
+        collegeLogo.className = 'codex-header-logo college-logo';
+        collegeLogo.loading = 'eager';
+        collegeLogo.decoding = 'async';
+        collegeLogo.onerror = () => { collegeLogo.style.display = 'none'; };
+        group.insertBefore(collegeLogo, brand);
+      }
+      if (!document.getElementById('codex-logo-styles')) {
+        const logoStyle = document.createElement('style');
+        logoStyle.id = 'codex-logo-styles';
+        logoStyle.textContent = `.site-header .header-inner{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important}.header-brand-group{display:inline-flex!important;flex-direction:row!important;align-items:center!important;gap:10px!important;flex:0 1 auto!important;min-width:0!important}.header-brand-group .brand{display:inline-flex!important;align-items:center!important;gap:8px!important;min-width:0!important}.site-header .codex-header-logo,.site-header .brand-mark,.site-header .brand-mark .brand-logo{width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;flex:0 0 40px!important;border-radius:8px!important;border:1px solid rgba(255,255,255,.12)!important;background:#0d0d0d!important;object-fit:contain!important;padding:3px!important;box-sizing:border-box!important;box-shadow:0 2px 6px rgba(0,0,0,.5)!important;display:flex!important;align-items:center!important;justify-content:center!important}body.light .site-header .codex-header-logo,body.light .site-header .brand-mark,body.light .site-header .brand-mark .brand-logo{background:#fff!important;border-color:rgba(13,13,13,.14)!important;box-shadow:0 2px 6px rgba(0,0,0,.08)!important}`;
+        document.head.appendChild(logoStyle);
+      }
+    });
   }
 
   function setupMobileNavigation() {
@@ -93,7 +115,7 @@
       switcher.innerHTML = ''; switcher.appendChild(button);
       const headerInner = document.querySelector('.site-header .header-inner');
       if (headerInner) { const nav = headerInner.querySelector('.nav, .top-nav'); if (nav) nav.insertAdjacentElement('afterend', switcher); else headerInner.appendChild(switcher); }
-      if (!document.getElementById('codex-theme-position-styles')) { const style = document.createElement('style'); style.id = 'codex-theme-position-styles'; style.textContent = `@media (min-width:901px){.site-header .header-inner{justify-content:flex-start!important}.site-header .header-inner>.nav{margin-left:auto!important}.site-header .header-inner>.theme-switch{position:static!important;top:auto!important;left:auto!important;right:auto!important;transform:none!important;margin:0 0 0 12px!important;flex:0 0 auto!important;z-index:210!important}}@media (max-width:900px){.site-header .header-inner>.theme-switch{position:fixed!important;top:10px!important;right:14px!important;left:auto!important;transform:none!important;margin:0!important;z-index:9999!important}}`; document.head.appendChild(style); }
+      if (!document.getElementById('codex-theme-position-styles')) { const style = document.createElement('style'); style.id = 'codex-theme-position-styles'; style.textContent = `@media (min-width:901px){.site-header .header-inner{justify-content:flex-start!important}.site-header .header-inner>.nav{margin-left:auto!important}.site-header .header-inner>.theme-switch{position:static!important;top:auto!important;left:auto!important;right:auto!important;transform:none!important;margin:0 0 0 12px!important;flex:0 0 auto!important;z-index:210!important}}@media (max-width:900px){.site-header .header-inner>.theme-switch{position:static!important;top:auto!important;left:auto!important;right:auto!important;transform:none!important;margin:0 0 0 auto!important;flex:0 0 auto!important;z-index:210!important}}`; document.head.appendChild(style); }
       switcher.dataset.singleToggleReady = 'true';
     });
     applyTheme(document.documentElement.dataset.theme || DEFAULT);

@@ -7,36 +7,246 @@ button,a,input,select,textarea{touch-action:manipulation}
 .theme-switch{display:flex!important;align-items:center;justify-content:center;width:44px;height:44px!important;padding:3px!important;border-radius:50%!important}
 .theme-switch .theme-toggle-single{width:36px!important;height:36px!important;min-width:36px!important;padding:0!important;display:grid!important;place-items:center!important;border:1px solid var(--line)!important;border-radius:50%!important;background:var(--panel2)!important;color:var(--text)!important;font:700 18px/1 'Inter',sans-serif!important;cursor:pointer!important;transition:transform .18s ease,background .18s ease,color .18s ease,border-color .18s ease!important}
 .theme-switch .theme-toggle-single:hover{transform:rotate(12deg) scale(1.04);border-color:var(--accent)!important;color:var(--accent)!important}
-.site-header .header-inner{align-items:center!important}
-.site-header .codex-header-logo{display:block!important;width:40px!important;height:40px!important;flex:0 0 40px!important;object-fit:contain!important;margin:0!important}
-.site-header .brand{display:flex!important;align-items:center!important;min-height:42px!important}
-.site-header .brand-mark{display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 42px!important;width:42px!important;height:42px!important}
-.site-header .brand-logo{display:block!important;width:42px!important;height:42px!important;object-fit:contain!important}
-.site-header .brand-mark{background:none!important;background-image:none!important;overflow:hidden!important;position:relative!important}
-.site-header .brand-mark::before{content:none!important;display:none!important;background:none!important}
-.site-header .brand-mark .brand-logo{position:relative!important;inset:auto!important;margin:0!important;transform:none!important;opacity:1!important}
-.site-header .codex-header-logo{position:relative!important;inset:auto!important;transform:none!important}
-.site-header .header-inner{gap:18px!important}
-.site-header .codex-header-logo + .brand{margin-left:0!important}
+/* Base Header: Single flex row with align-items: center */
+.site-header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 200 !important;
+  height: auto !important;
+  min-height: 64px !important;
+  padding-top: 0 !important;
+  background: color-mix(in srgb, var(--header) 95%, transparent) !important;
+  border-bottom: 1px solid var(--line) !important;
+  backdrop-filter: blur(18px) !important;
+}
+.site-header .header-inner {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+  padding: 10px clamp(12px, 1.8vw, 24px) !important;
+  gap: 12px !important;
+  box-sizing: border-box !important;
+}
+
+/* Left flex sub-group: college logo + coders club logo + title */
+.header-brand-group {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
+}
+.site-header .brand {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-width: 0 !important;
+  text-decoration: none !important;
+  color: var(--text) !important;
+}
+.site-header .brand-title {
+  display: block !important;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+.site-header .brand-sub {
+  display: block !important;
+  font-size: 8px !important;
+  color: var(--muted) !important;
+  letter-spacing: 1px !important;
+}
+
+/* Logos: 40px height with rounded dark borders blending into top bar */
+.site-header .codex-header-logo,
+.site-header .brand-mark,
+.site-header .brand-mark .brand-logo {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  flex: 0 0 40px !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background: #0d0d0d !important;
+  object-fit: contain !important;
+  padding: 3px !important;
+  box-sizing: border-box !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.site-header .brand-mark::before { content: none !important; display: none !important; }
+.site-header .brand-mark .brand-logo { border: 0 !important; padding: 0 !important; background: transparent !important; box-shadow: none !important; }
+body.light .site-header .codex-header-logo,
+body.light .site-header .brand-mark {
+  background: #ffffff !important;
+  border-color: rgba(13, 13, 13, 0.14) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+}
 
 @media(max-width:900px){
-.site-header{height:auto!important;min-height:76px!important;padding-top:48px!important}
-.header-inner{min-height:76px!important;height:auto!important;padding:10px 16px!important;gap:10px!important}
-.brand{min-width:0!important;flex:1 1 auto!important;gap:8px!important;overflow:hidden}
-.brand-mark,.brand-mark .brand-logo{width:38px!important;height:38px!important;flex:0 0 38px!important}
-.site-header .codex-header-logo{width:34px!important;height:34px!important;flex-basis:34px!important}
-.brand-title{font-size:17px!important;line-height:1.1!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.brand-sub{display:none!important}
-.nav{display:none!important}.top-nav{display:none!important}
-.mobile-menu-toggle{display:inline-flex!important;flex:0 0 42px;width:42px;height:42px;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--text);font:700 18px 'Fira Code',monospace;cursor:pointer}
-.mobile-menu-toggle[aria-expanded=true]{color:var(--accent);border-color:var(--accent)}
-.mobile-nav-panel{position:fixed;left:12px;right:12px;top:126px;z-index:250;display:none;padding:10px;background:color-mix(in srgb,var(--panel) 96%,transparent);border:1px solid var(--line);border-radius:12px;box-shadow:0 22px 60px rgba(0,0,0,.45);backdrop-filter:blur(18px)}
-.mobile-nav-panel.open{display:grid;gap:4px}.mobile-nav-panel a{display:flex;align-items:center;min-height:44px;padding:10px 12px;border-radius:8px;color:var(--text);text-decoration:none;font:700 11px 'Fira Code',monospace;text-transform:uppercase}.mobile-nav-panel a:hover,.mobile-nav-panel a.active{color:var(--accent);background:var(--soft)}.mobile-nav-panel .register-btn,.mobile-nav-panel .nav-cta{color:#fff!important;margin-top:4px}
-.theme-switch{top:8px!important;right:10px!important;left:auto!important;transform:none!important;width:40px!important;height:40px!important}.theme-switch .theme-toggle-single{width:34px!important;height:34px!important;min-width:34px!important;font-size:17px!important}
-.sign-out-btn{min-height:40px!important;padding:9px 10px!important;font-size:9px!important}
+  .site-header {
+    min-height: 64px !important;
+    padding-top: 0 !important;
+  }
+  .header-inner {
+    min-height: 64px !important;
+    height: auto !important;
+    padding: 10px 14px !important;
+    gap: 8px !important;
+  }
+  .site-header .brand-title {
+    font-size: 16px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .site-header .brand-sub { display: none !important; }
+  .nav, .top-nav { display: none !important; }
+  .mobile-menu-toggle {
+    display: inline-flex !important;
+    flex: 0 0 38px !important;
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 8px !important;
+    background: var(--panel2) !important;
+    color: var(--text) !important;
+    font: 700 18px 'Fira Code', monospace !important;
+    cursor: pointer !important;
+    margin: 0 !important;
+  }
+  .mobile-menu-toggle[aria-expanded=true] {
+    color: var(--accent) !important;
+    border-color: var(--accent) !important;
+  }
+  .mobile-nav-panel {
+    position: fixed !important;
+    left: 10px !important;
+    right: 10px !important;
+    top: 72px !important;
+    z-index: 999 !important;
+    display: none;
+    padding: 10px !important;
+    background: color-mix(in srgb, var(--panel) 97%, transparent) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 22px 60px rgba(0,0,0,.55) !important;
+    backdrop-filter: blur(20px) !important;
+    max-height: calc(100vh - 84px) !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+  }
+  .mobile-nav-panel.open {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+  .mobile-nav-panel a {
+    display: flex !important;
+    align-items: center !important;
+    min-height: 38px !important;
+    padding: 8px 10px !important;
+    border-radius: 8px !important;
+    background: var(--panel2) !important;
+    border: 1px solid var(--line) !important;
+    color: var(--text) !important;
+    text-decoration: none !important;
+    font: 700 10px 'Fira Code', monospace !important;
+    text-transform: uppercase !important;
+    letter-spacing: .2px !important;
+    transition: all .15s ease !important;
+  }
+  .mobile-nav-panel a:hover, .mobile-nav-panel a.active {
+    color: var(--accent) !important;
+    background: var(--soft) !important;
+    border-color: var(--accent) !important;
+  }
+  .mobile-nav-panel a[href*="index.html"]:first-child {
+    grid-column: 1/-1 !important;
+    background: var(--soft) !important;
+    border-color: color-mix(in srgb, var(--accent) 30%, transparent) !important;
+    color: var(--accent) !important;
+    font-weight: 800 !important;
+  }
+  .mobile-nav-panel a[href*="check-registration"] {
+    grid-column: 1/-1 !important;
+    background: var(--panel2) !important;
+  }
+  .mobile-nav-panel .register-btn, .mobile-nav-panel .nav-cta {
+    grid-column: 1/-1 !important;
+    min-height: 42px !important;
+    justify-content: center !important;
+    background: var(--accent) !important;
+    color: #fff !important;
+    font-size: 11px !important;
+    font-weight: 900 !important;
+    letter-spacing: .5px !important;
+    box-shadow: 0 4px 16px rgba(230,75,46,.35) !important;
+    margin-top: 2px !important;
+  }
+  .site-header .theme-switch {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    left: auto !important;
+    transform: none !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 0 0 auto !important;
+    flex: 0 0 36px !important;
+  }
+  .site-header .theme-switch .theme-toggle-single {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    font-size: 16px !important;
+  }
+  .site-header .sign-out-btn {
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 4px 8px !important;
+    font-size: 8.5px !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+  }
+  .site-header .nav-cta {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 5px 10px !important;
+    white-space: nowrap !important;
+    font: 900 9.5px 'Fira Code', monospace !important;
+    text-transform: uppercase !important;
+    text-decoration: none !important;
+    border-radius: 7px !important;
+    background: var(--accent) !important;
+    color: #fff !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+  }
 }
 
 @media(max-width:600px){
-.header-inner{min-height:70px!important;padding:8px 14px!important}.site-header{min-height:70px!important}.brand-mark,.brand-mark .brand-logo{width:34px!important;height:34px!important;flex-basis:34px!important}.site-header .codex-header-logo{width:32px!important;height:32px!important;flex-basis:32px!important}.brand-title{font-size:16px!important}.mobile-menu-toggle{width:40px;height:40px;flex-basis:40px}.mobile-nav-panel{top:112px;left:10px;right:10px}
+.header-inner{min-height:64px!important;padding:8px 12px!important}
 .section{padding:34px 14px!important}.section-title h2{font-size:clamp(26px,8vw,32px)!important;letter-spacing:-.6px!important}.section-title p{font-size:14px!important}.card,.info-box,.section-panel{padding:18px!important}footer,.footer{padding:22px 14px!important;font-size:10px!important}
 .hero{min-height:auto!important;padding:28px 14px 18px!important;display:flex!important;flex-direction:column!important;gap:10px!important;align-items:stretch!important}.hero-art{order:-1!important;min-height:235px!important;height:235px!important;width:100%!important;transform:none!important;overflow:hidden!important}.code-wall{inset:12px 8% 8px!important;opacity:.55!important}.code-wall:after{left:18px!important;top:20px!important;font-size:7px!important;line-height:1.8!important}.laptop{width:300px!important;height:180px!important;transform:scale(.82)!important}.screen{left:32px!important;width:236px!important;height:144px!important}.keyboard{width:300px!important}.base{left:37px!important;width:226px!important}.hero h1{font-size:clamp(48px,16vw,64px)!important;letter-spacing:-3px!important;line-height:.92!important;margin:10px 0 12px!important}.tagline{font-size:15px!important;line-height:1.45!important;letter-spacing:.7px!important}.hero p{font-size:15px!important;line-height:1.65!important;margin:14px 0!important}.prompt{font-size:10px!important;margin:12px 0!important}.hero-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}.hero-actions a{min-height:44px!important;padding:10px 8px!important;font-size:9px!important;text-align:center}
 .stats{margin:8px 14px 28px!important;padding:0!important;grid-template-columns:1fr!important;border-radius:10px!important}.stat{min-height:62px!important;padding:10px 14px!important;gap:10px!important}.stat:last-child{border-bottom:0!important}.stat strong{font-size:16px!important}.stat small{font-size:8px!important}.stat-icon{width:32px!important;height:32px!important}.final{margin:14px auto 34px!important;padding:0 14px!important}.final-box{padding:18px 14px!important;gap:14px!important}.final-box strong{font-size:10px!important;line-height:1.55!important}.final-box .register-btn{width:100%;min-height:44px}
@@ -48,266 +258,167 @@ button,a,input,select,textarea{touch-action:manipulation}
 
 }
 
-@media(max-width:900px){
-/* Mobile registration header: clean CSS grid layout ensuring no overlap across 320px-900px */
-body:has(.registration-wrap) .site-header,
-body:has(.register-page) .site-header {
-  min-height: auto !important;
-  height: auto !important;
-  padding-top: 0 !important;
-}
-
-body:has(.registration-wrap) .site-header .header-inner,
-body:has(.register-page) .site-header .header-inner {
-  display: grid !important;
-  grid-template-columns: auto minmax(0, 1fr) auto auto !important;
-  grid-template-rows: auto auto !important;
-  align-items: center !important;
-  column-gap: 8px !important;
-  row-gap: 6px !important;
-  min-height: 74px !important;
-  height: auto !important;
-  padding: 10px 14px !important;
-  position: relative !important;
-}
-
-body:has(.registration-wrap) .site-header .codex-header-logo,
-body:has(.register-page) .site-header .codex-header-logo {
-  grid-column: 1 !important;
-  grid-row: 1 / span 2 !important;
-  align-self: center !important;
-  width: 34px !important;
-  height: 34px !important;
-  flex: 0 0 34px !important;
-  margin: 0 !important;
-  position: static !important;
-  display: block !important;
-}
-
-body:has(.registration-wrap) .site-header .brand,
-body:has(.register-page) .site-header .brand {
-  grid-column: 2 !important;
-  grid-row: 1 / span 2 !important;
-  align-self: center !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  min-width: 0 !important;
-  width: auto !important;
-  position: static !important;
-  overflow: hidden !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  z-index: auto !important;
-}
-
-body:has(.registration-wrap) .site-header .brand-mark,
-body:has(.registration-wrap) .site-header .brand-mark .brand-logo,
-body:has(.register-page) .site-header .brand-mark,
-body:has(.register-page) .site-header .brand-mark .brand-logo {
-  width: 34px !important;
-  height: 34px !important;
-  flex: 0 0 34px !important;
-}
-
-body:has(.registration-wrap) .site-header .brand > span:last-child,
-body:has(.register-page) .site-header .brand > span:last-child {
-  display: block !important;
-  min-width: 0 !important;
-  flex: 1 1 auto !important;
-  overflow: hidden !important;
-}
-
-body:has(.registration-wrap) .site-header .brand-title,
-body:has(.register-page) .site-header .brand-title {
-  display: block !important;
-  width: auto !important;
-  max-width: 100% !important;
-  font-size: 15px !important;
-  line-height: 1.1 !important;
-  letter-spacing: -0.5px !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
-
-body:has(.registration-wrap) .site-header .brand-title span,
-body:has(.register-page) .site-header .brand-title span {
-  display: inline !important;
-  white-space: nowrap !important;
-}
-
-body:has(.registration-wrap) .site-header .brand-sub,
-body:has(.register-page) .site-header .brand-sub {
-  display: none !important;
-}
-
-body:has(.registration-wrap) .site-header .nav,
-body:has(.registration-wrap) .site-header .top-nav,
-body:has(.register-page) .site-header .nav,
-body:has(.register-page) .site-header .top-nav {
-  display: none !important;
-}
-
-body:has(.registration-wrap) .site-header .sign-out-btn,
-body:has(.register-page) .site-header .sign-out-btn {
-  grid-column: 3 !important;
-  grid-row: 1 !important;
-  position: static !important;
-  min-height: 32px !important;
-  height: 32px !important;
-  padding: 5px 9px !important;
-  white-space: nowrap !important;
-  font-size: 9px !important;
-  border-radius: 7px !important;
-  margin: 0 !important;
-  align-self: center !important;
-  z-index: 1 !important;
-}
-
-body:has(.registration-wrap) .site-header .theme-switch,
-body:has(.register-page) .site-header .theme-switch {
-  grid-column: 4 !important;
-  grid-row: 1 !important;
-  position: static !important;
-  top: auto !important;
-  right: auto !important;
-  left: auto !important;
-  bottom: auto !important;
-  transform: none !important;
-  width: 36px !important;
-  height: 32px !important;
-  min-width: 36px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  align-self: center !important;
-  justify-self: end !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  z-index: 1 !important;
-}
-
-body:has(.registration-wrap) .site-header .theme-switch .theme-toggle-single,
-body:has(.register-page) .site-header .theme-switch .theme-toggle-single {
-  width: 32px !important;
-  height: 32px !important;
-  min-width: 32px !important;
-  font-size: 15px !important;
-}
-
-body:has(.registration-wrap) .site-header .nav-cta,
-body:has(.register-page) .site-header .nav-cta {
-  grid-column: 3 !important;
-  grid-row: 2 !important;
-  position: static !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  min-height: 32px !important;
-  height: 32px !important;
-  padding: 5px 9px !important;
-  white-space: nowrap !important;
-  font: 900 9px 'Fira Code', monospace !important;
-  text-transform: uppercase !important;
-  text-decoration: none !important;
-  border-radius: 7px !important;
-  background: var(--accent) !important;
-  color: #fff !important;
-  border: 1px solid var(--accent) !important;
-  margin: 0 !important;
-  align-self: center !important;
-  z-index: 1 !important;
-}
-
-body:has(.registration-wrap):not(:has(.sign-out-btn)) .site-header .nav-cta,
-body:has(.register-page):not(:has(.sign-out-btn)) .site-header .nav-cta {
-  grid-row: 1 / span 2 !important;
-}
-
-body:has(.registration-wrap) .site-header .mobile-menu-toggle,
-body:has(.register-page) .site-header .mobile-menu-toggle {
-  grid-column: 4 !important;
-  grid-row: 2 !important;
-  position: static !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 36px !important;
-  height: 32px !important;
-  min-width: 36px !important;
-  flex: 0 0 36px !important;
-  border-radius: 7px !important;
-  margin: 0 !important;
-  align-self: center !important;
-  justify-self: end !important;
-  font-size: 16px !important;
-  z-index: 1 !important;
-}
-
-body:has(.registration-wrap):not(:has(.sign-out-btn)) .site-header .mobile-menu-toggle,
-body:has(.register-page):not(:has(.sign-out-btn)) .site-header .mobile-menu-toggle {
-  grid-row: 2 !important;
-}
-
-@media(max-width:360px){
-  body:has(.registration-wrap) .site-header .header-inner,
-  body:has(.register-page) .site-header .header-inner {
-    padding: 8px 10px !important;
-    column-gap: 6px !important;
-    row-gap: 4px !important;
-  }
-  body:has(.registration-wrap) .site-header .codex-header-logo,
-  body:has(.register-page) .site-header .codex-header-logo {
-    width: 28px !important;
-    height: 28px !important;
-    flex-basis: 28px !important;
-  }
-  body:has(.registration-wrap) .site-header .brand-mark,
-  body:has(.registration-wrap) .site-header .brand-mark .brand-logo,
-  body:has(.register-page) .site-header .brand-mark,
-  body:has(.register-page) .site-header .brand-mark .brand-logo {
-    width: 28px !important;
-    height: 28px !important;
-    flex-basis: 28px !important;
-  }
-  body:has(.registration-wrap) .site-header .brand-title,
-  body:has(.register-page) .site-header .brand-title {
-    font-size: 13px !important;
-  }
-  body:has(.registration-wrap) .site-header .sign-out-btn,
-  body:has(.register-page) .site-header .sign-out-btn,
-  body:has(.registration-wrap) .site-header .nav-cta,
-  body:has(.register-page) .site-header .nav-cta {
-    min-height: 28px !important;
-    height: 28px !important;
-    padding: 4px 6px !important;
-    font-size: 8px !important;
-  }
-  body:has(.registration-wrap) .site-header .theme-switch,
-  body:has(.register-page) .site-header .theme-switch,
-  body:has(.registration-wrap) .site-header .mobile-menu-toggle,
-  body:has(.register-page) .site-header .mobile-menu-toggle {
-    width: 30px !important;
-    height: 28px !important;
-    min-width: 30px !important;
-    flex-basis: 30px !important;
-  }
-  body:has(.registration-wrap) .site-header .theme-switch .theme-toggle-single,
-  body:has(.register-page) .site-header .theme-switch .theme-toggle-single {
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    font-size: 13px !important;
-  }
-}
-}
 @media(max-width:380px){.theme-switch .theme-toggle-single{width:32px!important;height:32px!important;min-width:32px!important;font-size:16px!important}.hero{padding-left:12px!important;padding-right:12px!important}.hero-actions{grid-template-columns:1fr!important}.hero-art{height:215px!important;min-height:215px!important}.laptop{transform:scale(.72)!important}.stats{margin-left:12px!important;margin-right:12px!important}.home-about-grid{grid-template-columns:1fr!important}}
 
 @media (min-width:901px){
-  .site-header .header-inner{align-items:center!important}
-  .site-header .codex-header-logo{width:42px!important;height:42px!important;flex:0 0 42px!important}
-  .site-header .brand{gap:10px!important;min-height:42px!important}
-  .site-header .brand-mark{width:42px!important;height:42px!important;flex:0 0 42px!important}
-  .site-header .brand-mark .brand-logo{width:42px!important;height:42px!important}
+  .site-header .header-inner{align-items:center!important;max-width:1400px!important;padding:10px clamp(12px,1.8vw,28px)!important;gap:clamp(8px,1.2vw,18px)!important}
+  .site-header .codex-header-logo{width:40px!important;height:40px!important;flex:0 0 40px!important}
+  .site-header .brand{min-width:0!important;flex:0 0 auto!important;gap:8px!important;min-height:40px!important}
+  .site-header .brand-mark{width:40px!important;height:40px!important;flex:0 0 40px!important}
+  .site-header .brand-mark .brand-logo{width:40px!important;height:40px!important}
+  .site-header .brand-title{font-size:18px!important;white-space:nowrap!important}
+  .site-header .nav{display:flex!important;align-items:center!important;gap:clamp(6px,1.1vw,18px)!important;margin-left:auto!important;flex-wrap:nowrap!important}
+  .site-header .nav a{font:700 clamp(9.5px,0.78vw,11px) 'Fira Code',monospace!important;letter-spacing:.1px!important;white-space:nowrap!important;padding:6px clamp(3px,0.4vw,6px)!important}
+  .site-header .nav .register-btn{padding:clamp(8px,0.7vw,11px) clamp(10px,1vw,15px)!important;font-size:clamp(9.5px,0.78vw,11px)!important;margin-left:2px!important}
+  .site-header .header-inner>.theme-switch{position:static!important;margin:0 0 0 8px!important;flex:0 0 auto!important;z-index:210!important}
 }
+@media (min-width:901px) and (max-width:1240px){
+  .site-header .brand-sub{display:none!important}
+}
+
+/* ==========================================================================
+   CODEX 4.0 - HEADER, NAVIGATION & INTERACTION ANIMATIONS
+   ========================================================================== */
+
+/* 1. Desktop Nav Link Glow & Animated Underline Indicator */
+.site-header .nav a {
+  position: relative;
+  transition: color 0.22s ease, transform 0.2s ease !important;
+}
+.site-header .nav a:not(.register-btn)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--accent);
+  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), left 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.site-header .nav a:not(.register-btn):hover::after,
+.site-header .nav a:not(.register-btn).active::after {
+  width: 100%;
+  left: 0;
+}
+.site-header .nav a:not(.register-btn):hover {
+  color: var(--accent) !important;
+  transform: translateY(-1px);
+}
+
+/* 2. Primary CTA Ambient Glow Pulse & Interactive Lift */
+@keyframes ctaPulseGlow {
+  0%, 100% {
+    box-shadow: 0 4px 14px rgba(230, 75, 46, 0.35);
+  }
+  50% {
+    box-shadow: 0 4px 22px rgba(230, 75, 46, 0.65), 0 0 12px rgba(230, 75, 46, 0.35);
+  }
+}
+.register-btn, .nav-cta {
+  animation: ctaPulseGlow 3.5s ease-in-out infinite !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
+}
+.register-btn:hover, .nav-cta:hover {
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 6px 24px rgba(230, 75, 46, 0.65) !important;
+}
+.register-btn:active, .nav-cta:active {
+  transform: translateY(0) scale(0.98) !important;
+}
+
+/* 3. Mobile Navigation Drawer Slide & Cascading Stagger */
+@keyframes mobileNavIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes mobileItemFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.mobile-nav-panel.open {
+  animation: mobileNavIn 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+.mobile-nav-panel.open a {
+  animation: mobileItemFade 0.22s ease forwards !important;
+}
+.mobile-nav-panel.open a:nth-child(1) { animation-delay: 0.02s; }
+.mobile-nav-panel.open a:nth-child(2) { animation-delay: 0.04s; }
+.mobile-nav-panel.open a:nth-child(3) { animation-delay: 0.06s; }
+.mobile-nav-panel.open a:nth-child(4) { animation-delay: 0.08s; }
+.mobile-nav-panel.open a:nth-child(5) { animation-delay: 0.10s; }
+.mobile-nav-panel.open a:nth-child(6) { animation-delay: 0.12s; }
+.mobile-nav-panel.open a:nth-child(7) { animation-delay: 0.14s; }
+.mobile-nav-panel.open a:nth-child(8) { animation-delay: 0.16s; }
+.mobile-nav-panel.open a:nth-child(9) { animation-delay: 0.18s; }
+.mobile-nav-panel.open a:nth-child(10) { animation-delay: 0.20s; }
+.mobile-nav-panel.open a:nth-child(11) { animation-delay: 0.22s; }
+
+.mobile-nav-panel a:active {
+  transform: scale(0.96) !important;
+}
+
+/* 4. Hamburger Toggle Rotation Animation */
+.mobile-menu-toggle {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background-color 0.2s ease !important;
+}
+.mobile-menu-toggle:active {
+  transform: scale(0.9) !important;
+}
+.mobile-menu-toggle[aria-expanded="true"] {
+  transform: rotate(90deg) !important;
+}
+
+/* 5. Theme Toggle Button Smooth Spin Micro-Interaction */
+.theme-switch .theme-toggle-single {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, color 0.2s ease, border-color 0.2s ease !important;
+}
+.theme-switch .theme-toggle-single:hover {
+  transform: rotate(25deg) scale(1.08) !important;
+}
+.theme-switch .theme-toggle-single:active {
+  transform: rotate(180deg) scale(0.92) !important;
+}
+
+/* 6. Brand Logo Interactive Glow */
+.site-header .brand:hover .brand-mark,
+.site-header .brand:hover .codex-header-logo {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 8px rgba(230, 75, 46, 0.45));
+}
+.site-header .brand-mark,
+.site-header .codex-header-logo {
+  transition: transform 0.25s ease, filter 0.25s ease !important;
+}
+
+/* 7. Accessibility - Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .site-header .nav a,
+  .site-header .nav a::after,
+  .register-btn,
+  .nav-cta,
+  .mobile-nav-panel.open,
+  .mobile-nav-panel.open a,
+  .mobile-menu-toggle,
+  .theme-switch .theme-toggle-single,
+  .site-header .brand-mark,
+  .site-header .codex-header-logo {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
